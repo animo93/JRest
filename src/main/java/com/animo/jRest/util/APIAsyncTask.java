@@ -1,11 +1,6 @@
 package com.animo.jRest.util;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,17 +13,21 @@ import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
 import java.net.Proxy;
 import java.net.URL;
-import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-	
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+
 
 public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Request>,APICall<Request,Response>>{
 
-	private static final Logger logger = Logger.getLogger(APIAsyncTask.class.getSimpleName());
+	private static final Logger logger = LogManager.getLogger(APIAsyncTask.class.getSimpleName());
 	private APICallBack<Request,Response> myCallBack;
 	private RequestBean<Request> bean;
 	private Type type;
@@ -56,7 +55,7 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 		APICall<Request,Response> myCall = new APICall<>();
 
 		try{
-			
+
 			URL url = new URL(bean.getUrl());
 			logger.debug("Going to make connection for "+url.toString());
 			if(bean.getProxy()!=null){
@@ -103,22 +102,22 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 				httpURLConnection.setRequestProperty("Authorization"," token " + bean.getAccessToken());
 
 			if(bean.getRequestType().toString().equals("POST") || bean.getRequestType().toString().equals("PATCH")){
-				
+
 				Request requestObject= bean.getRequestObject();
 				if(null!=requestObject){
-				String json = new Gson().toJson(requestObject,new TypeToken<Request>(){}.getType());
-				logger.debug("request json "+json);
-				/*System.out.println("request json "+json);*/
-				
-				OutputStream os = httpURLConnection.getOutputStream();
-				os.write(json.getBytes("UTF-8"));
-				os.close();
+					String json = new Gson().toJson(requestObject,new TypeToken<Request>(){}.getType());
+					logger.debug("request json "+json);
+					/*System.out.println("request json "+json);*/
+
+					OutputStream os = httpURLConnection.getOutputStream();
+					os.write(json.getBytes("UTF-8"));
+					os.close();
 				}
 			}
 			httpURLConnection.connect();
 
-		    logger.debug("response code "+httpURLConnection.getResponseCode());
-		    /*System.out.println("response code "+httpURLConnection.getResponseCode());*/
+			logger.debug("response code "+httpURLConnection.getResponseCode());
+			/*System.out.println("response code "+httpURLConnection.getResponseCode());*/
 			int status = httpURLConnection.getResponseCode();
 			myCall.setResponseCode(status);
 			InputStream inputStream;
@@ -141,7 +140,6 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 					repoJson = null;
 
 				repoJson = stringBuffer.toString();
-				System.out.println("repoJson"+repoJson);
 				inputStream.close();
 			}
 		} catch (Exception e) {
@@ -172,7 +170,7 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 				/*Class<? extends Type> s = type.getClass();*/
 				Class<?> t = (Class<?>) type;
 				Response res = (Response) mapper.readValue(repoJson, t);
-				
+
 				myCall.setResponseBody(res);
 				/*System.out.println(myCall.getResponseBody());*/
 			}

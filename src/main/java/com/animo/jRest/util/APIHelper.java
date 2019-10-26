@@ -15,7 +15,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.animo.jRest.annotation.Body;
 import com.animo.jRest.annotation.HEADERS;
@@ -35,7 +36,7 @@ public class APIHelper {
 	private RequestAuthentication auth;
 	private RequestProxy reqProxy;
 	private Map<String,String> headers;
-	private static Logger logger = Logger.getLogger("APIHelper");
+	private static Logger logger = LogManager.getLogger("APIHelper");
 
 	private APIHelper(APIBuilder builder){
 		this.baseURL = builder.baseURL;
@@ -174,7 +175,6 @@ public class APIHelper {
 
 				}
 				/*logger.debug("final Url ",urlBuilder.toString());*/
-				System.out.println("final Url "+urlBuilder.toString());
 				myRequestBean.setUrl(urlBuilder.toString());
 				//myRequestBean.setAccessToken((String) args[0]);
 				myRequestBean.setHeaders(headers);
