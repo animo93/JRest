@@ -1,4 +1,4 @@
-package com.animo.jRest;
+package com.animo.jRest.util;
 
 /**
  * @author animo

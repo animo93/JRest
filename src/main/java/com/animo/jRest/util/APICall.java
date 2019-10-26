@@ -1,4 +1,4 @@
-package com.animo.jRest;
+package com.animo.jRest.util;
 
 import java.lang.reflect.Type;
 
@@ -6,17 +6,17 @@ import java.lang.reflect.Type;
  * Created by animo on 21/12/17.
  */
 
-public class MyCall<Request,Response> {
+public class APICall<Request,Response> {
     private Response responseBody;
     private int responseCode;
-    private MyRequestBean<Request>  requestBean;
+    private RequestBean<Request>  requestBean;
     private Type type;
 
-    public MyRequestBean<Request> getRequestBean() {
+    public RequestBean<Request> getRequestBean() {
         return requestBean;
     }
 
-    public void setRequestBean(MyRequestBean<Request> requestBean) {
+    public void setRequestBean(RequestBean<Request> requestBean) {
         this.requestBean = requestBean;
     }
 
@@ -44,10 +44,15 @@ public class MyCall<Request,Response> {
         this.responseCode = responseCode;
     }
 
-    public void callMeNow(MyCallBack<Request,Response> callBack){
+    public APICall<Request,Response> callMeNow() throws Exception{
 
-        MyAsyncTask<Request,Response> asyncTask = new MyAsyncTask<>(requestBean,type,callBack);
-        asyncTask.execute(requestBean);
+        APIAsyncTask<Request,Response> asyncTask = new APIAsyncTask<>(requestBean,type);
+        return asyncTask.executeNow(requestBean);
+    }
+    
+    public void callMeLater(APICallBack<Request, Response> callBack) throws Exception {
+    	APIAsyncTask<Request,Response> asyncTask = new APIAsyncTask<>(requestBean,type);
+        asyncTask.executeLater(requestBean);
     }
 
 }

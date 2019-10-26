@@ -1,4 +1,4 @@
-package com.animo.jRest;
+package com.animo.jRest.util;
 
 import java.util.concurrent.Callable;
 

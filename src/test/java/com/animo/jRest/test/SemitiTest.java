@@ -1,19 +1,22 @@
 package com.animo.jRest.test;
 import java.util.Map;
 
-import com.animo.jRest.MyApiResponse;
-import com.animo.jRest.MyCall;
-import com.animo.jRest.MyCallBack;
+import com.animo.jRest.util.APIHelper;
+import com.animo.jRest.util.APICall;
+import com.animo.jRest.util.APICallBack;
 
 public class SemitiTest {
 	
-	public static void main(String args[]){
-		MyApiInterface myApiInterface = MyApiResponse.createApi(MyApiInterface.class);
-		MyCall<Void, Map<String, String>> call =  myApiInterface.testCall(null, "https://api.github.com/repos/animo93/gitA");
-		call.callMeNow(new MyCallBack<Void, Map<String,String>>() {
+	public static void main(String args[]) throws Exception{
+		APIHelper myApiHelper = APIHelper.APIBuilder
+				.builder("https://api.github.com/repos/animo93/gi")
+				.build();
+		MyApiInterface myApiInterface = myApiHelper.createApi(MyApiInterface.class);
+		APICall<Void, Map<String, String>> call =  myApiInterface.testCall();
+		call.callMeLater(new APICallBack<Void, Map<String,String>>() {
 			
 			@Override
-			public void callBackOnSuccess(MyCall<Void, Map<String, String>> myCall) {
+			public void callBackOnSuccess(APICall<Void, Map<String, String>> myCall) {
 				// TODO Auto-generated method stub
 				System.out.println(myCall.getResponseBody());
 				

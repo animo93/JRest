@@ -1,5 +1,5 @@
 package com.animo.jRest.test;
-import com.animo.jRest.AsyncTask;
+import com.animo.jRest.util.AsyncTask;
 
 /**
  * Created by animo on 20/12/17.
@@ -7,7 +7,7 @@ import com.animo.jRest.AsyncTask;
 
 public class MyAsyncTask{
 	
-	public static void main(String args[]){
+	public static void main(String args[]) throws Exception{
 		new AsyncTask<String, String>() {
 
 			@Override
@@ -34,7 +34,7 @@ public class MyAsyncTask{
 				
 			}
 
-		}.execute("World");
+		}.executeLater("World");
 		new AsyncTask<String, String>() {
 
 			@Override
@@ -61,7 +61,7 @@ public class MyAsyncTask{
 				
 			}
 
-		}.execute("World");
+		}.executeLater("World");
 		
 		new AsyncTask<String, String>() {
 
@@ -89,7 +89,7 @@ public class MyAsyncTask{
 				
 			}
 
-		}.execute("World");
+		}.executeLater("World");
 	}
 
 }

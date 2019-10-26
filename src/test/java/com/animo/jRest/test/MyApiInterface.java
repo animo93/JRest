@@ -2,10 +2,10 @@ package com.animo.jRest.test;
 
 import java.util.Map;
 
-import com.animo.jRest.HEADERS;
-import com.animo.jRest.HTTP_METHOD;
-import com.animo.jRest.MyCall;
-import com.animo.jRest.REQUEST;
+import com.animo.jRest.annotation.HEADERS;
+import com.animo.jRest.annotation.REQUEST;
+import com.animo.jRest.util.HTTP_METHOD;
+import com.animo.jRest.util.APICall;
 
 /**
  * Created by animo on 23/12/17.
@@ -13,8 +13,8 @@ import com.animo.jRest.REQUEST;
 
 public interface MyApiInterface {
 
-    @REQUEST(url = "",type = HTTP_METHOD.GET)
+    @REQUEST(endpoint = "",type = HTTP_METHOD.GET)
     @HEADERS("fasdfdasf:fdfasdfa")
-    MyCall<Void,Map<String, String>> testCall(String accessToken,String url);
+    APICall<Void,Map<String, String>> testCall();
 
 }
