@@ -15,6 +15,6 @@ public interface MyApiInterface {
 
     @REQUEST(endpoint = "",type = HTTP_METHOD.GET)
     @HEADERS("fasdfdasf:fdfasdfa")
-    APICall<Void,Map<String, String>> testCall();
+    APICall<Void,ApiResponse> testCall();
 
 }

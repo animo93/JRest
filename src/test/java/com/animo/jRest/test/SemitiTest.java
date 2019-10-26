@@ -12,13 +12,13 @@ public class SemitiTest {
 				.builder("https://api.github.com/repos/animo93/gi")
 				.build();
 		MyApiInterface myApiInterface = myApiHelper.createApi(MyApiInterface.class);
-		APICall<Void, Map<String, String>> call =  myApiInterface.testCall();
-		call.callMeLater(new APICallBack<Void, Map<String,String>>() {
+		APICall<Void, ApiResponse> call =  myApiInterface.testCall();
+		call.callMeLater(new APICallBack<Void, ApiResponse>() {
 			
 			@Override
-			public void callBackOnSuccess(APICall<Void, Map<String, String>> myCall) {
+			public void callBackOnSuccess(APICall<Void, ApiResponse> myCall) {
 				// TODO Auto-generated method stub
-				System.out.println(myCall.getResponseBody());
+				System.out.println(myCall.getResponseBody().getDocumentation_url());
 				
 			}
 			
