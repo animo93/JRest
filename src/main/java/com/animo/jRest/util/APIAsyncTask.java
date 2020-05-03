@@ -27,7 +27,7 @@ import com.google.gson.reflect.TypeToken;
 
 public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Request>,APICall<Request,Response>>{
 
-	private static final Logger logger = LogManager.getLogger(APIAsyncTask.class.getSimpleName());
+	private static final Logger logger = LogManager.getLogger(APIAsyncTask.class);
 	private APICallBack<Request,Response> myCallBack;
 	private RequestBean<Request> bean;
 	private Type type;
@@ -165,7 +165,7 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 				//Response response = gson.fromJson(repoJson, type);
 				logger.debug("repoJson "+repoJson);
 				/*System.out.println("repJson:"+repoJson);*/
-				logger.debug("type "+type.getClass());
+				logger.debug("Response type "+type);
 				ObjectMapper mapper = new ObjectMapper();
 				/*Class<? extends Type> s = type.getClass();*/
 				Class<?> t = (Class<?>) type;
