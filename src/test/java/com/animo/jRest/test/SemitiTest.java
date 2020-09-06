@@ -9,16 +9,17 @@ public class SemitiTest {
 	
 	public static void main(String args[]) throws Exception{
 		APIHelper myApiHelper = APIHelper.APIBuilder
-				.builder("https://api.github.com/repos/animo93/gi")
+				.builder("https://www.alphavantage.co")
 				.build();
 		MyApiInterface myApiInterface = myApiHelper.createApi(MyApiInterface.class);
-		APICall<Void, ApiResponse> call =  myApiInterface.testCall();
+		APICall<Void, ApiResponse> call =  myApiInterface.testCall("TIME_SERIES_DAILY","INFY","E474DCABHZ30APVR");
 		call.callMeLater(new APICallBack<Void, ApiResponse>() {
 			
 			@Override
 			public void callBackOnSuccess(APICall<Void, ApiResponse> myCall) {
 				// TODO Auto-generated method stub
-				System.out.println(myCall.getResponseBody().getDocumentation_url());
+				System.out.println(myCall.getResponseBody().getMetaData());
+				
 				
 			}
 			

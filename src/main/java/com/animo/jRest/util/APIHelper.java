@@ -3,6 +3,7 @@ package com.animo.jRest.util;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
@@ -36,7 +37,7 @@ public class APIHelper {
 	private RequestAuthentication auth;
 	private RequestProxy reqProxy;
 	private Map<String,String> headers;
-	private static Logger logger = LogManager.getLogger("APIHelper");
+	private static Logger logger = LogManager.getLogger(APIHelper.class);
 
 	private APIHelper(APIBuilder builder){
 		this.baseURL = builder.baseURL;
@@ -70,7 +71,7 @@ public class APIHelper {
 			}
 			params.put(key, value);
 			return this;
-			
+
 		}
 
 		public APIBuilder addAllParameters(Map<String,String> params){
@@ -124,8 +125,13 @@ public class APIHelper {
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 				Annotation requestAnnotation = method.getAnnotation(REQUEST.class);
+				Annotation[][] att=method.getParameterAnnotations();
+				Class[] parameterTypes = method.getParameterTypes();
+
+
 				Annotation headersAnnotation = method.getAnnotation(HEADERS.class);
 				REQUEST request = (REQUEST) requestAnnotation;
+				//Annotation t=att[0][0];
 				if(request == null){
 					throw new Exception("No Request Annotation found");
 				}
@@ -133,40 +139,81 @@ public class APIHelper {
 				RequestBean<Object> myRequestBean = new RequestBean<>();
 				StringBuilder urlBuilder = new StringBuilder(baseURL);
 				urlBuilder.append(request.endpoint());
-				
-				/*List<Object> argsAsList = Arrays.asList(args);*/
-				
-				
-				try{
-					if(args!=null){
-						List<Object> argsAsList = Arrays.asList(args);
-						
-						if(argsAsList!=null && !argsAsList.isEmpty()){
-							Map<String, String> map =argsAsList.stream()
-									.filter(v -> (v.getClass().getAnnotation(PATH.class))!=null)
-									.collect(Collectors.toMap(v -> "{"+v.getClass().getAnnotation(PATH.class).value().toString()+"}", v -> v.toString()));
 
-							if(map!=null && !map.isEmpty()){
-								map.forEach((k,v) -> {
-									Pattern pattern = Pattern.compile(k);
-									Matcher matcher = pattern.matcher(urlBuilder);
-									int start =0;
-									while(matcher.find(start)){
-										urlBuilder.replace(matcher.start(), matcher.end(), v);
-										start = matcher.start() + v.length();
+				Parameter[] parameters = method.getParameters();
+
+				addPathParameters(args, urlBuilder, parameters);
+
+				addQueryParameters(urlBuilder);
+
+
+				logger.debug("final Url ",urlBuilder.toString());
+				myRequestBean.setUrl(urlBuilder.toString());
+
+				myRequestBean.setHeaders(headers);
+				myRequestBean.setAuthentication(auth);
+				myRequestBean.setProxy(reqProxy);
+				myRequestBean.setRequestType(request.type());
+
+				addRequestBody(args, att, parameterTypes, request, myRequestBean);
+
+
+				Class<?> clazz = APICall.class;
+				Object object = clazz.newInstance();
+				APICall<Object, ?> myCall = (APICall<Object, ?>) object;
+				myCall.setRequestBean(myRequestBean);
+				Type type =  method.getGenericReturnType();
+				if(type instanceof ParameterizedType){
+					ParameterizedType pType = (ParameterizedType) type;
+					for(Type t:pType.getActualTypeArguments()){
+						myCall.setType(t);	
+					}
+				}
+				else
+					myCall.setType(type);
+
+				return myCall;
+
+			}
+
+			private void addRequestBody(Object[] args, Annotation[][] att, Class[] parameterTypes, REQUEST request,
+					RequestBean<Object> myRequestBean) throws Exception {
+				if(request.type().equals(HTTP_METHOD.POST) ||
+						request.type().equals(HTTP_METHOD.PATCH) ||
+						request.type().equals(HTTP_METHOD.PUT)){
+					int i=0;
+					for(Annotation[] annotations : att){
+						Class parameterType = parameterTypes[i++];
+
+						for(Annotation annotation : annotations){
+							if(annotation instanceof Body){
+								Body myAnnotation = (Body) annotation;
+								logger.debug("param: " , parameterType.getName());
+
+								if(args!=null){
+									List<Object> argsAsList = Arrays.asList(args);
+									logger.debug("argsASList :",argsAsList);
+									if(argsAsList!=null && argsAsList.size()>0){
+										argsAsList.forEach(arg -> {
+											if(arg.getClass().equals(parameterType)){
+												myRequestBean.setRequestObject(arg);
+											}
+										});
 									}
-								});
+								}
 							}
-						}else {
-							logger.info("No Path Arguments found");
-							throw new Exception("No Path Arguments found");
 						}
 					}
-				}catch (Exception e){
-					logger.error("Unable to form url from Path Parameters",e);
-					throw e;
+					//Commenting this out , since some post requests can be made without a body
+					/*if(myRequestBean.getRequestObject()==null){
+						logger.error("No request body found");
+						throw new Exception("No request body found");
+					}*/
+
 				}
-				
+			}
+
+			private void addQueryParameters(StringBuilder urlBuilder) {
 				if(params!=null && params.size()>0){
 					urlBuilder.append("?");
 					params.forEach((k,v) -> {
@@ -174,49 +221,30 @@ public class APIHelper {
 					});
 
 				}
-				/*logger.debug("final Url ",urlBuilder.toString());*/
-				myRequestBean.setUrl(urlBuilder.toString());
-				//myRequestBean.setAccessToken((String) args[0]);
-				myRequestBean.setHeaders(headers);
-				myRequestBean.setAuthentication(auth);
-				myRequestBean.setProxy(reqProxy);
-				myRequestBean.setRequestType(request.type());
-				if(request.type().equals(HTTP_METHOD.POST) ||
-						request.type().equals(HTTP_METHOD.PATCH)){
-					if(args!=null){
-						List<Object> argsAsList = Arrays.asList(args);
-					
-					if(argsAsList!=null && argsAsList.size()>0){
-						argsAsList.forEach(v -> {
-							if((v.getClass().getAnnotation(Body.class))!=null){
-								myRequestBean.setRequestObject(v);
-							}
-						});
-					}
-					else{
-						logger.info("No request body found");
-						throw new Exception("No request body found");
-					}
-					}
-				}
-				//Type returnType = method.getGenericReturnType();
-				Class<?> clazz = APICall.class;
-				Object object = clazz.newInstance();
-				APICall<Object, ?> apiCall = (APICall<Object, ?>) object;
-				apiCall.setRequestBean(myRequestBean);
-				Type type =  method.getGenericReturnType();
-				if(type instanceof ParameterizedType){
-					ParameterizedType pType = (ParameterizedType) type;
-					for(Type t:pType.getActualTypeArguments()){
-						apiCall.setType(t);
-					}
-				}
-				else
-					apiCall.setType(type);
-
-				return apiCall;
 			}
-			
+
+			private void addPathParameters(Object[] args, StringBuilder urlBuilder, Parameter[] parameters)
+					throws Exception {
+				for(int i=0;i<parameters.length;i++){
+					if(parameters[i].getAnnotation(PATH.class)!=null){
+						PATH path = (PATH) parameters[i].getAnnotation(PATH.class);
+						String value = path.value();
+						Pattern pattern = Pattern.compile("\\{"+value+"\\}");
+						Matcher matcher = pattern.matcher(urlBuilder);
+						int start =0;
+						while(matcher.find(start)){
+							urlBuilder.replace(matcher.start(), matcher.end(), String.valueOf(args[i]));
+							start = matcher.start() + String.valueOf(args[i]).length();
+						}
+					}
+				}
+
+				if(urlBuilder.toString().contains("{") &&
+						urlBuilder.toString().contains("}")){
+					throw new Exception("Undeclared PATH variable found ..Please declare them in the interface");
+				}
+			}
+
 		});
 
 		return (S) object;

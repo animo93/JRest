@@ -1,29 +1,28 @@
 package com.animo.jRest.test;
 
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ApiResponse {
 	
-	@JsonProperty(value="message")
-	private String message;
-	@JsonProperty(value="documentation_url")
-	private String documentation_url;
-	
-	
-
-	public String getMessage() {
-		return message;
+	@JsonProperty(value="Meta Data")
+	private Map<String, String> metaData;
+	@JsonProperty(value="Time Series (Daily)")
+	private Map<String, Map<String,String>> timeSeriesDaily;
+	public Map<String, String> getMetaData() {
+		return metaData;
 	}
-	public void setMessage(String message) {
-		this.message = message;
+	public void setMetaData(Map<String, String> metaData) {
+		this.metaData = metaData;
 	}
-	public String getDocumentation_url() {
-		return documentation_url;
+	public Map<String, Map<String, String>> getTimeSeriesDaily() {
+		return timeSeriesDaily;
 	}
-	public void setDocumentation_url(String documentation_url) {
-		this.documentation_url = documentation_url;
+	public void setTimeSeriesDaily(Map<String, Map<String, String>> timeSeriesDaily) {
+		this.timeSeriesDaily = timeSeriesDaily;
 	}
-	
 	
 	
 }
