@@ -20,6 +20,10 @@ import java.net.Proxy;
 import java.net.URL;
 import java.util.Map.Entry;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -58,7 +62,22 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 		BufferedReader reader = null;
 		String repoJson = null;
 		APICall<Request,Response> myCall = new APICall<>();
+		
+		if(bean.isDisableSSLVerification()) {
+			myCall=httpsConnection();
+		}else {
+			myCall=httpConnection();
+		}
 
+		return myCall;
+	}
+
+	private APICall<Request, Response> httpConnection() throws Exception {
+		HttpURLConnection httpURLConnection = null;
+		BufferedReader reader = null;
+		String repoJson = null;
+		APICall<Request,Response> myCall = new APICall<>();
+		
 		try{
 
 			URL url = new URL(bean.getUrl());
@@ -155,6 +174,154 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 		} finally {
 			if (httpURLConnection != null)
 				httpURLConnection.disconnect();
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					logger.error("error in closing conn", e);
+					throw e;
+				}
+			}
+		}
+
+		Gson gson = new Gson();
+		try{
+			if(repoJson!=null){
+				/*String repo=repoJson.replace("-", "");*/
+				//Response response = gson.fromJson(repoJson, type);
+				logger.debug("repoJson "+repoJson);
+				/*System.out.println("repJson:"+repoJson);*/
+				
+				if(!outputIsJson(repoJson)) {
+					myCall.setResponseBody((Response) repoJson);
+				}else {
+					logger.debug("type "+type.getClass());
+					ObjectMapper mapper = new ObjectMapper();
+					Class<?> t = type2Class(type);
+					Response res = (Response) mapper.readValue(repoJson, t);
+
+					myCall.setResponseBody(res);
+				}
+				
+			}
+		}catch(Exception e){
+			logger.error("Error in json conversion ",e);
+			throw e;
+		}
+
+		return myCall;
+	}
+
+	private APICall<Request, Response> httpsConnection() throws Exception {
+		HttpsURLConnection httpsURLConnection = null;
+		BufferedReader reader = null;
+		String repoJson = null;
+		APICall<Request,Response> myCall = new APICall<>();
+		
+		try{
+
+			URL url = new URL(bean.getUrl());
+			logger.debug("Going to make connection for "+url.toString());
+			if(bean.getProxy()!=null){
+				logger.debug("proxy "+bean.getProxy());
+				if(bean.getProxy().getUrl()!=null){
+					Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(
+							bean.getProxy().getUrl(), bean.getProxy().getPort()));
+					if(bean.getProxy().getUsername()!=null && bean.getProxy().getPassword()!=null){
+						Authenticator auth = new Authenticator() {
+							public PasswordAuthentication getPasswordAuthentication(){
+								return(new PasswordAuthentication(
+										bean.getProxy().getUsername(),bean.getProxy().getPassword().toCharArray()));
+							}
+						};
+						Authenticator.setDefault(auth);
+					}
+					httpsURLConnection = (HttpsURLConnection) url.openConnection(proxy);
+				}
+
+			}else{
+				httpsURLConnection = (HttpsURLConnection) url.openConnection();
+			}
+			
+			//Install all -trusting host verifier ...Very risky , never use in prod
+			httpsURLConnection.setHostnameVerifier(new HostnameVerifier() {
+				public boolean verify(String hostname,SSLSession session) {
+					logger.debug("Hostname is "+hostname);
+					return true;
+				}
+			});
+
+			httpsURLConnection.setRequestMethod(bean.getRequestType().toString());
+			httpsURLConnection.setRequestProperty("Content-Type","application/json");
+			if(bean.getHeaders()!=null && !bean.getHeaders().isEmpty()){
+				for(Entry<String, String> entry:bean.getHeaders().entrySet()){
+					httpsURLConnection.setRequestProperty(entry.getKey(), entry.getValue());
+				}
+			}
+
+			if(bean.getAuthentication()!=null){
+				RequestAuthentication auth = bean.getAuthentication();
+				if(auth.getUsername()!=null && auth.getPassword()!=null){
+					String userPassword = auth.getUsername()+":"+auth.getPassword();
+					String encodedAuthorization = Base64.encodeBase64String(userPassword.getBytes());
+					httpsURLConnection.setRequestProperty("Authorization", "Basic "+
+							encodedAuthorization.replaceAll("\n","")); 
+				}
+			}
+
+
+			if(bean.getAccessToken()!=null)
+				httpsURLConnection.setRequestProperty("Authorization"," token " + bean.getAccessToken());
+
+			if(bean.getRequestType().toString().equals("POST") || bean.getRequestType().toString().equals("PATCH") 
+					|| bean.getRequestType().toString().equals("PUT")){
+
+				Request requestObject= bean.getRequestObject();
+				if(null!=requestObject){
+					String json = new Gson().toJson(requestObject,new TypeToken<Request>(){}.getType());
+					logger.debug("request json "+json);
+					/*System.out.println("request json "+json);*/
+					httpsURLConnection.setDoOutput(true);
+
+					OutputStream os = httpsURLConnection.getOutputStream();
+					os.write(json.getBytes("UTF-8"));
+					os.close();
+				}
+			}
+			httpsURLConnection.connect();
+
+			logger.debug("response code "+httpsURLConnection.getResponseCode());
+			/*System.out.println("response code "+httpURLConnection.getResponseCode());*/
+			int status = httpsURLConnection.getResponseCode();
+			myCall.setResponseCode(status);
+			InputStream inputStream;
+			if(status!=HttpURLConnection.HTTP_OK && status!=HttpURLConnection.HTTP_CREATED)
+				inputStream = httpsURLConnection.getErrorStream();
+			else{
+				inputStream = httpsURLConnection.getInputStream();
+			}
+			StringBuffer stringBuffer = new StringBuffer();
+			if (inputStream == null)
+				repoJson = null;
+			else{
+				reader = new BufferedReader(new InputStreamReader(inputStream));
+
+				String line;
+				while ((line = reader.readLine()) != null) {
+					stringBuffer.append(line + "\n");
+				}
+				if (stringBuffer.length() == 0)
+					repoJson = null;
+
+				repoJson = stringBuffer.toString();
+				inputStream.close();
+			}
+		} catch (Exception e) {
+			logger.error("Could not make connection ",e);
+			throw e;
+		} finally {
+			if (httpsURLConnection != null)
+				httpsURLConnection.disconnect();
 			if (reader != null) {
 				try {
 					reader.close();

@@ -11,6 +11,14 @@ public class RequestBean<T> {
 	private RequestAuthentication authentication;
 	private RequestProxy proxy;
 	private Map<String, String> headers;
+	private boolean disableSSLVerification;
+	
+	public boolean isDisableSSLVerification() {
+		return disableSSLVerification;
+	}
+	public void setDisableSSLVerification(boolean disableSSLVerification) {
+		this.disableSSLVerification = disableSSLVerification;
+	}
 	public String getAccessToken() {
 		return accessToken;
 	}

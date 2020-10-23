@@ -37,6 +37,7 @@ public class APIHelper {
 	private RequestAuthentication auth;
 	private RequestProxy reqProxy;
 	private Map<String,String> headers;
+	private boolean disableSSLVerification;
 	private static Logger logger = LogManager.getLogger(APIHelper.class);
 
 	private APIHelper(APIBuilder builder){
@@ -45,6 +46,7 @@ public class APIHelper {
 		this.auth = builder.auth;
 		this.reqProxy = builder.proxy;
 		this.headers= builder.headers;
+		this.disableSSLVerification = builder.disableSSLVerification;
 	}
 
 
@@ -55,6 +57,7 @@ public class APIHelper {
 		private Map<String,String> params;
 		private RequestAuthentication auth;
 		private RequestProxy proxy;
+		private boolean disableSSLVerification;
 
 		public APIBuilder(String baseURL){
 			this.baseURL = baseURL;
@@ -108,6 +111,11 @@ public class APIHelper {
 			this.headers.putAll(headers);
 			return this;
 		}
+		
+		public APIBuilder setDisableSSLVerification(boolean disableSSLVerification) {
+			this.disableSSLVerification = disableSSLVerification;
+			return this;
+		}
 
 		public APIHelper build(){
 			return new APIHelper(this);
@@ -154,6 +162,7 @@ public class APIHelper {
 				myRequestBean.setAuthentication(auth);
 				myRequestBean.setProxy(reqProxy);
 				myRequestBean.setRequestType(request.type());
+				myRequestBean.setDisableSSLVerification(disableSSLVerification);
 
 				addRequestBody(args, att, parameterTypes, request, myRequestBean);
 
