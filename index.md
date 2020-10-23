@@ -1,8 +1,18 @@
-## Welcome to GitHub Pages
+## Introduction
 
-You can use the [editor on GitHub](https://github.com/animo93/JRest/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+JRest provides an opportunity to create an API contract via a Java Interface
+```
+public interface MyApiInterface {
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+    @REQUEST(endpoint = "/query",type = HTTP_METHOD.GET)
+    @HEADERS("Content_type:application/json")
+    APICall<Void,ApiResponse> testCall(@PATH(value = "function") String function,
+			@PATH(value = "symbol") String symbol,
+			@PATH(value = "apikey") String apiKey);
+   
+
+}
+```
 
 ### Markdown
 
