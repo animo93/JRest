@@ -4,14 +4,24 @@ JRest provides an opportunity to create an API contract via a Java Interface
 ```
 public interface MyApiInterface {
 
-    @REQUEST(endpoint = "/query",type = HTTP_METHOD.GET)
-    @HEADERS("Content_type:application/json")
-    APICall<Void,ApiResponse> testCall(@PATH(value = "function") String function,
-			@PATH(value = "symbol") String symbol,
-			@PATH(value = "apikey") String apiKey);
+    @REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
+    APICall<Void,ApiResponse> listRepos(@PATH(value = "user") String user);
    
 
 }
+```
+The `ApiHelper` can be used to build an implementation of the `MyApiInterface`
+```
+APIHelper myApiHelper = APIHelper.APIBuilder
+				.builder("https://api.github.com/")
+				.build();
+MyApiInterface myApiInterface = myApiHelper.createApi(MyApiInterface.class);
+```
+
+Next `APICall` needs to be called to instantiate the API call
+
+```
+APICall<Void, ApiResponse> call =  myApiInterface.listRepos("test");
 ```
 
 ### Markdown
