@@ -1,4 +1,4 @@
-## Introduction
+# Introduction
 
 JRest provides an opportunity to create an API contract via a Java Interface
 ```
@@ -24,34 +24,57 @@ Next `APICall` needs to be called to instantiate the API call
 APICall<Void, ApiResponse> call =  myApiInterface.listRepos("test");
 ```
 
-### Markdown
+One can either make a Synchronous or Asynchronous call via `APICallBack`
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+### Synchronous Call
+```
+APICall<Void, ApiResponse> response = call.callMeNow()
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+### Asynchronous Call
+```
+call.callMeLater(new APICallBack<Void, ApiResponse>() {
+			
+			@Override
+			public void callBackOnSuccess(APICall<Void, ApiResponse> myCall) {
+				System.out.println(myCall.getResponseCode());		
+				
+			}
+			
+			@Override
+			public void callBackOnFailure(Exception e) {
+				System.out.println("error");
+				e.printStackTrace();
+				
+			}
+		});
+```
+Use annotations to describe the HTTP request:
+ 1. URL parameter replacement
+ 2. Object conversion to request body
+ 
+# API Declaration
+ Annotations on the interface methods and its parameters indicate how a request will be handled.
+ 
+### REQUEST METHOD
+Every method must have an `REQUEST` annotation that provides the request method and relative URL. The relative URL of the resource is specified in the annotation via `endpoint` and Request type can be specified by the `type` attribute
+```
+ @REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
+```
 
-### Jekyll Themes
+### URL MANIPULATION
+A request URL can be updated dynamically using replacement blocks and parameters on the method. A replacement block is an alphanumeric string surrounded by { and }.
+```
+@REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
+    APICall<Void,ApiResponse> listRepos(@PATH(value = "user") String user);
+```
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/animo93/JRest/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+### REQUEST BODY
+An object can be specified for use as an HTTP request body with the @Body annotation.
 
-### Support or Contact
+```
+@REQUEST(endpoint = "/users/new",type = HTTP_METHOD.POST)
+APICall<Void,String> createUser(@Body User user);
+```
+The Object would be converted via Google Gson into the required JSON data while posting
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
