@@ -1,5 +1,6 @@
 # JRest
 A Java Rest Client developed on the lines of HttpUrlConnection
+
 For more information please visit [the website][1].
 
 License
