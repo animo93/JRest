@@ -28,7 +28,18 @@ import com.animo.jRest.annotation.REQUEST;
 
 
 /**
- * Created by animo on 23/12/17.
+ * Helper method which is used for initializing and building the initial API request.
+ * <p>It adapts a Java Interface to HTTP calls by using annotation on the declared method. Instances can be created
+ * by passing the builder method to generate an implementation.<p>
+ * For example :-
+ * <pre><code>
+ * APIHelper myApiHelper = APIHelper.APIBuilder
+ *			.builder("https://api.github.com/")
+ *			.build();
+ * MyApiInterface myApiInterface = myApiHelper.createApi(MyApiInterface.class);
+ * </code></pre>
+ * 
+ * @author animo
  */
 
 public class APIHelper {
@@ -85,7 +96,13 @@ public class APIHelper {
 			this.params.putAll(params);
 			return this;
 		}
-
+		
+		/**
+		 * Username and Password used for making REST calls via Basic authentication
+		 * @param username
+		 * @param password
+		 * @return
+		 */
 		public APIBuilder addUsernameAndPassword(String username,String password){
 			if(this.auth == null){
 				this.auth = new RequestAuthentication();
@@ -94,6 +111,15 @@ public class APIHelper {
 			this.auth.setPassword(password);
 			return this;
 		}
+		
+		/**
+		 * Proxy details used while building the APICall , if the client is behind any Proxy 
+		 * @param proxyURL
+		 * @param username
+		 * @param password
+		 * @param port
+		 * @return
+		 */
 
 		public APIBuilder addProxy(String proxyURL , String username, String password , int port){
 			if(this.proxy ==null){
@@ -113,6 +139,13 @@ public class APIHelper {
 			return this;
 		}
 		
+		/**
+		 * Disable any certificates or Hostname verification checks used for making HTTPS calls .
+		 * <p>Avoid using this in Production setting
+		 * @param disableSSLVerification
+		 * @return
+		 */
+		
 		public APIBuilder setDisableSSLVerification(boolean disableSSLVerification) {
 			this.disableSSLVerification = disableSSLVerification;
 			return this;
@@ -123,7 +156,36 @@ public class APIHelper {
 		}
 
 	}
-
+	
+	/**
+	 * Create an implementation of the API endpoints defined by the {@code service} interface.
+	 * <p>The relative path for a given method is obtained from an annotation on the method describing
+     * the request type.The built in methods are {@link com.animo.jRest.util.HTTP_METHOD.GET GET},
+     * {@link com.animo.jRest.util.HTTP_METHOD.PUT PUT} ,{@link com.animo.jRest.util.HTTP_METHOD.POST POST},
+     * {@link com.animo.jRest.util.HTTP_METHOD.PATCH PATCH} , {@link com.animo.jRest.util.HTTP_METHOD.DELETE DELETE}
+     * 
+     * <p>Method parameters can be used to replace parts of the URL by annotating them with {@link
+     * com.animo.jRest.annotation.Path @Path}. Replacement sections are denoted by an identifier surrounded by
+     * curly braces (e.g., "{foo}").
+     * 
+     * <p>The body of a request is denoted by the {@link com.animo.jRest.annotation.Body @Body} annotation.
+     * The body would be converted to JSON via Google GSON
+     * 
+     * <p>By default, methods return a {@link com.animo.jRest.util.APICall APICall} which represents the HTTP request. The generic
+     * parameter of the call is the response body type and will be converted by Jackson Object Mapper
+     * 
+     * <p>For example :
+     * <pre><code>
+     * public interface MyApiInterface {
+	 *
+     *	&#64;REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
+     *	APICall<Void,ApiResponse> listRepos(@PATH(value = "user") String user);
+     *
+     *}</code></pre>
+     * 
+	 * @param service.class
+	 * @return {@code service}
+	 */
 	@SuppressWarnings("unchecked")
 	public <S> S createApi(Class<S> clazz){
 		ClassLoader loader = clazz.getClassLoader();

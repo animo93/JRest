@@ -5,7 +5,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by animo on 21/12/17.
+ * An invocation of a APIHelper method that sends a request to a webserver and returns a response.
+ * Each call yields its own HTTP request and response pair
+ * 
+ * <p>Calls may be executed synchronously with {@link #callMeNow}, or asynchronously with {@link
+ * #callMeLater}. 
+ * 
+ * @author animo
+ *
+ * @param <Request>
+ * @param <Response>
  */
 
 public class APICall<Request,Response> {
@@ -54,13 +63,25 @@ public class APICall<Request,Response> {
     public void setResponseCode(int responseCode) {
         this.responseCode = responseCode;
     }
-
+    
+    /**
+     * Synchronous implementation of {@link com.animo.jRest.util.APICall APICall} , which invokes a blocking call to webserver
+     * . And waits for the APICall to complete
+     * @return {@code APICall}
+     * @throws Exception
+     */
     public APICall<Request,Response> callMeNow() throws Exception{
 
         APIAsyncTask<Request,Response> asyncTask = new APIAsyncTask<>(requestBean,type);
         return asyncTask.executeNow(requestBean);
     }
     
+    /**
+     * Asynchronous implementation of {@link com.animo.jRest.util.APICall APICall} , which invokes a non-blocking call to webserver
+     * . It accepts {@link com.animo.jRest.util.APICallBack APICallBack} as a parameter
+     * @param callBack
+     * @throws Exception
+     */
     public void callMeLater(APICallBack<Request, Response> callBack) throws Exception {
     	APIAsyncTask<Request,Response> asyncTask = new APIAsyncTask<>(requestBean,type,callBack);
         asyncTask.executeLater(requestBean);
