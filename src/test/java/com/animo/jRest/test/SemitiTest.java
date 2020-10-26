@@ -1,25 +1,32 @@
 package com.animo.jRest.test;
-import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import com.animo.jRest.util.APIHelper;
+import org.junit.Assert;
+import org.junit.Test;
+
 import com.animo.jRest.util.APICall;
 import com.animo.jRest.util.APICallBack;
+import com.animo.jRest.util.APIHelper;
 
 public class SemitiTest {
 	
-	public static void main(String args[]) throws Exception{
+	@Test
+	public void testFollowRedirectsFalse() throws Exception {
+
 		APIHelper myApiHelper = APIHelper.APIBuilder
-				.builder("https://www.alphavantage.co")
+				.builder("https://picsum.photos/200/300")
 				.build();
-		MyApiInterface myApiInterface = myApiHelper.createApi(MyApiInterface.class);
-		APICall<Void, ApiResponse> call =  myApiInterface.testCall("TIME_SERIES_DAILY","INFY","E474DCABHZ30APVR");
-		call.callMeLater(new APICallBack<Void, ApiResponse>() {
+		TestApiInterface myApiInterface = myApiHelper.createApi(TestApiInterface.class);
+		APICall<Void, String> call =  myApiInterface.testFollowRedirectFalse();
+		//int[] responseCode= {0};
+
+		AtomicInteger responseCode = new AtomicInteger();
+		call.callMeLater(new APICallBack<Void, String>() {
 			
 			@Override
-			public void callBackOnSuccess(APICall<Void, ApiResponse> myCall) {
-				// TODO Auto-generated method stub
-				System.out.println(myCall.getResponseBody().getMetaData());
-				
+			public void callBackOnSuccess(APICall<Void, String> myCall) {
+				System.out.println(myCall.getResponseCode());
+				responseCode.set(myCall.getResponseCode());		
 				
 			}
 			
@@ -31,6 +38,75 @@ public class SemitiTest {
 				
 			}
 		});
+		Thread.sleep(10000);
+		Assert.assertEquals(302, responseCode.intValue());
+	
+	}
+	
+	@Test
+	public void testFollowRedirectsTrue() throws Exception {
+
+		APIHelper myApiHelper = APIHelper.APIBuilder
+				.builder("https://picsum.photos/200/300")
+				.build();
+		TestApiInterface myApiInterface = myApiHelper.createApi(TestApiInterface.class);
+		APICall<Void, String> call =  myApiInterface.testFollowRedirectTrue();
+		//int[] responseCode= {0};
+
+		AtomicInteger responseCode = new AtomicInteger();
+		call.callMeLater(new APICallBack<Void, String>() {
+			
+			@Override
+			public void callBackOnSuccess(APICall<Void, String> myCall) {
+				System.out.println(myCall.getResponseCode());
+				responseCode.set(myCall.getResponseCode());		
+				
+			}
+			
+			@Override
+			public void callBackOnFailure(Exception e) {
+				// TODO Auto-generated method stub
+				System.out.println("error");
+				e.printStackTrace();
+				
+			}
+		});
+		Thread.sleep(10000);
+		Assert.assertEquals(200, responseCode.intValue());
+	
+	}
+	
+	@Test
+	public void testFollowRedirectsNone() throws Exception {
+
+		APIHelper myApiHelper = APIHelper.APIBuilder
+				.builder("https://picsum.photos/200/300")
+				.build();
+		TestApiInterface myApiInterface = myApiHelper.createApi(TestApiInterface.class);
+		APICall<Void, String> call =  myApiInterface.testFollowRedirectNone();
+		//int[] responseCode= {0};
+
+		AtomicInteger responseCode = new AtomicInteger();
+		call.callMeLater(new APICallBack<Void, String>() {
+			
+			@Override
+			public void callBackOnSuccess(APICall<Void, String> myCall) {
+				System.out.println(myCall.getResponseCode());
+				responseCode.set(myCall.getResponseCode());		
+				
+			}
+			
+			@Override
+			public void callBackOnFailure(Exception e) {
+				// TODO Auto-generated method stub
+				System.out.println("error");
+				e.printStackTrace();
+				
+			}
+		});
+		Thread.sleep(10000);
+		Assert.assertEquals(200, responseCode.intValue());
+	
 	}
 
 }

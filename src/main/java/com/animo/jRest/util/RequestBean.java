@@ -12,7 +12,16 @@ public class RequestBean<T> {
 	private RequestProxy proxy;
 	private Map<String, String> headers;
 	private boolean disableSSLVerification;
+	private boolean followRedirects = true;
 	
+	
+	
+	public boolean isFollowRedirects() {
+		return followRedirects;
+	}
+	public void setFollowRedirects(boolean followRedirects) {
+		this.followRedirects = followRedirects;
+	}
 	public boolean isDisableSSLVerification() {
 		return disableSSLVerification;
 	}

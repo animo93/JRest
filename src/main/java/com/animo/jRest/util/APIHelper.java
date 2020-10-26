@@ -20,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.animo.jRest.annotation.Body;
+import com.animo.jRest.annotation.FollowRedirects;
 import com.animo.jRest.annotation.HEADERS;
 import com.animo.jRest.annotation.PATH;
 import com.animo.jRest.annotation.REQUEST;
@@ -138,6 +139,11 @@ public class APIHelper {
 
 
 				Annotation headersAnnotation = method.getAnnotation(HEADERS.class);
+				
+				FollowRedirects followRedirectsAnnotation = method.getAnnotation(FollowRedirects.class);
+				
+				
+				
 				REQUEST request = (REQUEST) requestAnnotation;
 				//Annotation t=att[0][0];
 				if(request == null){
@@ -165,6 +171,10 @@ public class APIHelper {
 				myRequestBean.setDisableSSLVerification(disableSSLVerification);
 
 				addRequestBody(args, att, parameterTypes, request, myRequestBean);
+				
+				if(followRedirectsAnnotation!=null)
+					myRequestBean.setFollowRedirects(followRedirectsAnnotation.value());
+				
 
 
 				Class<?> clazz = APICall.class;

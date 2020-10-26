@@ -1,6 +1,8 @@
 package com.animo.jRest.util;
 
 import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by animo on 21/12/17.
@@ -10,9 +12,18 @@ public class APICall<Request,Response> {
     private Response responseBody;
     private int responseCode;
     private RequestBean<Request>  requestBean;
+    private Map<String, List<String>> responseHeaders;
     private Type type;
 
-    public RequestBean<Request> getRequestBean() {
+    public Map<String, List<String>> getResponseHeaders() {
+		return responseHeaders;
+	}
+
+	public void setResponseHeaders(Map<String, List<String>> responseHeaders) {
+		this.responseHeaders = responseHeaders;
+	}
+
+	public RequestBean<Request> getRequestBean() {
         return requestBean;
     }
 
