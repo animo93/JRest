@@ -7,15 +7,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Adds headers literally supplied in the {@code value}.
+ * Adds headers dynamically via parameters , literally supplied via a Map<String,String>
  *
  * <pre><code>
- * &#64;Headers("Cache-Control: max-age=640000")
- *
- * &#64;Headers({
- *   "X-Foo: Bar",
- *   "X-Ping: Pong"
- * })
+ * 
+ * &#64;REQUEST(endpoint = "/get",type=HTTP_METHOD.GET)
+	APICall<Void,Map<String,Object>> getSingleParamHeadersCall(@HEADER Map<String, String> header);
  * </code></pre>
  *
  * @author animo
@@ -23,7 +20,6 @@ import java.lang.annotation.Target;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface HEADERS {
-	String[] value();
+@Target(ElementType.PARAMETER)
+public @interface HEADER {
 }

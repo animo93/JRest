@@ -21,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.animo.jRest.annotation.Body;
 import com.animo.jRest.annotation.FollowRedirects;
+import com.animo.jRest.annotation.HEADER;
 import com.animo.jRest.annotation.HEADERS;
 import com.animo.jRest.annotation.PATH;
 import com.animo.jRest.annotation.REQUEST;
@@ -48,7 +49,6 @@ public class APIHelper {
 	private Map<String,String> params;
 	private RequestAuthentication auth;
 	private RequestProxy reqProxy;
-	private Map<String,String> headers;
 	private boolean disableSSLVerification;
 	private static Logger logger = LogManager.getLogger(APIHelper.class);
 
@@ -57,14 +57,12 @@ public class APIHelper {
 		this.params = builder.params;
 		this.auth = builder.auth;
 		this.reqProxy = builder.proxy;
-		this.headers= builder.headers;
 		this.disableSSLVerification = builder.disableSSLVerification;
 	}
 
 
 
 	public static class APIBuilder{
-		private Map<String, String> headers;
 		private String baseURL;
 		private Map<String,String> params;
 		private RequestAuthentication auth;
@@ -96,7 +94,7 @@ public class APIHelper {
 			this.params.putAll(params);
 			return this;
 		}
-		
+
 		/**
 		 * Username and Password used for making REST calls via Basic authentication
 		 * @param username
@@ -111,7 +109,7 @@ public class APIHelper {
 			this.auth.setPassword(password);
 			return this;
 		}
-		
+
 		/**
 		 * Proxy details used while building the APICall , if the client is behind any Proxy 
 		 * @param proxyURL
@@ -131,21 +129,15 @@ public class APIHelper {
 			this.proxy.setPort(port);
 			return this;
 		}
-		public APIBuilder addHeaders(Map<String, String> headers){
-			if(this.headers ==null){
-				this.headers= new HashMap<String, String>();
-			}
-			this.headers.putAll(headers);
-			return this;
-		}
-		
+
+
 		/**
 		 * Disable any certificates or Hostname verification checks used for making HTTPS calls .
 		 * <p>Avoid using this in Production setting
 		 * @param disableSSLVerification
 		 * @return
 		 */
-		
+
 		public APIBuilder setDisableSSLVerification(boolean disableSSLVerification) {
 			this.disableSSLVerification = disableSSLVerification;
 			return this;
@@ -156,33 +148,33 @@ public class APIHelper {
 		}
 
 	}
-	
+
 	/**
 	 * Create an implementation of the API endpoints defined by the {@code service} interface.
 	 * <p>The relative path for a given method is obtained from an annotation on the method describing
-     * the request type.The built in methods are {@link com.animo.jRest.util.HTTP_METHOD.GET GET},
-     * {@link com.animo.jRest.util.HTTP_METHOD.PUT PUT} ,{@link com.animo.jRest.util.HTTP_METHOD.POST POST},
-     * {@link com.animo.jRest.util.HTTP_METHOD.PATCH PATCH} , {@link com.animo.jRest.util.HTTP_METHOD.DELETE DELETE}
-     * 
-     * <p>Method parameters can be used to replace parts of the URL by annotating them with {@link
-     * com.animo.jRest.annotation.Path @Path}. Replacement sections are denoted by an identifier surrounded by
-     * curly braces (e.g., "{foo}").
-     * 
-     * <p>The body of a request is denoted by the {@link com.animo.jRest.annotation.Body @Body} annotation.
-     * The body would be converted to JSON via Google GSON
-     * 
-     * <p>By default, methods return a {@link com.animo.jRest.util.APICall APICall} which represents the HTTP request. The generic
-     * parameter of the call is the response body type and will be converted by Jackson Object Mapper
-     * 
-     * <p>For example :
-     * <pre><code>
-     * public interface MyApiInterface {
+	 * the request type.The built in methods are {@link com.animo.jRest.util.HTTP_METHOD.GET GET},
+	 * {@link com.animo.jRest.util.HTTP_METHOD.PUT PUT} ,{@link com.animo.jRest.util.HTTP_METHOD.POST POST},
+	 * {@link com.animo.jRest.util.HTTP_METHOD.PATCH PATCH} , {@link com.animo.jRest.util.HTTP_METHOD.DELETE DELETE}
+	 * 
+	 * <p>Method parameters can be used to replace parts of the URL by annotating them with {@link
+	 * com.animo.jRest.annotation.Path @Path}. Replacement sections are denoted by an identifier surrounded by
+	 * curly braces (e.g., "{foo}").
+	 * 
+	 * <p>The body of a request is denoted by the {@link com.animo.jRest.annotation.Body @Body} annotation.
+	 * The body would be converted to JSON via Google GSON
+	 * 
+	 * <p>By default, methods return a {@link com.animo.jRest.util.APICall APICall} which represents the HTTP request. The generic
+	 * parameter of the call is the response body type and will be converted by Jackson Object Mapper
+	 * 
+	 * <p>For example :
+	 * <pre><code>
+	 * public interface MyApiInterface {
 	 *
-     *	&#64;REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
-     *	APICall<Void,ApiResponse> listRepos(@PATH(value = "user") String user);
-     *
-     *}</code></pre>
-     * 
+	 *	&#64;REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
+	 *	APICall<Void,ApiResponse> listRepos(@PATH(value = "user") String user);
+	 *
+	 *}</code></pre>
+	 * 
 	 * @param service.class
 	 * @return {@code service}
 	 */
@@ -196,16 +188,16 @@ public class APIHelper {
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 				Annotation requestAnnotation = method.getAnnotation(REQUEST.class);
-				Annotation[][] att=method.getParameterAnnotations();
+				Annotation[][] parameterAnnotation=method.getParameterAnnotations();
 				Class[] parameterTypes = method.getParameterTypes();
 
 
 				Annotation headersAnnotation = method.getAnnotation(HEADERS.class);
-				
+
 				FollowRedirects followRedirectsAnnotation = method.getAnnotation(FollowRedirects.class);
-				
-				
-				
+
+
+
 				REQUEST request = (REQUEST) requestAnnotation;
 				//Annotation t=att[0][0];
 				if(request == null){
@@ -222,21 +214,23 @@ public class APIHelper {
 
 				addQueryParameters(urlBuilder);
 
+				addHeaders(myRequestBean,headersAnnotation,parameters,args);
 
-				logger.debug("final Url ",urlBuilder.toString());
+
+				logger.debug("final Url "+urlBuilder.toString());
 				myRequestBean.setUrl(urlBuilder.toString());
 
-				myRequestBean.setHeaders(headers);
+				
 				myRequestBean.setAuthentication(auth);
 				myRequestBean.setProxy(reqProxy);
 				myRequestBean.setRequestType(request.type());
 				myRequestBean.setDisableSSLVerification(disableSSLVerification);
 
-				addRequestBody(args, att, parameterTypes, request, myRequestBean);
-				
+				addRequestBody(args, parameterAnnotation, parameterTypes, request, myRequestBean);
+
 				if(followRedirectsAnnotation!=null)
 					myRequestBean.setFollowRedirects(followRedirectsAnnotation.value());
-				
+
 
 
 				Class<?> clazz = APICall.class;
@@ -255,6 +249,69 @@ public class APIHelper {
 
 				return myCall;
 
+			}
+
+			private void addHeaders(RequestBean<Object> myRequestBean, Annotation headersAnnotation, Parameter[] parameters, Object[] args) {
+				
+				HEADERS headers = (HEADERS) headersAnnotation;
+				String[] requestHeadersFromMethod = new String[] {};
+				Map<String,String> requestHeadersMap = new HashMap<String, String>();
+				if(headers!=null) {
+					requestHeadersFromMethod = headers.value();
+					
+					logger.debug("Request Headers from Method"+requestHeadersFromMethod);
+					requestHeadersMap = convertToHeadersMap(requestHeadersFromMethod);
+				}
+				
+				
+				Map<String, String> requestHeadersFromParam = getParamHeaders(parameters,args);
+				
+				//String[] requestHeaders = concatenateHeaders(requestHeadersFromMethod,requestHeadersFromParam);
+				
+				requestHeadersMap.putAll(requestHeadersFromParam);
+				
+				myRequestBean.setHeaders(requestHeadersMap);
+				
+			}
+
+			private String[] concatenateHeaders(String[] requestHeadersFromMethod, String[] requestHeadersFromParam) {
+				
+				String[] requestHeaders = new String[] {};
+				System.arraycopy(requestHeadersFromMethod, 0, requestHeaders, 0, requestHeadersFromParam.length);
+				System.arraycopy(requestHeadersFromParam, 0, requestHeaders, requestHeadersFromParam.length, requestHeadersFromParam.length);
+				
+				return requestHeaders;
+			}
+
+			private Map<String,String> getParamHeaders(Parameter[] parameters, Object[] args) {
+				Map<String,String> paramValues = new HashMap<String, String>();
+				try {
+					for(int i=0,j=0;i<parameters.length;i++) {
+						if(parameters[i].getAnnotation(HEADER.class)!=null) {
+							HEADER header = parameters[i].getAnnotation(HEADER.class);
+							paramValues = (Map<String,String>) args[i];
+						}
+					}
+				}catch (ClassCastException ex) {
+					logger.error("Unable to get ParamHeaders "+ex);
+					throw new RuntimeException("Header Parameters should be passed in Map<key:value> format ");
+				}
+				
+				
+				logger.debug("Request Headers from Params "+paramValues);
+				return paramValues;
+			}
+
+			private Map<String, String> convertToHeadersMap(String[] requestHeaders) {
+				Map<String,String> headersMap = new HashMap<String,String>();
+				for(String header:requestHeaders) {
+					if(!header.contains(":")) {
+						throw new RuntimeException("Header data invalid ...Should be using <key>:<value> String format "+header);
+					}
+					headersMap.put(header.split(":")[0], header.split(":")[1]);
+				}
+				logger.debug("Final Request Headers Map "+headersMap);
+				return headersMap;
 			}
 
 			private void addRequestBody(Object[] args, Annotation[][] att, Class[] parameterTypes, REQUEST request,
