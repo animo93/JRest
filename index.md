@@ -69,6 +69,32 @@ A request URL can be updated dynamically using replacement blocks and parameters
     APICall<Void,ApiResponse> listRepos(@PATH(value = "user") String user);
 ```
 
+### HEADER MANIPULATION
+Headers can be added to a API Method in a static manner via `HEADERS` annotation
+```
+@HEADERS("X-Foo:Bar")
+@REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
+    APICall<Void,ApiResponse> listRepos(@PATH(value = "user") String user);
+```
+Multiple Headers can also be set in a static manner via below 
+```
+@HEADERS({
+		"X-Foo:Bar",
+		"X-Ping:Pong"
+	})
+@REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
+    APICall<Void,ApiResponse> listRepos(@PATH(value = "user") String user);
+```
+
+A request Header can also be updated dynamically via the `HEADER` annotation set in the method Parameter
+```
+@HEADERS("X-Foo:Bar")
+@REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
+    APICall<Void,ApiResponse> listRepos(@PATH(value = "user") String user,@HEADER Map<String, String> header);
+```
+Note that the Headers parameters can only be used via a Map
+
+
 ### REQUEST BODY
 An object can be specified for use as an HTTP request body with the @Body annotation.
 
