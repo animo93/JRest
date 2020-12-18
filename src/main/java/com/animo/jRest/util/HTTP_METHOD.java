@@ -15,4 +15,3 @@ public enum HTTP_METHOD {
     HTTP_METHOD() {
     }
 }
-
