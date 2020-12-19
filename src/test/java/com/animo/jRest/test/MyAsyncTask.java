@@ -7,7 +7,7 @@ import com.animo.jRest.util.AsyncTask;
 
 public class MyAsyncTask{
 	
-	public static void main(String args[]) throws Exception{
+	public static void main(String[] args) throws Exception{
 		new AsyncTask<String, String>() {
 
 			@Override
@@ -45,7 +45,7 @@ public class MyAsyncTask{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				return "Hello "+params;
+				return "Hello " + params;
 			}
 
 
@@ -73,7 +73,7 @@ public class MyAsyncTask{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				return "Hello "+params;
+				return "Hello " + params;
 			}
 
 

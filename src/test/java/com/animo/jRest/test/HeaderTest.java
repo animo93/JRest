@@ -3,7 +3,6 @@ package com.animo.jRest.test;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -11,6 +10,11 @@ import org.junit.rules.ExpectedException;
 
 import com.animo.jRest.util.APICall;
 import com.animo.jRest.util.APIHelper;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 
 public class HeaderTest {
 	
@@ -21,13 +25,13 @@ public class HeaderTest {
 	@Test
 	public void testSingleStaticHeaderKey() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		final APIHelper testAPIHelper = APIHelper.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-		APICall<Void, Map<String,Object>> testCall = testInterface.getCall();
-		APICall<Void, Map<String,Object>> response = testCall.callMeNow();
-		Assert.assertTrue(((Map<String,String>) response.getResponseBody().get("headers")).containsKey("x-foo"));
+		final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		final APICall<Void, Map<String, Object>> testCall = testInterface.getCall();
+		final APICall<Void, Map<String, Object>> response = testCall.callMeNow();
+		assertTrue(((Map<String, String>) response.getResponseBody().get("headers")).containsKey("x-foo"));
 		
 	}
 	
@@ -35,27 +39,27 @@ public class HeaderTest {
 	@Test
 	public void testSingleStaticHeaderValue() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		final APIHelper testAPIHelper = APIHelper.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-		APICall<Void, Map<String,Object>> testCall = testInterface.getCall();
-		APICall<Void, Map<String,Object>> response = testCall.callMeNow();
-		Assert.assertEquals("Bar", ((Map<String,String>) response.getResponseBody().get("headers")).get("x-foo"));
+		final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		final APICall<Void, Map<String, Object>> testCall = testInterface.getCall();
+		final APICall<Void, Map<String, Object>> response = testCall.callMeNow();
+		assertEquals("Bar", ((Map<String, String>) response.getResponseBody().get("headers")).get("x-foo"));
 	}
 	
 	@Ignore
 	@Test
 	public void testMultipleStaticHeaderKey() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		final APIHelper testAPIHelper = APIHelper.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-		APICall<Void, Map<String,Object>> testCall = testInterface.getMultipleHeadersCall();
-		APICall<Void, Map<String,Object>> response = testCall.callMeNow();
-		Assert.assertTrue(((Map<String,String>) response.getResponseBody().get("headers")).containsKey("x-foo") &&
-				((Map<String,String>) response.getResponseBody().get("headers")).containsKey("x-ping"));
+		final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		final APICall<Void, Map<String, Object>> testCall = testInterface.getMultipleHeadersCall();
+		final APICall<Void, Map<String, Object>> response = testCall.callMeNow();
+		assertTrue(((Map<String, String>) response.getResponseBody().get("headers")).containsKey("x-foo") &&
+				((Map<String, String>) response.getResponseBody().get("headers")).containsKey("x-ping"));
 		
 	}
 	
@@ -63,128 +67,128 @@ public class HeaderTest {
 	@Test
 	public void testMultipleStaticHeaderValue() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		final APIHelper testAPIHelper = APIHelper.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-		APICall<Void, Map<String,Object>> testCall = testInterface.getMultipleHeadersCall();
-		APICall<Void, Map<String,Object>> response = testCall.callMeNow();
-		Assert.assertEquals("Bar", ((Map<String,String>) response.getResponseBody().get("headers")).get("x-foo"));
-		Assert.assertEquals("Pong", ((Map<String,String>) response.getResponseBody().get("headers")).get("x-ping"));
+		final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		final APICall<Void, Map<String, Object>> testCall = testInterface.getMultipleHeadersCall();
+		final APICall<Void, Map<String, Object>> response = testCall.callMeNow();
+		assertEquals("Bar", ((Map<String, String>) response.getResponseBody().get("headers")).get("x-foo"));
+		assertEquals("Pong", ((Map<String, String>) response.getResponseBody().get("headers")).get("x-ping"));
 	}
 	
 	@Ignore
 	@Test
 	public void testFailureStaticHeader() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		final APIHelper testAPIHelper = APIHelper.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();		
 		
 		exceptionRule.expect(RuntimeException.class);
 		exceptionRule.expectMessage("Header data invalid");
 		
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-		APICall<Void, Map<String,Object>> testCall = testInterface.getIncorrectHeader();
-		APICall<Void, Map<String,Object>> response = testCall.callMeNow();
+		final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		final APICall<Void, Map<String, Object>> testCall = testInterface.getIncorrectHeader();
+		final APICall<Void, Map<String, Object>> response = testCall.callMeNow();
 		
 	}
 	@Ignore
 	@Test
-	public void testSingleDynammicHeaderKey() throws Exception {
+	public void testSingleDynamicHeaderKey() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		final APIHelper testAPIHelper = APIHelper.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-		Map<String,String> testMap = new HashMap<String, String>();
+		final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		final Map<String, String> testMap = new HashMap<>();
 		testMap.put("x-Foo", "Bar");
-		APICall<Void, Map<String,Object>> testCall = testInterface.getSingleParamHeadersCall(testMap);
-		APICall<Void, Map<String,Object>> response = testCall.callMeNow();
-		Assert.assertTrue(((Map<String,String>) response.getResponseBody().get("headers")).containsKey("x-foo"));
+		final APICall<Void, Map<String, Object>> testCall = testInterface.getSingleParamHeadersCall(testMap);
+		final APICall<Void, Map<String, Object>> response = testCall.callMeNow();
+		assertTrue(((Map<String, String>) response.getResponseBody().get("headers")).containsKey("x-foo"));
 		
 	}
 	@Ignore
 	@Test
-	public void testSingleDynammicHeaderValue() throws Exception {
+	public void testSingleDynamicHeaderValue() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		final APIHelper testAPIHelper = APIHelper.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-		Map<String,String> testMap = new HashMap<String, String>();
+		final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		final Map<String, String> testMap = new HashMap<>();
 		testMap.put("x-Foo", "Bar");
-		APICall<Void, Map<String,Object>> testCall = testInterface.getSingleParamHeadersCall(testMap);
-		APICall<Void, Map<String,Object>> response = testCall.callMeNow();
+		final APICall<Void, Map<String, Object>> testCall = testInterface.getSingleParamHeadersCall(testMap);
+		final APICall<Void, Map<String, Object>> response = testCall.callMeNow();
 		
-		Assert.assertEquals("Bar", ((Map<String,String>) response.getResponseBody().get("headers")).get("x-foo"));
+		assertEquals("Bar", ((Map<String, String>) response.getResponseBody().get("headers")).get("x-foo"));
 		
 	}
 	@Ignore
 	@Test
-	public void testBothDynammicStaticHeadersKey() throws Exception {
+	public void testBothDynamicStaticHeadersKey() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		final APIHelper testAPIHelper = APIHelper.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-		Map<String,String> testMap = new HashMap<String, String>();
+		final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		final Map<String, String> testMap = new HashMap<>();
 		testMap.put("x-Foo", "Bar");
-		APICall<Void, Map<String,Object>> testCall = testInterface.getBothSingleParamStaticHeadersCall(testMap);
-		APICall<Void, Map<String,Object>> response = testCall.callMeNow();
-		Assert.assertTrue(((Map<String,String>) response.getResponseBody().get("headers")).containsKey("x-foo"));
-		Assert.assertTrue(((Map<String,String>) response.getResponseBody().get("headers")).containsKey("x-ping"));
-		Assert.assertTrue(((Map<String,String>) response.getResponseBody().get("headers")).containsKey("x-static"));
+		final APICall<Void, Map<String, Object>> testCall = testInterface.getBothSingleParamStaticHeadersCall(testMap);
+		final APICall<Void, Map<String, Object>> response = testCall.callMeNow();
+		assertTrue(((Map<String, String>) response.getResponseBody().get("headers")).containsKey("x-foo"));
+		assertTrue(((Map<String, String>) response.getResponseBody().get("headers")).containsKey("x-ping"));
+		assertTrue(((Map<String, String>) response.getResponseBody().get("headers")).containsKey("x-static"));
 		
 	}
 	
 	@Test
-	public void testBothDynammicStaticHeadersValue() throws Exception {
+	public void testBothDynamicStaticHeadersValue() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		final APIHelper testAPIHelper = APIHelper.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-		Map<String,String> testMap = new HashMap<String, String>();
+		final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		final Map<String, String> testMap = new HashMap<>();
 		testMap.put("x-Foo", "Bar");
-		APICall<Void, Map<String,Object>> testCall = testInterface.getBothSingleParamStaticHeadersCall(testMap);
-		APICall<Void, Map<String,Object>> response = testCall.callMeNow();
+		final APICall<Void, Map<String, Object>> testCall = testInterface.getBothSingleParamStaticHeadersCall(testMap);
+		final APICall<Void, Map<String, Object>> response = testCall.callMeNow();
 		
-		Assert.assertEquals("Bar", ((Map<String,String>) response.getResponseBody().get("headers")).get("x-foo"));
-		Assert.assertEquals("Pong", ((Map<String,String>) response.getResponseBody().get("headers")).get("x-ping"));
-		Assert.assertEquals("True", ((Map<String,String>) response.getResponseBody().get("headers")).get("x-static"));
+		assertEquals("Bar", ((Map<String, String>) response.getResponseBody().get("headers")).get("x-foo"));
+		assertEquals("Pong", ((Map<String, String>) response.getResponseBody().get("headers")).get("x-ping"));
+		assertEquals("True", ((Map<String, String>) response.getResponseBody().get("headers")).get("x-static"));
 		
 	}
 	
 	@Test
 	public void testNoHeaders() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		final APIHelper testAPIHelper = APIHelper.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-		Map<String,String> testMap = new HashMap<String, String>();
+		final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		final Map<String, String> testMap = new HashMap<>();
 		testMap.put("x-Foo", "Bar");
-		APICall<Void, Map<String,Object>> testCall = testInterface.noHeadersCall();
-		APICall<Void, Map<String,Object>> response = testCall.callMeNow();
+		final APICall<Void, Map<String, Object>> testCall = testInterface.noHeadersCall();
+		final APICall<Void, Map<String, Object>> response = testCall.callMeNow();
 		
-		Assert.assertFalse(((Map<String,String>) response.getResponseBody().get("headers")).containsKey("x-foo"));
+		assertFalse(((Map<String, String>) response.getResponseBody().get("headers")).containsKey("x-foo"));
 		
 	}
 	
 	@Test
 	public void testFailureDynamicHeader() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		final APIHelper testAPIHelper = APIHelper.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();		
 		
 		exceptionRule.expect(RuntimeException.class);
 		exceptionRule.expectMessage("Header Parameters should be passed in Map");
 		
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-		APICall<Void, Map<String,Object>> testCall = testInterface.incorrectHeadersCall("X-Foo:Bar");
-		APICall<Void, Map<String,Object>> response = testCall.callMeNow();
+		final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		final APICall<Void, Map<String, Object>> testCall = testInterface.incorrectHeadersCall("X-Foo:Bar");
+		final APICall<Void, Map<String, Object>> response = testCall.callMeNow();
 		
 	}
 

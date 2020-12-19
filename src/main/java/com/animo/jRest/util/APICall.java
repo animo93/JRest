@@ -17,7 +17,7 @@ import java.util.Map;
  * @param <Response>
  */
 
-public class APICall<Request,Response> {
+public class APICall<Request, Response> {
     private Response responseBody;
     private int responseCode;
     private RequestBean<Request>  requestBean;
@@ -25,14 +25,14 @@ public class APICall<Request,Response> {
     private Type type;
 
     public Map<String, List<String>> getResponseHeaders() {
-		return responseHeaders;
-	}
+        return responseHeaders;
+    }
 
-	public void setResponseHeaders(Map<String, List<String>> responseHeaders) {
-		this.responseHeaders = responseHeaders;
-	}
+    public void setResponseHeaders(Map<String, List<String>> responseHeaders) {
+        this.responseHeaders = responseHeaders;
+    }
 
-	public RequestBean<Request> getRequestBean() {
+    public RequestBean<Request> getRequestBean() {
         return requestBean;
     }
 
@@ -68,22 +68,22 @@ public class APICall<Request,Response> {
      * Synchronous implementation of {@link com.animo.jRest.util.APICall APICall} , which invokes a blocking call to webserver
      * . And waits for the APICall to complete
      * @return {@code APICall}
-     * @throws Exception
+     * @throws Exception Exception if issue with asyncTask executeNow method
      */
-    public APICall<Request,Response> callMeNow() throws Exception{
+    public APICall<Request, Response> callMeNow() throws Exception {
 
-        APIAsyncTask<Request,Response> asyncTask = new APIAsyncTask<>(requestBean,type);
+        final APIAsyncTask<Request, Response> asyncTask = new APIAsyncTask<>(requestBean, type);
         return asyncTask.executeNow(requestBean);
     }
     
     /**
      * Asynchronous implementation of {@link com.animo.jRest.util.APICall APICall} , which invokes a non-blocking call to webserver
      * . It accepts {@link com.animo.jRest.util.APICallBack APICallBack} as a parameter
-     * @param callBack
-     * @throws Exception
+     * @param callBack APICallBack
+     * @throws Exception if issue occurs with asyncTask executeLater method
      */
     public void callMeLater(APICallBack<Request, Response> callBack) throws Exception {
-    	APIAsyncTask<Request,Response> asyncTask = new APIAsyncTask<>(requestBean,type,callBack);
+    	final APIAsyncTask<Request,Response> asyncTask = new APIAsyncTask<>(requestBean, type, callBack);
         asyncTask.executeLater(requestBean);
     }
 

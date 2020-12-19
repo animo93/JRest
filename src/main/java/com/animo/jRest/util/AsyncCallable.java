@@ -2,26 +2,26 @@ package com.animo.jRest.util;
 
 import java.util.concurrent.Callable;
 
-public class AsyncCallable<Params,Result> implements Callable<Result>{
+public class AsyncCallable<Params, Result> implements Callable<Result> {
 	
-	private Params params;
-	private AsyncTask<Params, Result> asyncTask;
+	private final Params params;
+	private final AsyncTask<Params, Result> asyncTask;
 	
-	public AsyncCallable(Params params,AsyncTask<Params, Result> asyncTask) {
+	public AsyncCallable(Params params, AsyncTask<Params, Result> asyncTask) {
 		this.params = params;
 		this.asyncTask = asyncTask;
 	}
 
 	@Override
-	public Result call() throws Exception {
-		Result result=null;
+	public Result call() {
+		Result result = null;
 		Exception exception = null;
-		try{
+		try {
 			result = asyncTask.runInBackground(params);
-		}catch(Exception e){
-			exception =e;
+		} catch(Exception e) {
+			exception = e;
 		}	
-		asyncTask.postExecute(result,exception);
+		asyncTask.postExecute(result, exception);
 		return result;
 	}
 
