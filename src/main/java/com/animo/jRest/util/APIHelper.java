@@ -1,5 +1,6 @@
 package com.animo.jRest.util;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -7,6 +8,9 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +28,8 @@ import com.animo.jRest.annotation.FollowRedirects;
 import com.animo.jRest.annotation.HEADER;
 import com.animo.jRest.annotation.HEADERS;
 import com.animo.jRest.annotation.PATH;
+import com.animo.jRest.annotation.Query;
+import com.animo.jRest.annotation.QueryMap;
 import com.animo.jRest.annotation.REQUEST;
 
 
@@ -80,7 +86,6 @@ public class APIHelper {
 		public APIBuilder addParameter(String key,String value){
 			if(params==null){
 				params = new HashMap<String, String>();
-				System.out.println("key"+key);
 			}
 			params.put(key, value);
 			return this;
@@ -212,15 +217,17 @@ public class APIHelper {
 
 				addPathParameters(args, urlBuilder, parameters);
 
+				addDynamicQueryParameters(urlBuilder,args,parameters);
+
 				addQueryParameters(urlBuilder);
+
+				logger.debug("final Url "+urlBuilder.toString());
 
 				addHeaders(myRequestBean,headersAnnotation,parameters,args);
 
-
-				logger.debug("final Url "+urlBuilder.toString());
 				myRequestBean.setUrl(urlBuilder.toString());
 
-				
+
 				myRequestBean.setAuthentication(auth);
 				myRequestBean.setProxy(reqProxy);
 				myRequestBean.setRequestType(request.type());
@@ -252,34 +259,34 @@ public class APIHelper {
 			}
 
 			private void addHeaders(RequestBean<Object> myRequestBean, Annotation headersAnnotation, Parameter[] parameters, Object[] args) {
-				
+
 				HEADERS headers = (HEADERS) headersAnnotation;
 				String[] requestHeadersFromMethod = new String[] {};
 				Map<String,String> requestHeadersMap = new HashMap<String, String>();
 				if(headers!=null) {
 					requestHeadersFromMethod = headers.value();
-					
+
 					logger.debug("Request Headers from Method"+requestHeadersFromMethod);
 					requestHeadersMap = convertToHeadersMap(requestHeadersFromMethod);
 				}
-				
-				
+
+
 				Map<String, String> requestHeadersFromParam = getParamHeaders(parameters,args);
-				
+
 				//String[] requestHeaders = concatenateHeaders(requestHeadersFromMethod,requestHeadersFromParam);
-				
+
 				requestHeadersMap.putAll(requestHeadersFromParam);
-				
+
 				myRequestBean.setHeaders(requestHeadersMap);
-				
+
 			}
 
 			private String[] concatenateHeaders(String[] requestHeadersFromMethod, String[] requestHeadersFromParam) {
-				
+
 				String[] requestHeaders = new String[] {};
 				System.arraycopy(requestHeadersFromMethod, 0, requestHeaders, 0, requestHeadersFromParam.length);
 				System.arraycopy(requestHeadersFromParam, 0, requestHeaders, requestHeadersFromParam.length, requestHeadersFromParam.length);
-				
+
 				return requestHeaders;
 			}
 
@@ -293,11 +300,11 @@ public class APIHelper {
 						}
 					}
 				}catch (ClassCastException ex) {
-					logger.error("Unable to get ParamHeaders "+ex);
-					throw new RuntimeException("Header Parameters should be passed in Map<key:value> format ");
+					logger.error("Unable to get ParamHeaders ",ex);
+					throw new InvalidParameterException("Header Parameters should be passed in Map<key:value> format ");
 				}
-				
-				
+
+
 				logger.debug("Request Headers from Params "+paramValues);
 				return paramValues;
 			}
@@ -357,8 +364,61 @@ public class APIHelper {
 					params.forEach((k,v) -> {
 						urlBuilder.append(k+"="+v+"&");
 					});
-
+					urlBuilder.deleteCharAt(urlBuilder.lastIndexOf("&"));
 				}
+
+			}
+
+			private void addDynamicQueryParameters(StringBuilder urlBuilder,Object[] args,Parameter[] parameters) throws Exception {
+				Map<String,String> paramMap = new HashMap<String,String>();
+
+				for(int i=0;i<parameters.length;i++) {
+					if(parameters[i].getAnnotation(Query.class)!=null) {
+						Query query = parameters[i].getAnnotation(Query.class);
+						
+						String queryKey = query.value();
+						
+						if(queryKey!=null && !queryKey.isEmpty()) {
+							
+							String queryValue = null;
+							try {
+								queryValue = (String) args[i];
+							}catch (ClassCastException ex) {
+								logger.error("Unable to add Query Params ",ex);
+								throw new InvalidParameterException("Query parameter should be passed in string format only ");
+							}
+
+							if(queryValue!=null) {
+								if(!query.encoded()) {
+									queryKey = URLEncoder.encode(queryKey, "UTF-8");
+									queryValue = URLEncoder.encode(queryValue, "UTF-8");
+								}
+								paramMap.put(queryKey, queryValue);
+							}
+						}
+					} else if(parameters[i].getAnnotation(QueryMap.class)!=null) {
+						QueryMap queryMap = parameters[i].getAnnotation(QueryMap.class);
+						Map<String,String> queryMapValue = null;
+						try {
+							queryMapValue = (Map<String, String>) args[i];
+						} catch (ClassCastException ex) {
+							logger.error("Unable to add Query Params ",ex);
+							throw new InvalidParameterException("Query parameter should be passed in Map format only ");
+						}
+
+						if(queryMapValue!=null && !queryMapValue.isEmpty()) {
+							paramMap.putAll(queryMapValue);
+						}
+					}
+				}
+
+				logger.debug("Query params fetched from Params "+paramMap);
+
+				if(params==null) {
+					params = new HashMap<String, String>();
+				}
+				params.putAll(paramMap);
+
 			}
 
 			private void addPathParameters(Object[] args, StringBuilder urlBuilder, Parameter[] parameters)
