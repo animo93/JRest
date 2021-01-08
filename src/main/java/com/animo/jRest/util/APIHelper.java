@@ -18,7 +18,6 @@ import java.util.Map;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,7 +30,6 @@ import com.animo.jRest.annotation.PATH;
 import com.animo.jRest.annotation.Query;
 import com.animo.jRest.annotation.QueryMap;
 import com.animo.jRest.annotation.REQUEST;
-
 
 
 /**
@@ -48,17 +46,16 @@ import com.animo.jRest.annotation.REQUEST;
  * 
  * @author animo
  */
-
 public class APIHelper {
 
-	private String baseURL;
-	private Map<String,String> params;
-	private RequestAuthentication auth;
-	private RequestProxy reqProxy;
-	private boolean disableSSLVerification;
-	private static Logger logger = LogManager.getLogger(APIHelper.class);
+	private final String baseURL;
+	private Map<String, String> params;
+	private final RequestAuthentication auth;
+	private final RequestProxy reqProxy;
+	private final boolean disableSSLVerification;
+	private final static Logger logger = LogManager.getLogger(APIHelper.class);
 
-	private APIHelper(APIBuilder builder){
+	private APIHelper(APIBuilder builder) {
 		this.baseURL = builder.baseURL;
 		this.params = builder.params;
 		this.auth = builder.auth;
@@ -68,8 +65,8 @@ public class APIHelper {
 
 
 
-	public static class APIBuilder{
-		private String baseURL;
+	public static class APIBuilder {
+		private final String baseURL;
 		private Map<String,String> params;
 		private RequestAuthentication auth;
 		private RequestProxy proxy;
@@ -85,16 +82,16 @@ public class APIHelper {
 
 		public APIBuilder addParameter(String key,String value){
 			if(params==null){
-				params = new HashMap<String, String>();
+				params = new HashMap<>();
+				System.out.println("key"+key);
 			}
 			params.put(key, value);
 			return this;
-
 		}
 
-		public APIBuilder addAllParameters(Map<String,String> params){
-			if(this.params==null){
-				this.params = new HashMap<String, String>();
+		public APIBuilder addAllParameters(Map<String,String> params) {
+			if(this.params == null){
+				this.params = new HashMap<>();
 			}
 			this.params.putAll(params);
 			return this;
@@ -102,11 +99,11 @@ public class APIHelper {
 
 		/**
 		 * Username and Password used for making REST calls via Basic authentication
-		 * @param username
-		 * @param password
-		 * @return
+		 * @param username String used for username
+		 * @param password String used for password
+		 * @return APIBuilder object with adjusted fields
 		 */
-		public APIBuilder addUsernameAndPassword(String username,String password){
+		public APIBuilder addUsernameAndPassword(String username,String password) {
 			if(this.auth == null){
 				this.auth = new RequestAuthentication();
 			}
@@ -117,14 +114,14 @@ public class APIHelper {
 
 		/**
 		 * Proxy details used while building the APICall , if the client is behind any Proxy 
-		 * @param proxyURL
-		 * @param username
-		 * @param password
-		 * @param port
-		 * @return
+		 * @param proxyURL String used for the proxy URL
+		 * @param username String used for the username
+		 * @param password String used for the password
+		 * @param port integer port number
+		 * @return APIBuilder object with adjusted fields
 		 */
 
-		public APIBuilder addProxy(String proxyURL , String username, String password , int port){
+		public APIBuilder addProxy(String proxyURL, String username, String password, int port) {
 			if(this.proxy ==null){
 				this.proxy = new RequestProxy();
 			}
@@ -139,8 +136,8 @@ public class APIHelper {
 		/**
 		 * Disable any certificates or Hostname verification checks used for making HTTPS calls .
 		 * <p>Avoid using this in Production setting
-		 * @param disableSSLVerification
-		 * @return
+		 * @param disableSSLVerification boolean value for disableSSLVerification
+		 * @return APIBuilder object with adjusted fields
 		 */
 
 		public APIBuilder setDisableSSLVerification(boolean disableSSLVerification) {
@@ -180,28 +177,24 @@ public class APIHelper {
 	 *
 	 *}</code></pre>
 	 * 
-	 * @param service.class
+	 * @param clazz service.class
 	 * @return {@code service}
 	 */
 	@SuppressWarnings("unchecked")
-	public <S> S createApi(Class<S> clazz){
-		ClassLoader loader = clazz.getClassLoader();
-		Class[] interfaces = new Class[]{clazz};
+	public <S> S createApi(Class<S> clazz) {
+		final ClassLoader loader = clazz.getClassLoader();
+		final Class[] interfaces = new Class[]{clazz};
 
-
-		Object object = Proxy.newProxyInstance(loader, interfaces, new InvocationHandler() {
+		final Object object = Proxy.newProxyInstance(loader, interfaces, new InvocationHandler() {
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-				Annotation requestAnnotation = method.getAnnotation(REQUEST.class);
-				Annotation[][] parameterAnnotation=method.getParameterAnnotations();
-				Class[] parameterTypes = method.getParameterTypes();
+				final Annotation requestAnnotation = method.getAnnotation(REQUEST.class);
+				final Annotation[][] parameterAnnotation = method.getParameterAnnotations();
+				final Class[] parameterTypes = method.getParameterTypes();
 
-
-				Annotation headersAnnotation = method.getAnnotation(HEADERS.class);
+				final Annotation headersAnnotation = method.getAnnotation(HEADERS.class);
 
 				FollowRedirects followRedirectsAnnotation = method.getAnnotation(FollowRedirects.class);
-
-
 
 				REQUEST request = (REQUEST) requestAnnotation;
 				//Annotation t=att[0][0];
@@ -209,11 +202,11 @@ public class APIHelper {
 					throw new Exception("No Request Annotation found");
 				}
 
-				RequestBean<Object> myRequestBean = new RequestBean<>();
-				StringBuilder urlBuilder = new StringBuilder(baseURL);
+				final RequestBean<Object> myRequestBean = new RequestBean<>();
+				final StringBuilder urlBuilder = new StringBuilder(baseURL);
 				urlBuilder.append(request.endpoint());
 
-				Parameter[] parameters = method.getParameters();
+				final Parameter[] parameters = method.getParameters();
 
 				addPathParameters(args, urlBuilder, parameters);
 
@@ -221,12 +214,10 @@ public class APIHelper {
 
 				addQueryParameters(urlBuilder);
 
-				logger.debug("final Url "+urlBuilder.toString());
+				addHeaders(myRequestBean, headersAnnotation, parameters, args);
 
-				addHeaders(myRequestBean,headersAnnotation,parameters,args);
-
+				logger.debug("final Url " + urlBuilder.toString());
 				myRequestBean.setUrl(urlBuilder.toString());
-
 
 				myRequestBean.setAuthentication(auth);
 				myRequestBean.setProxy(reqProxy);
@@ -235,19 +226,17 @@ public class APIHelper {
 
 				addRequestBody(args, parameterAnnotation, parameterTypes, request, myRequestBean);
 
-				if(followRedirectsAnnotation!=null)
+				if(followRedirectsAnnotation != null)
 					myRequestBean.setFollowRedirects(followRedirectsAnnotation.value());
 
-
-
-				Class<?> clazz = APICall.class;
-				Object object = clazz.newInstance();
-				APICall<Object, ?> myCall = (APICall<Object, ?>) object;
+				final Class<?> clazz = APICall.class;
+				final Object object = clazz.newInstance();
+				final APICall<Object, ?> myCall = (APICall<Object, ?>) object;
 				myCall.setRequestBean(myRequestBean);
-				Type type =  method.getGenericReturnType();
+				final Type type =  method.getGenericReturnType();
 				if(type instanceof ParameterizedType){
-					ParameterizedType pType = (ParameterizedType) type;
-					for(Type t:pType.getActualTypeArguments()){
+					final ParameterizedType pType = (ParameterizedType) type;
+					for(Type t:pType.getActualTypeArguments()) {
 						myCall.setType(t);	
 					}
 				}
@@ -255,23 +244,20 @@ public class APIHelper {
 					myCall.setType(type);
 
 				return myCall;
-
 			}
 
 			private void addHeaders(RequestBean<Object> myRequestBean, Annotation headersAnnotation, Parameter[] parameters, Object[] args) {
-
-				HEADERS headers = (HEADERS) headersAnnotation;
-				String[] requestHeadersFromMethod = new String[] {};
-				Map<String,String> requestHeadersMap = new HashMap<String, String>();
-				if(headers!=null) {
+				final HEADERS headers = (HEADERS) headersAnnotation;
+				final String[] requestHeadersFromMethod;
+				Map<String, String> requestHeadersMap = new HashMap<>();
+				if(headers != null) {
 					requestHeadersFromMethod = headers.value();
-
-					logger.debug("Request Headers from Method"+requestHeadersFromMethod);
+					
+					logger.debug("Request Headers from Method" + Arrays.toString(requestHeadersFromMethod));
 					requestHeadersMap = convertToHeadersMap(requestHeadersFromMethod);
 				}
-
-
-				Map<String, String> requestHeadersFromParam = getParamHeaders(parameters,args);
+				
+				final Map<String, String> requestHeadersFromParam = getParamHeaders(parameters, args);
 
 				//String[] requestHeaders = concatenateHeaders(requestHeadersFromMethod,requestHeadersFromParam);
 
@@ -282,65 +268,64 @@ public class APIHelper {
 			}
 
 			private String[] concatenateHeaders(String[] requestHeadersFromMethod, String[] requestHeadersFromParam) {
-
-				String[] requestHeaders = new String[] {};
+				final String[] requestHeaders = new String[] {};
 				System.arraycopy(requestHeadersFromMethod, 0, requestHeaders, 0, requestHeadersFromParam.length);
 				System.arraycopy(requestHeadersFromParam, 0, requestHeaders, requestHeadersFromParam.length, requestHeadersFromParam.length);
 
 				return requestHeaders;
 			}
 
-			private Map<String,String> getParamHeaders(Parameter[] parameters, Object[] args) {
-				Map<String,String> paramValues = new HashMap<String, String>();
+			private Map<String, String> getParamHeaders(Parameter[] parameters, Object[] args) {
+				Map<String, String> paramValues = new HashMap<>();
 				try {
-					for(int i=0,j=0;i<parameters.length;i++) {
+					for(int i = 0,j = 0; i < parameters.length; i++) {
 						if(parameters[i].getAnnotation(HEADER.class)!=null) {
 							HEADER header = parameters[i].getAnnotation(HEADER.class);
-							paramValues = (Map<String,String>) args[i];
+							paramValues = (Map<String, String>) args[i];
 						}
 					}
 				}catch (ClassCastException ex) {
-					logger.error("Unable to get ParamHeaders ",ex);
-					throw new InvalidParameterException("Header Parameters should be passed in Map<key:value> format ");
+					logger.error("Unable to get ParamHeaders " + ex);
+					throw new RuntimeException("Header Parameters should be passed in Map<key:value> format ");
 				}
-
-
-				logger.debug("Request Headers from Params "+paramValues);
+				
+				
+				logger.debug("Request Headers from Params " + paramValues);
 				return paramValues;
 			}
 
 			private Map<String, String> convertToHeadersMap(String[] requestHeaders) {
-				Map<String,String> headersMap = new HashMap<String,String>();
+				Map<String, String> headersMap = new HashMap<>();
 				for(String header:requestHeaders) {
 					if(!header.contains(":")) {
-						throw new RuntimeException("Header data invalid ...Should be using <key>:<value> String format "+header);
+						throw new RuntimeException("Header data invalid ...Should be using <key>:<value> String format " + header);
 					}
 					headersMap.put(header.split(":")[0], header.split(":")[1]);
 				}
-				logger.debug("Final Request Headers Map "+headersMap);
+				logger.debug("Final Request Headers Map " + headersMap);
 				return headersMap;
 			}
 
 			private void addRequestBody(Object[] args, Annotation[][] att, Class[] parameterTypes, REQUEST request,
-					RequestBean<Object> myRequestBean) throws Exception {
+					RequestBean<Object> myRequestBean) {
 				if(request.type().equals(HTTP_METHOD.POST) ||
 						request.type().equals(HTTP_METHOD.PATCH) ||
 						request.type().equals(HTTP_METHOD.PUT)){
-					int i=0;
-					for(Annotation[] annotations : att){
+					int i = 0;
+					for(Annotation[] annotations : att) {
 						Class parameterType = parameterTypes[i++];
 
-						for(Annotation annotation : annotations){
-							if(annotation instanceof Body){
+						for(Annotation annotation : annotations) {
+							if(annotation instanceof Body) {
 								Body myAnnotation = (Body) annotation;
-								logger.debug("param: " , parameterType.getName());
+								logger.debug("param: {}", parameterType.getName());
 
-								if(args!=null){
+								if(args!=null) {
 									List<Object> argsAsList = Arrays.asList(args);
-									logger.debug("argsASList :",argsAsList);
-									if(argsAsList!=null && argsAsList.size()>0){
+									logger.debug("argsASList: {}", argsAsList);
+									if(argsAsList != null && argsAsList.size() > 0) {
 										argsAsList.forEach(arg -> {
-											if(arg.getClass().equals(parameterType)){
+											if(arg.getClass().equals(parameterType)) {
 												myRequestBean.setRequestObject(arg);
 											}
 										});
@@ -359,12 +344,9 @@ public class APIHelper {
 			}
 
 			private void addQueryParameters(StringBuilder urlBuilder) {
-				if(params!=null && params.size()>0){
+				if(params != null && params.size() > 0) {
 					urlBuilder.append("?");
-					params.forEach((k,v) -> {
-						urlBuilder.append(k+"="+v+"&");
-					});
-					urlBuilder.deleteCharAt(urlBuilder.lastIndexOf("&"));
+					params.forEach((k, v) -> urlBuilder.append(k).append("=").append(v).append("&"));
 				}
 
 			}
@@ -410,6 +392,7 @@ public class APIHelper {
 							paramMap.putAll(queryMapValue);
 						}
 					}
+
 				}
 
 				logger.debug("Query params fetched from Params "+paramMap);
@@ -423,14 +406,14 @@ public class APIHelper {
 
 			private void addPathParameters(Object[] args, StringBuilder urlBuilder, Parameter[] parameters)
 					throws Exception {
-				for(int i=0;i<parameters.length;i++){
-					if(parameters[i].getAnnotation(PATH.class)!=null){
+				for(int i = 0 ; i < parameters.length ; i++) {
+					if(parameters[i].getAnnotation(PATH.class) != null) {
 						PATH path = (PATH) parameters[i].getAnnotation(PATH.class);
-						String value = path.value();
-						Pattern pattern = Pattern.compile("\\{"+value+"\\}");
-						Matcher matcher = pattern.matcher(urlBuilder);
-						int start =0;
-						while(matcher.find(start)){
+						final String value = path.value();
+						final Pattern pattern = Pattern.compile("\\{" + value + "\\}");
+						final Matcher matcher = pattern.matcher(urlBuilder);
+						int start = 0;
+						while(matcher.find(start)) {
 							urlBuilder.replace(matcher.start(), matcher.end(), String.valueOf(args[i]));
 							start = matcher.start() + String.valueOf(args[i]).length();
 						}
@@ -438,15 +421,12 @@ public class APIHelper {
 				}
 
 				if(urlBuilder.toString().contains("{") &&
-						urlBuilder.toString().contains("}")){
+						urlBuilder.toString().contains("}")) {
 					throw new Exception("Undeclared PATH variable found ..Please declare them in the interface");
 				}
 			}
-
 		});
 
 		return (S) object;
 	}
-
-
 }

@@ -10,13 +10,13 @@ package com.animo.jRest.util;
  * @param <Response>
  */
 
-public interface APICallBack<Request,Response> {
+public interface APICallBack<Request, Response> {
 	/**
 	 * Invoked for a received HTTP response
 	 * <p>Note: An HTTP response may still indicate an application-level failure such as a 404 or 500.
 	 * @param {@code APICall}
 	 */
-    void callBackOnSuccess(APICall<Request,Response> myCall);
+    void callBackOnSuccess(APICall<Request, Response> myCall);
     /**
      * Invoked when a network exception occurred talking to the server or when an unexpected exception
      * occurred creating the request or processing the response.
