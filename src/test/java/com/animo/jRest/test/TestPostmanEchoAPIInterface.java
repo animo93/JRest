@@ -2,14 +2,23 @@ package com.animo.jRest.test;
 
 import java.util.Map;
 
-import com.animo.jRest.annotation.HEADER;
-import com.animo.jRest.annotation.HEADERS;
-import com.animo.jRest.annotation.REQUEST;
+import com.animo.jRest.annotation.*;
 import com.animo.jRest.util.APICall;
 import com.animo.jRest.util.HTTP_METHOD;
 
 public interface TestPostmanEchoAPIInterface {
-	
+
+	//	For Query Parameters Test
+	@REQUEST(endpoint = "/get", type = HTTP_METHOD.GET)
+	APICall<Void, Map<String, Object>> getSingleQParamCall(@Query(value = "foo1")String foo1);
+
+	@REQUEST(endpoint = "/get", type = HTTP_METHOD.GET)
+	APICall<Void, Map<String, Object>> getMultipleQParamCall(@Query(value = "foo1")String foo1, @Query("foo2")String foo2);
+
+	@REQUEST(endpoint = "/get", type = HTTP_METHOD.GET)
+	APICall<Void, Map<String, Object>> getQParamMapCall(@QueryMap Map<String, String> queryMap);
+
+	//	For Headers Test
 	@REQUEST(endpoint = "/get", type = HTTP_METHOD.GET)
 	@HEADERS("X-Foo:Bar")
 	APICall<Void, Map<String, Object>> getCall();
