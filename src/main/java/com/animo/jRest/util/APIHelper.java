@@ -1,5 +1,6 @@
 package com.animo.jRest.util;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -7,6 +8,11 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidParameterException;
+import java.net.URLEncoder;
+import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -15,9 +21,17 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.animo.jRest.annotation.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.animo.jRest.annotation.Body;
+import com.animo.jRest.annotation.FollowRedirects;
+import com.animo.jRest.annotation.HEADER;
+import com.animo.jRest.annotation.HEADERS;
+import com.animo.jRest.annotation.PATH;
+import com.animo.jRest.annotation.Query;
+import com.animo.jRest.annotation.QueryMap;
+import com.animo.jRest.annotation.REQUEST;
 
 
 /**
@@ -244,19 +258,20 @@ public class APIHelper {
 				}
 				
 				final Map<String, String> requestHeadersFromParam = getParamHeaders(parameters, args);
-				
+
 				//String[] requestHeaders = concatenateHeaders(requestHeadersFromMethod,requestHeadersFromParam);
-				
+
 				requestHeadersMap.putAll(requestHeadersFromParam);
-				
+
 				myRequestBean.setHeaders(requestHeadersMap);
+
 			}
 
 			private String[] concatenateHeaders(String[] requestHeadersFromMethod, String[] requestHeadersFromParam) {
 				final String[] requestHeaders = new String[] {};
 				System.arraycopy(requestHeadersFromMethod, 0, requestHeaders, 0, requestHeadersFromParam.length);
 				System.arraycopy(requestHeadersFromParam, 0, requestHeaders, requestHeadersFromParam.length, requestHeadersFromParam.length);
-				
+
 				return requestHeaders;
 			}
 
@@ -328,25 +343,53 @@ public class APIHelper {
 				}
 			}
 
-			private void prepareQueryParamMap(Object args[],Parameter[] parameters) {
+			private void prepareQueryParamMap(Object args[],Parameter[] parameters) throws UnsupportedEncodingException {
 				/* put all the found query parameters in Query and QueryMap,
 				into the paramters map to be converted into query string*/
 				for (int i = 0; i < parameters.length; i++) {
 					if (parameters[i].getAnnotation(Query.class) != null) {
 						if (params == null) params = new HashMap<>();
 						Query query = (Query) parameters[i].getAnnotation(Query.class);
-						final String value = query.value();
-						params.put(value, (String) args[i]);
+						String queryKey = query.value();
+						if (queryKey != null && !queryKey.isEmpty()) {
+
+							String queryValue = null;
+							try {
+								queryValue = (String) args[i];
+							} catch (ClassCastException ex) {
+								logger.error("Unable to add Query Params ", ex);
+								throw new InvalidParameterException("Query parameter should be passed in string format only ");
+							}
+
+							if (queryValue != null) {
+								if (!query.encoded()) {
+									queryKey = URLEncoder.encode(queryKey, "UTF-8");
+									queryValue = URLEncoder.encode(queryValue, "UTF-8");
+								}
+								params.put(queryKey, queryValue);
+							}
+						}
 					} else if (parameters[i].getAnnotation(QueryMap.class) != null) {
 						if (params == null) params = new HashMap<>();
-						QueryMap query = (QueryMap) parameters[i].getAnnotation(QueryMap.class);
-						Map<String, String> paramValues = (Map<String, String>) args[i];
-						params.putAll(paramValues);
+						QueryMap queryMap = (QueryMap) parameters[i].getAnnotation(QueryMap.class);
+						Map<String, String> queryMapValue = null;
+						try {
+							queryMapValue = (Map<String, String>) args[i];
+						} catch (ClassCastException ex) {
+							logger.error("Unable to add Query Params ", ex);
+							throw new InvalidParameterException("Query parameter should be passed in Map format only ");
+						}
+
+						if (queryMapValue != null && !queryMapValue.isEmpty()) {
+							params.putAll(queryMapValue);
+						}
 					}
+
 				}
+				logger.debug("Query params fetched from Params " + params);
 			}
 
-			private void addQueryParameters(Object[] args, StringBuilder urlBuilder, Parameter[] parameters) {
+			private void addQueryParameters(Object[] args, StringBuilder urlBuilder, Parameter[] parameters) throws UnsupportedEncodingException {
 				prepareQueryParamMap(args,parameters);
 				if(params != null && params.size() > 0) {
 					urlBuilder.append("?");
