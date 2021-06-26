@@ -16,7 +16,7 @@ public class QueryParamTest {
 	
 	
 	
-	@Ignore
+	//@Ignore
 	@Test
 	public void testSingleQueryParam() throws Exception {
 		
@@ -31,7 +31,7 @@ public class QueryParamTest {
 		
 	}
 	
-	@Ignore
+	//@Ignore
 	@Test
 	public void testMultipleQueryParam() throws Exception {
 		
@@ -46,7 +46,7 @@ public class QueryParamTest {
 		Assert.assertEquals("pong", ((Map<String,String>) response.getResponseBody().get("args")).get("ping"));
 		
 	}
-	@Ignore
+	//@Ignore
 	@Test
 	public void testMultipleQueryParamWithGlobalParams() throws Exception {
 		
@@ -62,7 +62,7 @@ public class QueryParamTest {
 		Assert.assertEquals("pong", ((Map<String,String>) response.getResponseBody().get("args")).get("ping"));
 		
 	}
-	@Ignore
+	//@Ignore
 	@Test
 	public void testNullQueryParam() throws Exception {
 		
@@ -77,7 +77,7 @@ public class QueryParamTest {
 		Assert.assertTrue(((Map<String,String>) response.getResponseBody().get("args")).isEmpty());
 		
 	}
-	@Ignore
+	//@Ignore
 	@Test
 	public void testInvalidQueryParamFailure() throws Exception {
 		
@@ -95,7 +95,7 @@ public class QueryParamTest {
 		Assert.assertTrue(exception.getMessage().contains("Query parameter should be passed in string format only"));
 		
 	}
-	@Ignore
+	//@Ignore
 	@Test
 	public void testEmptyQueryParamKeyFailure() throws Exception {
 		
@@ -112,7 +112,7 @@ public class QueryParamTest {
 		
 	}
 	
-	@Ignore
+	//@Ignore
 	@Test
 	public void testQueryParamKeyWithSpace() throws Exception {
 		
@@ -128,7 +128,7 @@ public class QueryParamTest {
 		Assert.assertEquals("bar", ((Map<String,String>) response.getResponseBody().get("args")).get("query key"));
 		
 	}
-	@Ignore
+	//@Ignore
 	@Test
 	public void testUnEncodedqueryKeyWithEncodedSetTrue() throws Exception {
 		
@@ -159,7 +159,7 @@ public class QueryParamTest {
 		Assert.assertEquals("bar", ((Map<String,String>) response.getResponseBody().get("args")).get("query key"));
 		
 	}
-	@Ignore
+	//@Ignore
 	@Test
 	public void testSingleQueryMap() throws Exception {
 		
@@ -177,7 +177,7 @@ public class QueryParamTest {
 		Assert.assertEquals("pong", ((Map<String,String>) response.getResponseBody().get("args")).get("ping"));
 		
 	}
-	@Ignore
+	//@Ignore
 	@Test
 	public void testMultipleQueryMap() throws Exception {
 		
@@ -202,7 +202,7 @@ public class QueryParamTest {
 		Assert.assertEquals("doe", ((Map<String,String>) response.getResponseBody().get("args")).get("john"));
 		
 	}
-	@Ignore
+	//@Ignore
 	@Test
 	public void testBothSingleQueryAndQueryMap() throws Exception {
 		
@@ -220,7 +220,7 @@ public class QueryParamTest {
 		Assert.assertEquals("pong", ((Map<String,String>) response.getResponseBody().get("args")).get("ping"));
 		
 	}
-	@Ignore
+	//@Ignore
 	@Test
 	public void testQueryMapAndQueryWithGlobalParams() throws Exception {
 		
@@ -242,7 +242,7 @@ public class QueryParamTest {
 		Assert.assertEquals("tok", ((Map<String,String>) response.getResponseBody().get("args")).get("tik"));
 		
 	}
-	@Ignore
+	//@Ignore
 	@Test
 	public void testInvalidQueryMapFailure() throws Exception {
 		
@@ -260,7 +260,7 @@ public class QueryParamTest {
 		Assert.assertTrue(exception.getMessage().contains("Query parameter should be passed in Map format only"));
 		
 	}
-	@Ignore
+	//@Ignore
 	@Test
 	public void testNullQueryMap() throws Exception {
 		

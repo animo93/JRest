@@ -21,7 +21,7 @@ public class HeaderTest {
 	@Rule
 	public ExpectedException exceptionRule = ExpectedException.none();
 	
-	@Ignore
+	//@Ignore
 	@Test
 	public void testSingleStaticHeaderKey() throws Exception {
 		
@@ -35,7 +35,7 @@ public class HeaderTest {
 		
 	}
 	
-	@Ignore
+	//@Ignore
 	@Test
 	public void testSingleStaticHeaderValue() throws Exception {
 		
@@ -48,7 +48,7 @@ public class HeaderTest {
 		assertEquals("Bar", ((Map<String, String>) response.getResponseBody().get("headers")).get("x-foo"));
 	}
 	
-	@Ignore
+	//@Ignore
 	@Test
 	public void testMultipleStaticHeaderKey() throws Exception {
 		
@@ -63,7 +63,7 @@ public class HeaderTest {
 		
 	}
 	
-	@Ignore
+	//@Ignore
 	@Test
 	public void testMultipleStaticHeaderValue() throws Exception {
 		
@@ -77,7 +77,7 @@ public class HeaderTest {
 		assertEquals("Pong", ((Map<String, String>) response.getResponseBody().get("headers")).get("x-ping"));
 	}
 	
-	@Ignore
+	//@Ignore
 	@Test
 	public void testFailureStaticHeader() throws Exception {
 		
@@ -93,7 +93,7 @@ public class HeaderTest {
 		final APICall<Void, Map<String, Object>> response = testCall.callMeNow();
 		
 	}
-	@Ignore
+	//@Ignore
 	@Test
 	public void testSingleDynamicHeaderKey() throws Exception {
 		
@@ -108,7 +108,7 @@ public class HeaderTest {
 		assertTrue(((Map<String, String>) response.getResponseBody().get("headers")).containsKey("x-foo"));
 		
 	}
-	@Ignore
+	//@Ignore
 	@Test
 	public void testSingleDynamicHeaderValue() throws Exception {
 		
@@ -124,7 +124,7 @@ public class HeaderTest {
 		assertEquals("Bar", ((Map<String, String>) response.getResponseBody().get("headers")).get("x-foo"));
 		
 	}
-	@Ignore
+	//@Ignore
 	@Test
 	public void testBothDynamicStaticHeadersKey() throws Exception {
 		
