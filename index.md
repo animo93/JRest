@@ -52,6 +52,7 @@ call.callMeLater(new APICallBack<Void, ApiResponse>() {
 Use annotations to describe the HTTP request:
  1. URL parameter replacement
  2. Object conversion to request body
+ 3. Query Parameter Support
  
 # API Declaration
  Annotations on the interface methods and its parameters indicate how a request will be handled.
@@ -67,6 +68,16 @@ A request URL can be updated dynamically using replacement blocks and parameters
 ```
 @REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
     APICall<Void,ApiResponse> listRepos(@PATH(value = "user") String user);
+```
+Query Parameters can be added via the @Query Annotation
+```
+@REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
+    APICall<Void,ApiResponse> listRepos(@PATH(value = "user") String user,@Query("sortBy") String sortBy);
+```
+Complex Parameters can be represented via the @QueryMap Annotation
+```
+@REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
+    APICall<Void,ApiResponse> listRepos(@PATH(value = "user") String user,@QueryMap Map<String,String> queryMap);
 ```
 
 ### HEADER MANIPULATION
