@@ -6,3 +6,5 @@
 .classpath
 /build/
 /target/
+.idea
+JRest.iml

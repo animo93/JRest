@@ -11,6 +11,8 @@ import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
+import java.net.URLEncoder;
+import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -210,9 +212,7 @@ public class APIHelper {
 
 				addPathParameters(args, urlBuilder, parameters);
 
-				addDynamicQueryParameters(urlBuilder,args,parameters);
-
-				addQueryParameters(urlBuilder);
+				addQueryParameters(args, urlBuilder, parameters);
 
 				addHeaders(myRequestBean, headersAnnotation, parameters, args);
 
@@ -343,25 +343,16 @@ public class APIHelper {
 				}
 			}
 
-			private void addQueryParameters(StringBuilder urlBuilder) {
-				if(params != null && params.size() > 0) {
-					urlBuilder.append("?");
-					params.forEach((k, v) -> urlBuilder.append(k).append("=").append(v).append("&"));
-				}
-
-			}
-
-			private void addDynamicQueryParameters(StringBuilder urlBuilder,Object[] args,Parameter[] parameters) throws Exception {
-				Map<String,String> paramMap = new HashMap<String,String>();
-
-				for(int i=0;i<parameters.length;i++) {
-					if(parameters[i].getAnnotation(Query.class)!=null) {
-						Query query = parameters[i].getAnnotation(Query.class);
-						
-						String queryKey = query.value();
-						
+			private void prepareQueryParamMap(Object args[],Parameter[] parameters) {
+				/* put all the found query parameters in Query and QueryMap,
+				into the paramters map to be converted into query string*/
+				for (int i = 0; i < parameters.length; i++) {
+					if (parameters[i].getAnnotation(Query.class) != null) {
+						if (params == null) params = new HashMap<>();
+						Query query = (Query) parameters[i].getAnnotation(Query.class);
+						final String queryKey = query.value();
 						if(queryKey!=null && !queryKey.isEmpty()) {
-							
+
 							String queryValue = null;
 							try {
 								queryValue = (String) args[i];
@@ -375,11 +366,11 @@ public class APIHelper {
 									queryKey = URLEncoder.encode(queryKey, "UTF-8");
 									queryValue = URLEncoder.encode(queryValue, "UTF-8");
 								}
-								paramMap.put(queryKey, queryValue);
+								params.put(queryKey, queryValue);
 							}
-						}
-					} else if(parameters[i].getAnnotation(QueryMap.class)!=null) {
-						QueryMap queryMap = parameters[i].getAnnotation(QueryMap.class);
+					} else if (parameters[i].getAnnotation(QueryMap.class) != null) {
+						if (params == null) params = new HashMap<>();
+						QueryMap queryMap = (QueryMap) parameters[i].getAnnotation(QueryMap.class);
 						Map<String,String> queryMapValue = null;
 						try {
 							queryMapValue = (Map<String, String>) args[i];
@@ -389,19 +380,20 @@ public class APIHelper {
 						}
 
 						if(queryMapValue!=null && !queryMapValue.isEmpty()) {
-							paramMap.putAll(queryMapValue);
+							params.putAll(queryMapValue);
 						}
 					}
-
 				}
+					logger.debug("Query params fetched from Params "+params);
+			}
 
-				logger.debug("Query params fetched from Params "+paramMap);
-
-				if(params==null) {
-					params = new HashMap<String, String>();
+			private void addQueryParameters(Object[] args, StringBuilder urlBuilder, Parameter[] parameters) {
+				prepareQueryParamMap(args,parameters);
+				if(params != null && params.size() > 0) {
+					urlBuilder.append("?");
+					params.forEach((k, v) -> urlBuilder.append(k).append("=").append(v).append("&"));
+					urlBuilder.deleteCharAt(urlBuilder.length()-1);
 				}
-				params.putAll(paramMap);
-
 			}
 
 			private void addPathParameters(Object[] args, StringBuilder urlBuilder, Parameter[] parameters)
