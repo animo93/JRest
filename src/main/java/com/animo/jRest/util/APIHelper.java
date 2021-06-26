@@ -15,15 +15,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.animo.jRest.annotation.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.animo.jRest.annotation.Body;
-import com.animo.jRest.annotation.FollowRedirects;
-import com.animo.jRest.annotation.HEADER;
-import com.animo.jRest.annotation.HEADERS;
-import com.animo.jRest.annotation.PATH;
-import com.animo.jRest.annotation.REQUEST;
 
 
 /**
@@ -43,7 +37,7 @@ import com.animo.jRest.annotation.REQUEST;
 public class APIHelper {
 
 	private final String baseURL;
-	private final Map<String, String> params;
+	private Map<String, String> params;
 	private final RequestAuthentication auth;
 	private final RequestProxy reqProxy;
 	private final boolean disableSSLVerification;
@@ -204,7 +198,7 @@ public class APIHelper {
 
 				addPathParameters(args, urlBuilder, parameters);
 
-				addQueryParameters(urlBuilder);
+				addQueryParameters(args, urlBuilder, parameters);
 
 				addHeaders(myRequestBean, headersAnnotation, parameters, args);
 
@@ -334,10 +328,30 @@ public class APIHelper {
 				}
 			}
 
-			private void addQueryParameters(StringBuilder urlBuilder) {
+			private void prepareQueryParamMap(Object args[],Parameter[] parameters) {
+				/* put all the found query parameters in Query and QueryMap,
+				into the paramters map to be converted into query string*/
+				for (int i = 0; i < parameters.length; i++) {
+					if (parameters[i].getAnnotation(Query.class) != null) {
+						if (params == null) params = new HashMap<>();
+						Query query = (Query) parameters[i].getAnnotation(Query.class);
+						final String value = query.value();
+						params.put(value, (String) args[i]);
+					} else if (parameters[i].getAnnotation(QueryMap.class) != null) {
+						if (params == null) params = new HashMap<>();
+						QueryMap query = (QueryMap) parameters[i].getAnnotation(QueryMap.class);
+						Map<String, String> paramValues = (Map<String, String>) args[i];
+						params.putAll(paramValues);
+					}
+				}
+			}
+
+			private void addQueryParameters(Object[] args, StringBuilder urlBuilder, Parameter[] parameters) {
+				prepareQueryParamMap(args,parameters);
 				if(params != null && params.size() > 0) {
 					urlBuilder.append("?");
 					params.forEach((k, v) -> urlBuilder.append(k).append("=").append(v).append("&"));
+					urlBuilder.deleteCharAt(urlBuilder.length()-1);
 				}
 			}
 

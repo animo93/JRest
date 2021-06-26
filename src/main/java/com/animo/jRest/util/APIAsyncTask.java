@@ -57,14 +57,19 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 		final HttpURLConnection httpURLConnection = null;
 		final BufferedReader reader = null;
 		final String repoJson = null;
-		final APICall<Request, Response> myCall;
-		
-		myCall = httpsConnection();
+		APICall<Request, Response> myCall = null;
+		final URL url = new URL(this.bean.getUrl());
+
+		// using the URL from the bean, check the protocol for 'http' or 'https' and make the appropriate call
+		if (url.getProtocol().equals("http"))
+			myCall = httpConnection(url);
+		else if(url.getProtocol().equals("https"))
+			myCall = httpsConnection(url);
 
 		return myCall;
 	}
 
-	private APICall<Request, Response> httpsConnection() throws Exception {
+	private APICall<Request, Response> httpsConnection(URL url) throws Exception {
 		HttpsURLConnection httpsURLConnection = null;
 		BufferedReader reader = null;
 		String repoJson = null;
@@ -72,7 +77,7 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 		
 		try{
 
-			final URL url = new URL(bean.getUrl());
+//			final URL url = new URL(bean.getUrl());
 			logger.debug("Going to make connection for " + url.toString());
 			if(bean.getProxy() != null){
 				logger.debug("proxy " + bean.getProxy());
@@ -208,6 +213,149 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 					myCall.setResponseBody(res);
 				}
 				
+			}
+		} catch(Exception e) {
+			logger.error("Error in json conversion ", e);
+			throw e;
+		}
+
+		return myCall;
+	}
+
+	private APICall<Request, Response> httpConnection(URL url) throws Exception {
+		HttpURLConnection httpsURLConnection = null;
+		BufferedReader reader = null;
+		String repoJson = null;
+		APICall<Request, Response> myCall = new APICall<>();
+
+		try{
+
+//			final URL url = new URL(bean.getUrl());
+			logger.debug("Going to make connection for " + url.toString());
+			if(bean.getProxy() != null){
+				logger.debug("proxy " + bean.getProxy());
+				if(bean.getProxy().getUrl() != null) {
+					final Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(
+							bean.getProxy().getUrl(), bean.getProxy().getPort()));
+					if(bean.getProxy().getUsername() != null && bean.getProxy().getPassword() != null) {
+						final Authenticator auth = new Authenticator() {
+							public PasswordAuthentication getPasswordAuthentication(){
+								return(new PasswordAuthentication(
+										bean.getProxy().getUsername(), bean.getProxy().getPassword().toCharArray()));
+							}
+						};
+						Authenticator.setDefault(auth);
+					}
+					httpsURLConnection = (HttpsURLConnection) url.openConnection(proxy);
+				}
+
+			}else{
+				httpsURLConnection = (HttpsURLConnection) url.openConnection();
+			}
+
+			httpsURLConnection.setRequestMethod(bean.getRequestType().toString());
+			httpsURLConnection.setRequestProperty("Content-Type", "application/json");
+			if(bean.getHeaders() != null && !bean.getHeaders().isEmpty()) {
+				for(Entry<String, String> entry:bean.getHeaders().entrySet()) {
+					httpsURLConnection.setRequestProperty(entry.getKey(), entry.getValue());
+				}
+			}
+
+			if(bean.getAuthentication() != null) {
+				final RequestAuthentication auth = bean.getAuthentication();
+				if(auth.getUsername() != null && auth.getPassword() != null) {
+					final String userPassword = auth.getUsername() + ":" + auth.getPassword();
+					final String encodedAuthorization = Base64.encodeBase64String(userPassword.getBytes());
+					httpsURLConnection.setRequestProperty("Authorization", "Basic " +
+							encodedAuthorization.replaceAll("\n", ""));
+				}
+			}
+
+			if(bean.getAccessToken() != null)
+				httpsURLConnection.setRequestProperty("Authorization", " token " + bean.getAccessToken());
+
+			if(bean.getRequestType().toString().equals("POST") || bean.getRequestType().toString().equals("PATCH")
+					|| bean.getRequestType().toString().equals("PUT")) {
+				Request requestObject = bean.getRequestObject();
+				if(null != requestObject) {
+					final String json = new Gson().toJson(requestObject, new TypeToken<Request>(){}.getType());
+					logger.debug("request json " + json);
+					/*System.out.println("request json "+json);*/
+					httpsURLConnection.setDoOutput(true);
+
+					final OutputStream os = httpsURLConnection.getOutputStream();
+					os.write(json.getBytes("UTF-8"));
+					os.close();
+				}
+			}
+
+			httpsURLConnection.setInstanceFollowRedirects(bean.isFollowRedirects());
+			httpsURLConnection.connect();
+
+			logger.debug("Response Headers " + httpsURLConnection.getHeaderFields());
+			myCall.setResponseHeaders(httpsURLConnection.getHeaderFields());
+
+			logger.debug("response code " + httpsURLConnection.getResponseCode());
+
+			int status = httpsURLConnection.getResponseCode();
+			myCall.setResponseCode(status);
+			final InputStream inputStream;
+			if(status != HttpURLConnection.HTTP_OK && status != HttpURLConnection.HTTP_CREATED)
+				inputStream = httpsURLConnection.getErrorStream();
+			else {
+				inputStream = httpsURLConnection.getInputStream();
+			}
+			final StringBuffer stringBuffer = new StringBuffer();
+			if (inputStream == null)
+				repoJson = null;
+			else{
+				reader = new BufferedReader(new InputStreamReader(inputStream));
+
+				String line;
+				while ((line = reader.readLine()) != null) {
+					stringBuffer.append(line).append("\n");
+				}
+				if (stringBuffer.length() == 0)
+					repoJson = null;
+
+				repoJson = stringBuffer.toString();
+				inputStream.close();
+			}
+		} catch (Exception e) {
+			logger.error("Could not make connection ", e);
+			throw e;
+		} finally {
+			if (httpsURLConnection != null)
+				httpsURLConnection.disconnect();
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					logger.error("error in closing conn", e);
+					throw e;
+				}
+			}
+		}
+
+		Gson gson = new Gson();
+		try {
+			if(repoJson != null) {
+				/*String repo=repoJson.replace("-", "");*/
+				//Response response = gson.fromJson(repoJson, type);
+				logger.debug("repoJson " + repoJson);
+				/*System.out.println("repJson:"+repoJson);*/
+
+				if(!outputIsJson(repoJson)) {
+					myCall.setResponseBody((Response) repoJson);
+				} else {
+					logger.debug("type " + type.getClass());
+					final ObjectMapper mapper = new ObjectMapper();
+					final Class<?> t = type2Class(type);
+					Response res = (Response) mapper.readValue(repoJson, t);
+
+					myCall.setResponseBody(res);
+				}
+
 			}
 		} catch(Exception e) {
 			logger.error("Error in json conversion ", e);
