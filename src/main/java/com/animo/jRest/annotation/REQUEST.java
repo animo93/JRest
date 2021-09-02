@@ -14,7 +14,7 @@ import com.animo.jRest.util.HTTP_METHOD;
  * <p>For Example :
  * <pre><code>
  * &#64;REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
- * APICall<Void,ApiResponse> listRepos(@PATH(value = "user") String user);
+ * APICall&#60;Void,ApiResponse&#62; listRepos(@PATH(value = "user") String user);
  * </code></pre>
  * @author animo
  *

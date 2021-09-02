@@ -7,14 +7,11 @@ import java.util.Map;
 /**
  * An invocation of a APIHelper method that sends a request to a webserver and returns a response.
  * Each call yields its own HTTP request and response pair
- * 
- * <p>Calls may be executed synchronously with {@link #callMeNow}, or asynchronously with {@link
- * #callMeLater}. 
- * 
- * @author animo
  *
- * @param <Request>
- * @param <Response>
+ * <p>Calls may be executed synchronously with {@link #callMeNow}, or asynchronously with {@link
+ * #callMeLater}.
+ * @param <Request> Request type
+ * @param <Response> Response type
  */
 
 public class APICall<Request, Response> {

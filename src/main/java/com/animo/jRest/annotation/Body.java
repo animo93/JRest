@@ -11,6 +11,7 @@ import java.lang.annotation.Target;
  * of a POST/PUT request (instead of sending in as request parameters or form-style request body).
  * 
  * <b>The object will be serialized using Google GSON and the result will be set directly as the request body.
+ * </b>
  * @author animo
  *
  */

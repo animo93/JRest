@@ -12,10 +12,10 @@ public interface JRestDynamicAPiInterface<T> {
      * <p> For example : (Service Execution) </p>
      * 	 <pre><code>
      * 	     MyApiInterface testInterface = testAPIHelper.createDynamicApi(MyApiInterface.class,"listRepos");
-     * 	     APICall&#60;Void, Map<String,Object>> call = testInterface.dynamicAPIInvocation("testUser");
-     * 	     APICall&#60;Void,Map<String,Object>> response = call.callMeNow();
+     * 	     APICall&#60;Void, Map&#60;String,Object&#62;&#62; call = testInterface.dynamicAPIInvocation("testUser");
+     * 	     APICall&#60;Void,Map&#60;String,Object&#62;&#62; response = call.callMeNow();
      * 	 </code></pre>
-     * @param args
+     * @param args The actual arguments which are going to be passed to the method to be invoked
      * @return {@link com.animo.jRest.util.APICall}
      */
     APICall<Void, T> dynamicAPIInvocation(Object... args);

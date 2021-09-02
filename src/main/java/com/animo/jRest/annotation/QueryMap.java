@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * 
  * Query parameter keys and values appended to the URL.
  *
- * <p>Values are converted to strings using {@link Retrofit#stringConverter(Type, Annotation[])} (or
+ * <p>Values are converted to strings using
  * {@link Object#toString()}, if no matching string converter is installed).
  *
  * <p>Simple Example:
@@ -23,8 +23,7 @@ import java.lang.annotation.Target;
  * Calling with {@code foo.friends(ImmutableMap.of("group", "coworker", "age", "42"))} yields {@code
  * /friends?group=coworker&age=42}.
  *
- * <p>Map keys and values representing parameter values are URL encoded by default. Specify {@link
- * #encoded() encoded=true} to change this behavior.
+ * <p>Map keys and values representing parameter values are URL encoded by default. Specify {encoded=true} to change this behavior.
  *
  * <pre><code>
  * &#64;GET("/friends")

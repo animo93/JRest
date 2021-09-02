@@ -156,12 +156,8 @@ public class APIHelper {
 	/**
 	 * Create an implementation of the API endpoints defined by the {@code service} interface.
 	 * <p>The relative path for a given method is obtained from an annotation on the method describing
-	 * the request type.The built in methods are {@link com.animo.jRest.util.HTTP_METHOD.GET GET},
-	 * {@link com.animo.jRest.util.HTTP_METHOD.PUT PUT} ,{@link com.animo.jRest.util.HTTP_METHOD.POST POST},
-	 * {@link com.animo.jRest.util.HTTP_METHOD.PATCH PATCH} , {@link com.animo.jRest.util.HTTP_METHOD.DELETE DELETE}
-	 * 
-	 * <p>Method parameters can be used to replace parts of the URL by annotating them with {@link
-	 * com.animo.jRest.annotation.Path @Path}. Replacement sections are denoted by an identifier surrounded by
+	 * the request type.The built in methods are {GET},{PUT} ,{POST},{PATCH} , {DELETE}
+	 * <p>Method parameters can be used to replace parts of the URL by annotating them with {Path}. Replacement sections are denoted by an identifier surrounded by
 	 * curly braces (e.g., "{foo}").
 	 * 
 	 * <p>The body of a request is denoted by the {@link com.animo.jRest.annotation.Body @Body} annotation.
@@ -175,11 +171,12 @@ public class APIHelper {
 	 * public interface MyApiInterface {
 	 *
 	 *	&#64;REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
-	 *	APICall&#60;Void,ApiResponse> listRepos(@PATH(value = "user") String user);
+	 *	APICall&#60;Void,ApiResponse&#62; listRepos(@PATH(value = "user") String user);
 	 *
 	 *}</code></pre>
 	 * 
 	 * @param clazz service.class
+	 * @param <S> Service Class
 	 * @return {@code service}
 	 */
 	@SuppressWarnings("unchecked")
@@ -194,30 +191,34 @@ public class APIHelper {
 
 	/**
 	 * Create a dynamic runtime implementation of the API endpoints defined by the {@code service} interface.
-	 * <p>The {@code service} interface should extend JRestDynamicAPiInterface<T> , if dynamic implementation is required</p>
+	 * <p>The {@code service} interface should extend JRestDynamicAPiInterface&#60;T&#62; , if dynamic implementation is required</p>
 	 * <p>This should be used to dynamically invoke any of the APIs already defined in the {@code service} interface.</p>
 	 * <p>The Service interface APIs should be created as usual ,and can be invoked by providing the name and arguments </p>
 	 *
 	 *
 	 * <p>For example : (Service Definition)
 	 * <pre><code>
-	 * public interface MyApiInterface extends JRestDynamicAPiInterface&#60;ApiResponse>{
+	 * public interface MyApiInterface extends JRestDynamicAPiInterface&#60;ApiResponse&#62;{
 	 *
 	 *	&#64;REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
-	 *	APICall&#60;Void,ApiResponse> listRepos(@PATH(value = "user") String user);
+	 *	APICall&#60;Void,ApiResponse&#62; listRepos(@PATH(value = "user") String user);
 	 *
-	 *  APICall&#60;Void,ApiResponse> dynamicApiInvocation(Object... args)
+	 *  APICall&#60;Void,ApiResponse&#62; dynamicApiInvocation(Object... args)
 	 *
 	 *}</code></pre>
 	 *
 	 * <p> For example : (Service Execution) </p>
 	 * <pre><code>
 	 *     MyApiInterface testInterface = testAPIHelper.createDynamicApi(MyApiInterface.class,"listRepos");
-	 *     APICall&#60;Void, Map<String,Object>> call = testInterface.dynamicAPIInvocation("testUser");
-	 *     APICall&#60;Void,Map<String,Object>> response = call.callMeNow();
+	 *     APICall&#60;Void, Map&#60;String,Object&#62;&#62; call = testInterface.dynamicAPIInvocation("testUser");
+	 *     APICall&#60;Void,Map&#60;String,Object&#62;&#62; response = call.callMeNow();
 	 * </code></pre>
 	 *
 	 * @param clazz service.class
+	 * @param <S> Service Class
+	 * @param methodName The method name which is going to be dynamically invoked
+	 * @param parameterTypes The parameter types for the method going to be dynamically invoked
+	 * @throws NoSuchMethodException When the method doesn't exists in service class
 	 * @return {@code service}
 	 */
 	public <S> S createDynamicApi(Class<S> clazz,String methodName,Class... parameterTypes) throws NoSuchMethodException {
