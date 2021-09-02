@@ -175,7 +175,7 @@ public class APIHelper {
 	 * public interface MyApiInterface {
 	 *
 	 *	&#64;REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
-	 *	APICall<Void,ApiResponse> listRepos(@PATH(value = "user") String user);
+	 *	APICall&#60;Void,ApiResponse> listRepos(@PATH(value = "user") String user);
 	 *
 	 *}</code></pre>
 	 * 
@@ -187,9 +187,59 @@ public class APIHelper {
 		final ClassLoader loader = clazz.getClassLoader();
 		final Class[] interfaces = new Class[]{clazz};
 
-		final Object object = Proxy.newProxyInstance(loader, interfaces, new InvocationHandler() {
+		final Object object = Proxy.newProxyInstance(loader, interfaces,setInvocationHandler(null));
+
+		return (S) object;
+	}
+
+	/**
+	 * Create a dynamic runtime implementation of the API endpoints defined by the {@code service} interface.
+	 * <p>The {@code service} interface should extend JRestDynamicAPiInterface<T> , if dynamic implementation is required</p>
+	 * <p>This should be used to dynamically invoke any of the APIs already defined in the {@code service} interface.</p>
+	 * <p>The Service interface APIs should be created as usual ,and can be invoked by providing the name and arguments </p>
+	 *
+	 *
+	 * <p>For example : (Service Definition)
+	 * <pre><code>
+	 * public interface MyApiInterface extends JRestDynamicAPiInterface&#60;ApiResponse>{
+	 *
+	 *	&#64;REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
+	 *	APICall&#60;Void,ApiResponse> listRepos(@PATH(value = "user") String user);
+	 *
+	 *  APICall&#60;Void,ApiResponse> dynamicApiInvocation(Object... args)
+	 *
+	 *}</code></pre>
+	 *
+	 * <p> For example : (Service Execution) </p>
+	 * <pre><code>
+	 *     MyApiInterface testInterface = testAPIHelper.createDynamicApi(MyApiInterface.class,"listRepos");
+	 *     APICall&#60;Void, Map<String,Object>> call = testInterface.dynamicAPIInvocation("testUser");
+	 *     APICall&#60;Void,Map<String,Object>> response = call.callMeNow();
+	 * </code></pre>
+	 *
+	 * @param clazz service.class
+	 * @return {@code service}
+	 */
+	public <S> S createDynamicApi(Class<S> clazz,String methodName,Class... parameterTypes) throws NoSuchMethodException {
+
+		final ClassLoader loader = clazz.getClassLoader();
+		final Class[] interfaces = new Class[]{clazz};
+
+		Method methodToCall = clazz.getMethod(methodName,parameterTypes);
+		final Object object = Proxy.newProxyInstance(loader, interfaces,setInvocationHandler(methodToCall));
+
+		return (S) object;
+
+	}
+
+	private InvocationHandler setInvocationHandler(Method methodToCall){
+		return new InvocationHandler() {
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+				if(methodToCall != null){
+					method = methodToCall;
+					args = (Object[]) args[0];
+				}
 				final Annotation requestAnnotation = method.getAnnotation(REQUEST.class);
 				final Annotation[][] parameterAnnotation = method.getParameterAnnotations();
 				final Class[] parameterTypes = method.getParameterTypes();
@@ -237,7 +287,7 @@ public class APIHelper {
 				if(type instanceof ParameterizedType){
 					final ParameterizedType pType = (ParameterizedType) type;
 					for(Type t:pType.getActualTypeArguments()) {
-						myCall.setType(t);	
+						myCall.setType(t);
 					}
 				}
 				else
@@ -252,11 +302,11 @@ public class APIHelper {
 				Map<String, String> requestHeadersMap = new HashMap<>();
 				if(headers != null) {
 					requestHeadersFromMethod = headers.value();
-					
+
 					logger.debug("Request Headers from Method" + Arrays.toString(requestHeadersFromMethod));
 					requestHeadersMap = convertToHeadersMap(requestHeadersFromMethod);
 				}
-				
+
 				final Map<String, String> requestHeadersFromParam = getParamHeaders(parameters, args);
 
 				//String[] requestHeaders = concatenateHeaders(requestHeadersFromMethod,requestHeadersFromParam);
@@ -288,8 +338,8 @@ public class APIHelper {
 					logger.error("Unable to get ParamHeaders " + ex);
 					throw new RuntimeException("Header Parameters should be passed in Map<key:value> format ");
 				}
-				
-				
+
+
 				logger.debug("Request Headers from Params " + paramValues);
 				return paramValues;
 			}
@@ -307,7 +357,7 @@ public class APIHelper {
 			}
 
 			private void addRequestBody(Object[] args, Annotation[][] att, Class[] parameterTypes, REQUEST request,
-					RequestBean<Object> myRequestBean) {
+										RequestBean<Object> myRequestBean) {
 				if(request.type().equals(HTTP_METHOD.POST) ||
 						request.type().equals(HTTP_METHOD.PATCH) ||
 						request.type().equals(HTTP_METHOD.PUT)){
@@ -419,8 +469,6 @@ public class APIHelper {
 					throw new Exception("Undeclared PATH variable found ..Please declare them in the interface");
 				}
 			}
-		});
-
-		return (S) object;
+		};
 	}
 }

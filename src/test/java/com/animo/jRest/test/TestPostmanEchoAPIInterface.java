@@ -9,6 +9,7 @@ import com.animo.jRest.annotation.QueryMap;
 import com.animo.jRest.annotation.REQUEST;
 import com.animo.jRest.util.APICall;
 import com.animo.jRest.util.HTTP_METHOD;
+import com.animo.jRest.util.JRestDynamicAPiInterface;
 
 public interface TestPostmanEchoAPIInterface {
 	
