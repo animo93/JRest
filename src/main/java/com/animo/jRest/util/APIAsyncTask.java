@@ -54,9 +54,89 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 		final String repoJson = null;
 		APICall<Request, Response> myCall = null;
 		final URL url = new URL(this.bean.getUrl());
+		if(url.getProtocol().equals("https")){
+			myCall = httpsConnection(url);
+		}else {
+			myCall = httpConnection(url);
+		}
 
-		myCall = httpsConnection(url);
 		return myCall;
+	}
+
+	private APICall<Request,Response> httpConnection(URL url) throws Exception {
+		HttpURLConnection httpURLConnection = null;
+		String repoJson = null;
+		APICall<Request, Response> myCall = new APICall<>();
+
+		try{
+			httpURLConnection = getHttpConnection();
+
+			httpURLConnection.setRequestMethod(bean.getRequestType().toString());
+
+			setHeaders(httpURLConnection);
+
+			setAuthentication(httpURLConnection);
+
+			setRequestBody(httpURLConnection);
+
+			httpURLConnection.setInstanceFollowRedirects(bean.isFollowRedirects());
+
+			httpURLConnection.connect();
+
+			logger.debug("Response Headers " + httpURLConnection.getHeaderFields());
+			myCall.setResponseHeaders(httpURLConnection.getHeaderFields());
+
+			logger.debug("response code " + httpURLConnection.getResponseCode());
+
+			int status = httpURLConnection.getResponseCode();
+			myCall.setResponseCode(status);
+
+			repoJson = getResponseBody(status,httpURLConnection);
+
+		} catch (Exception e) {
+			logger.error("Could not make connection ", e);
+			throw e;
+		}
+
+		convertResponse(repoJson, myCall);
+
+		return myCall;
+	}
+
+	private HttpURLConnection getHttpConnection() throws IOException{
+		try {
+			final URL url = new URL(bean.getUrl());
+			logger.debug("Going to make connection for " + url.toString());
+			if(bean.getProxy() != null){
+				logger.debug("proxy " + bean.getProxy());
+				if(bean.getProxy().getUrl() != null) {
+					final Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(
+							bean.getProxy().getUrl(), bean.getProxy().getPort()));
+					if(bean.getProxy().getUsername() != null && bean.getProxy().getPassword() != null) {
+						final Authenticator auth = new Authenticator() {
+							public PasswordAuthentication getPasswordAuthentication(){
+								return(new PasswordAuthentication(
+										bean.getProxy().getUsername(), bean.getProxy().getPassword().toCharArray()));
+							}
+						};
+						Authenticator.setDefault(auth);
+					}
+					return (HttpURLConnection) url.openConnection(proxy);
+				}else {
+					throw new IllegalArgumentException("Proxy Url is not provided ");
+				}
+
+			}else{
+				return (HttpURLConnection) url.openConnection();
+			}
+		}catch (MalformedURLException e) {
+			logger.error("Url is malformed "+bean.getUrl(), e);
+			throw e;
+		} catch (IOException e) {
+			logger.error("Unable to establish connection to "+bean.getUrl(), e);
+			throw e;
+		}
+
 	}
 
 	private APICall<Request, Response> httpsConnection(URL url) throws Exception {
@@ -137,7 +217,7 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 		}
 	}
 
-	private String getResponseBody(int status,HttpsURLConnection httpsURLConnection) throws Exception {
+	private String getResponseBody(int status,HttpURLConnection httpsURLConnection) throws Exception {
 		String repoJson = null;
 		BufferedReader reader = null;
 		try {
@@ -181,7 +261,7 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 		return repoJson;
 	}
 
-	private void setRequestBody(HttpsURLConnection httpsURLConnection) throws IOException {
+	private void setRequestBody(HttpURLConnection httpsURLConnection) throws IOException {
 		if(bean.getRequestType().toString().equals("POST") || bean.getRequestType().toString().equals("PATCH")
 				|| bean.getRequestType().toString().equals("PUT")) {
 			Request requestObject = bean.getRequestObject();
@@ -198,7 +278,7 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 		}
 	}
 
-	private void setAuthentication(HttpsURLConnection httpsURLConnection) {
+	private void setAuthentication(HttpURLConnection httpsURLConnection) {
 		if(bean.getAuthentication() != null) {
 			final RequestAuthentication auth = bean.getAuthentication();
 			if(auth.getUsername() != null && auth.getPassword() != null) {
@@ -213,7 +293,7 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 			httpsURLConnection.setRequestProperty("Authorization", " token " + bean.getAccessToken());
 	}
 
-	private void setHeaders(HttpsURLConnection httpsURLConnection) {
+	private void setHeaders(HttpURLConnection httpsURLConnection) {
 		httpsURLConnection.setRequestProperty("Content-Type", "application/json");
 		if(bean.getHeaders() != null && !bean.getHeaders().isEmpty()) {
 			for(Entry<String, String> entry:bean.getHeaders().entrySet()) {

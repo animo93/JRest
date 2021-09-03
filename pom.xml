@@ -33,6 +33,20 @@
 			<version>2.6.2</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.mock-server</groupId>
+			<artifactId>mockserver-netty</artifactId>
+			<version>5.11.2</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mock-server</groupId>
+			<artifactId>mockserver-client-java</artifactId>
+			<version>5.11.2</version>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/junit/junit -->
 		<dependency>
 			<groupId>junit</groupId>
