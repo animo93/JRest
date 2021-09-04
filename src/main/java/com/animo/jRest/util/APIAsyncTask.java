@@ -294,7 +294,8 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 	}
 
 	private void setHeaders(HttpURLConnection httpsURLConnection) {
-		httpsURLConnection.setRequestProperty("Content-Type", "application/json");
+		//Setting this to fix a bug in jdk which sets illegal "Accept" header
+		httpsURLConnection.setRequestProperty("Accept", "application/json");
 		if(bean.getHeaders() != null && !bean.getHeaders().isEmpty()) {
 			for(Entry<String, String> entry:bean.getHeaders().entrySet()) {
 				httpsURLConnection.setRequestProperty(entry.getKey(), entry.getValue());
