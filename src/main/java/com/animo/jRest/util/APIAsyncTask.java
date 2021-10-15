@@ -197,12 +197,12 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 		try {
 			if(repoJson != null) {
 
-				logger.debug("repoJson " + repoJson);
+				logger.debug("repoJson {}" ,repoJson);
 
 				if(!outputIsJson(repoJson)) {
 					myCall.setResponseBody((Response) repoJson);
 				} else {
-					logger.debug("type " + type.getClass());
+					logger.debug("type {}" , type.getClass());
 					final ObjectMapper mapper = new ObjectMapper();
 					final Class<?> t = type2Class(type);
 					Response res = (Response) mapper.readValue(repoJson, t);
@@ -267,8 +267,7 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 			Request requestObject = bean.getRequestObject();
 			if(null != requestObject) {
 				final String json = new Gson().toJson(requestObject, new TypeToken<Request>(){}.getType());
-				logger.debug("request json " + json);
-				/*System.out.println("request json "+json);*/
+				logger.debug("request json {}" ,json);
 				httpsURLConnection.setDoOutput(true);
 
 				final OutputStream os = httpsURLConnection.getOutputStream();
@@ -306,9 +305,9 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 	private HttpsURLConnection getConnection() throws IOException {
 		try {
 			final URL url = new URL(bean.getUrl());
-			logger.debug("Going to make connection for " + url.toString());
+			logger.debug("Going to make connection for {}" , url.toString());
 			if(bean.getProxy() != null){
-				logger.debug("proxy " + bean.getProxy());
+				logger.debug("proxy {}" , bean.getProxy());
 				if(bean.getProxy().getUrl() != null) {
 					final Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(
 							bean.getProxy().getUrl(), bean.getProxy().getPort()));

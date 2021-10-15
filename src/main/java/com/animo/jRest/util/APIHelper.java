@@ -267,7 +267,7 @@ public class APIHelper {
 
 				addHeaders(myRequestBean, headersAnnotation, parameters, args);
 
-				logger.debug("final Url " + urlBuilder.toString());
+				logger.debug("final Url {}",urlBuilder.toString());
 				myRequestBean.setUrl(urlBuilder.toString());
 
 				myRequestBean.setAuthentication(auth);
@@ -275,7 +275,7 @@ public class APIHelper {
 				myRequestBean.setRequestType(request.type());
 				myRequestBean.setDisableSSLVerification(disableSSLVerification);
 
-				addRequestBody(args, parameterAnnotation, parameterTypes, request, myRequestBean);
+				addRequestBody(args, request, myRequestBean,parameters);
 
 				if(followRedirectsAnnotation != null)
 					myRequestBean.setFollowRedirects(followRedirectsAnnotation.value());
@@ -304,7 +304,7 @@ public class APIHelper {
 				if(headers != null) {
 					requestHeadersFromMethod = headers.value();
 
-					logger.debug("Request Headers from Method" + Arrays.toString(requestHeadersFromMethod));
+					logger.debug("Request Headers from Method {} " , Arrays.toString(requestHeadersFromMethod));
 					requestHeadersMap = convertToHeadersMap(requestHeadersFromMethod);
 				}
 
@@ -341,7 +341,7 @@ public class APIHelper {
 				}
 
 
-				logger.debug("Request Headers from Params " + paramValues);
+				logger.debug("Request Headers from Params {}" ,paramValues);
 				return paramValues;
 			}
 
@@ -353,44 +353,22 @@ public class APIHelper {
 					}
 					headersMap.put(header.split(":")[0], header.split(":")[1]);
 				}
-				logger.debug("Final Request Headers Map " + headersMap);
+				logger.debug("Final Request Headers Map {} " ,headersMap);
 				return headersMap;
 			}
 
-			private void addRequestBody(Object[] args, Annotation[][] att, Class[] parameterTypes, REQUEST request,
-										RequestBean<Object> myRequestBean) {
+			private void addRequestBody(Object[] args,REQUEST request,
+										RequestBean<Object> myRequestBean,Parameter[] parameters) {
 				if(request.type().equals(HTTP_METHOD.POST) ||
 						request.type().equals(HTTP_METHOD.PATCH) ||
 						request.type().equals(HTTP_METHOD.PUT)){
-					int i = 0;
-					for(Annotation[] annotations : att) {
-						Class parameterType = parameterTypes[i++];
-
-						for(Annotation annotation : annotations) {
-							if(annotation instanceof Body) {
-								Body myAnnotation = (Body) annotation;
-								logger.debug("param: {}", parameterType.getName());
-
-								if(args!=null) {
-									List<Object> argsAsList = Arrays.asList(args);
-									logger.debug("argsASList: {}", argsAsList);
-									if(argsAsList != null && argsAsList.size() > 0) {
-										argsAsList.forEach(arg -> {
-											if(arg.getClass().equals(parameterType)) {
-												myRequestBean.setRequestObject(arg);
-											}
-										});
-									}
-								}
-							}
+					for (int i = 0; i < parameters.length; i++) {
+						if(parameters[i].getAnnotation(Body.class)!=null){
+							Body body = (Body) parameters[i].getAnnotation(Body.class);
+							logger.debug("Going to set request body {}",args[i]);
+							myRequestBean.setRequestObject(args[i]);
 						}
 					}
-					//Commenting this out , since some post requests can be made without a body
-					/*if(myRequestBean.getRequestObject()==null){
-						logger.error("No request body found");
-						throw new Exception("No request body found");
-					}*/
-
 				}
 			}
 
