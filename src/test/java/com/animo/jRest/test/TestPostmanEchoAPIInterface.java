@@ -2,11 +2,7 @@ package com.animo.jRest.test;
 
 import java.util.Map;
 
-import com.animo.jRest.annotation.HEADER;
-import com.animo.jRest.annotation.HEADERS;
-import com.animo.jRest.annotation.Query;
-import com.animo.jRest.annotation.QueryMap;
-import com.animo.jRest.annotation.REQUEST;
+import com.animo.jRest.annotation.*;
 import com.animo.jRest.util.APICall;
 import com.animo.jRest.util.HTTP_METHOD;
 import com.animo.jRest.util.JRestDynamicAPiInterface;
@@ -79,5 +75,13 @@ public interface TestPostmanEchoAPIInterface {
 	
 	@REQUEST(endpoint = "/get",type=HTTP_METHOD.GET)
 	APICall<Void,Map<String,Object>> singleQueryMapFailureCall(@QueryMap() int bar);
+
+	@REQUEST(endpoint = "/post",type = HTTP_METHOD.POST)
+	@HEADERS("Content-Type: application/json")
+	APICall<Void,Map<String,Object>> requestBodyObjectCall(@Body TestRequestBody requestBody);
+
+	@REQUEST(endpoint = "/post",type = HTTP_METHOD.POST)
+	@HEADERS("Content-Type: application/json")
+	APICall<Void,Map<String,Object>> requestBodyMapCall(@Body Map<String,Object> requestBody);
 
 }
