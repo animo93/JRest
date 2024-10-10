@@ -266,7 +266,13 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 				|| bean.getRequestType().toString().equals("PUT")) {
 			Request requestObject = bean.getRequestObject();
 			if(null != requestObject) {
-				final String json = new Gson().toJson(requestObject, new TypeToken<Request>(){}.getType());
+				StringBuilder builder = new StringBuilder();
+				if(requestObject instanceof ParameterizedType) {
+					builder.append(new Gson().toJson(requestObject, TypeToken.getParameterized(requestObject.getClass(),String.class).getType()));
+				}else{
+					builder.append(new Gson().toJson(requestObject));
+				}
+				final String json = builder.toString();
 				logger.debug("request json {}" ,json);
 				httpsURLConnection.setDoOutput(true);
 

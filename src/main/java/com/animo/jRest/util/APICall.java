@@ -19,7 +19,7 @@ public class APICall<Request, Response> {
     private int responseCode;
     private RequestBean<Request>  requestBean;
     private Map<String, List<String>> responseHeaders;
-    private Type type;
+    private Type responseType;
 
     public Map<String, List<String>> getResponseHeaders() {
         return responseHeaders;
@@ -37,12 +37,12 @@ public class APICall<Request, Response> {
         this.requestBean = requestBean;
     }
 
-    public Type getType() {
-        return type;
+    public Type getResponseType() {
+        return responseType;
     }
 
-    public void setType(Type type) {
-        this.type = type;
+    public void setResponseType(Type responseType) {
+        this.responseType = responseType;
     }
 
     public Response getResponseBody() {
@@ -69,7 +69,7 @@ public class APICall<Request, Response> {
      */
     public APICall<Request, Response> callMeNow() throws Exception {
 
-        final APIAsyncTask<Request, Response> asyncTask = new APIAsyncTask<>(requestBean, type);
+        final APIAsyncTask<Request, Response> asyncTask = new APIAsyncTask<>(requestBean, responseType);
         return asyncTask.executeNow(requestBean);
     }
     
@@ -80,7 +80,7 @@ public class APICall<Request, Response> {
      * @throws Exception if issue occurs with asyncTask executeLater method
      */
     public void callMeLater(APICallBack<Request, Response> callBack) throws Exception {
-    	final APIAsyncTask<Request,Response> asyncTask = new APIAsyncTask<>(requestBean, type, callBack);
+    	final APIAsyncTask<Request,Response> asyncTask = new APIAsyncTask<>(requestBean, responseType, callBack);
         asyncTask.executeLater(requestBean);
     }
 
