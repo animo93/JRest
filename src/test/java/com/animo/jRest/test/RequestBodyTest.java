@@ -22,8 +22,8 @@ public class RequestBodyTest {
                 .builder("https://postman-echo.com")
                 .build();
         final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-        final APICall<Void, Map<String, Object>> testCall = testInterface.requestBodyObjectCall(testRequestBody);
-        final APICall<Void, Map<String, Object>> response = testCall.callMeNow();
+        final APICall<TestRequestBody, Map<String, Object>> testCall = testInterface.requestBodyObjectCall(testRequestBody);
+        final APICall<TestRequestBody, Map<String, Object>> response = testCall.callMeNow();
         assertTrue(((Map<String, String>) response.getResponseBody().get("data")).containsKey("message"));
 
     }

@@ -78,7 +78,7 @@ public interface TestPostmanEchoAPIInterface {
 
 	@REQUEST(endpoint = "/post",type = HTTP_METHOD.POST)
 	@HEADERS("Content-Type: application/json")
-	APICall<Void,Map<String,Object>> requestBodyObjectCall(@Body TestRequestBody requestBody);
+	APICall<TestRequestBody,Map<String,Object>> requestBodyObjectCall(@Body TestRequestBody requestBody);
 
 	@REQUEST(endpoint = "/post",type = HTTP_METHOD.POST)
 	@HEADERS("Content-Type: application/json")

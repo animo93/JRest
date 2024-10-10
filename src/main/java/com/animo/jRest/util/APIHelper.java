@@ -9,13 +9,9 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidParameterException;
-import java.net.URLEncoder;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import java.util.regex.Matcher;
@@ -288,11 +284,12 @@ public class APIHelper {
 				if(type instanceof ParameterizedType){
 					final ParameterizedType pType = (ParameterizedType) type;
 					for(Type t:pType.getActualTypeArguments()) {
-						myCall.setType(t);
+						myCall.setResponseType(t);
 					}
 				}
+				// This block will never get executed
 				else
-					myCall.setType(type);
+					myCall.setResponseType(type);
 
 				return myCall;
 			}
