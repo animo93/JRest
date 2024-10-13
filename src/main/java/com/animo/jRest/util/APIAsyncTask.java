@@ -1,30 +1,22 @@
 package com.animo.jRest.util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.lang.reflect.Array;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.lang.reflect.WildcardType;
-import java.net.*;
-import java.util.Map.Entry;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import javax.net.ssl.HttpsURLConnection;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.lang.reflect.*;
+import java.net.Proxy;
+import java.net.*;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Map.Entry;
 
 public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Request>,APICall<Request,Response>>{
 
@@ -52,143 +44,28 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 		final HttpURLConnection httpURLConnection = null;
 		final BufferedReader reader = null;
 		final String repoJson = null;
-		APICall<Request, Response> myCall = null;
+		APICall<Request, Response> myCall = new APICall<>();
 		final URL url = new URL(this.bean.getUrl());
-		if(url.getProtocol().equals("https")){
-			myCall = httpsConnection(url);
-		}else {
-			myCall = httpConnection(url);
-		}
+		HttpRequest.Builder builder = HttpRequest.newBuilder()
+				.uri(url.toURI());
+		setRequestBody(builder);
+		setHeaders(builder);
+		setAuthentication(builder);
 
-		return myCall;
-	}
-
-	private APICall<Request,Response> httpConnection(URL url) throws Exception {
-		HttpURLConnection httpURLConnection = null;
-		String repoJson = null;
-		APICall<Request, Response> myCall = new APICall<>();
-
-		try{
-			httpURLConnection = getHttpConnection();
-
-			httpURLConnection.setRequestMethod(bean.getRequestType().toString());
-
-			setHeaders(httpURLConnection);
-
-			setAuthentication(httpURLConnection);
-
-			setRequestBody(httpURLConnection);
-
-			httpURLConnection.setInstanceFollowRedirects(bean.isFollowRedirects());
-
-			httpURLConnection.connect();
-
-			logger.debug("Response Headers " + httpURLConnection.getHeaderFields());
-			myCall.setResponseHeaders(httpURLConnection.getHeaderFields());
-
-			logger.debug("response code " + httpURLConnection.getResponseCode());
-
-			int status = httpURLConnection.getResponseCode();
-			myCall.setResponseCode(status);
-
-			repoJson = getResponseBody(status,httpURLConnection);
-
-		} catch (Exception e) {
-			logger.error("Could not make connection ", e);
-			throw e;
-		}
-
-		convertResponse(repoJson, myCall);
-
-		return myCall;
-	}
-
-	private HttpURLConnection getHttpConnection() throws IOException{
 		try {
-			final URL url = new URL(bean.getUrl());
-			logger.debug("Going to make connection for " + url.toString());
-			if(bean.getProxy() != null){
-				logger.debug("proxy " + bean.getProxy());
-				if(bean.getProxy().getUrl() != null) {
-					final Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(
-							bean.getProxy().getUrl(), bean.getProxy().getPort()));
-					if(bean.getProxy().getUsername() != null && bean.getProxy().getPassword() != null) {
-						final Authenticator auth = new Authenticator() {
-							public PasswordAuthentication getPasswordAuthentication(){
-								return(new PasswordAuthentication(
-										bean.getProxy().getUsername(), bean.getProxy().getPassword().toCharArray()));
-							}
-						};
-						Authenticator.setDefault(auth);
-					}
-					return (HttpURLConnection) url.openConnection(proxy);
-				}else {
-					throw new IllegalArgumentException("Proxy Url is not provided ");
-				}
-
-			}else{
-				return (HttpURLConnection) url.openConnection();
-			}
-		}catch (MalformedURLException e) {
-			logger.error("Url is malformed "+bean.getUrl(), e);
-			throw e;
-		} catch (IOException e) {
-			logger.error("Unable to establish connection to "+bean.getUrl(), e);
-			throw e;
-		}
-
-	}
-
-	private APICall<Request, Response> httpsConnection(URL url) throws Exception {
-		HttpsURLConnection httpsURLConnection = null;
-		String repoJson = null;
-		APICall<Request, Response> myCall = new APICall<>();
-		
-		try{
-			httpsURLConnection = getConnection();
-
-			if(url.getProtocol().equals("https")){
-				if(bean.isDisableSSLVerification()) {
-					//Install all -trusting host verifier ...Very risky , never use in prod
-					httpsURLConnection.setHostnameVerifier(new HostnameVerifier() {
-						public boolean verify(String hostname, SSLSession session) {
-							logger.debug("Hostname is " + hostname);
-							return true;
-						}
-					});
-				}
-			}
-
-
-			httpsURLConnection.setRequestMethod(bean.getRequestType().toString());
-
-			setHeaders(httpsURLConnection);
-
-			setAuthentication(httpsURLConnection);
-
-			setRequestBody(httpsURLConnection);
-
-			httpsURLConnection.setInstanceFollowRedirects(bean.isFollowRedirects());
-
-			httpsURLConnection.connect();
-			
-			logger.debug("Response Headers " + httpsURLConnection.getHeaderFields());
-			myCall.setResponseHeaders(httpsURLConnection.getHeaderFields());
-
-			logger.debug("response code " + httpsURLConnection.getResponseCode());
-			
-			int status = httpsURLConnection.getResponseCode();
-			myCall.setResponseCode(status);
-
-			repoJson = getResponseBody(status,httpsURLConnection);
-
+			HttpResponse<String> response = HttpClient.newBuilder()
+					.followRedirects((bean.isFollowRedirects())? HttpClient.Redirect.ALWAYS : HttpClient.Redirect.NEVER)
+					.proxy(bean.getProxy() != null ? ProxySelector.of(new InetSocketAddress(bean.getProxy().getUrl(), bean.getProxy().getPort())) : ProxySelector.getDefault())
+					.build()
+					.send(builder.build(), HttpResponse.BodyHandlers.ofString());
+			myCall.setResponseHeaders(response.headers().map());
+			myCall.setResponseCode(response.statusCode());
+			String responseJson = getResponseBody(response.statusCode(),response);
+			convertResponse(responseJson, myCall);
 		} catch (Exception e) {
 			logger.error("Could not make connection ", e);
 			throw e;
 		}
-
-		convertResponse(repoJson, myCall);
-
 		return myCall;
 	}
 
@@ -217,51 +94,19 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 		}
 	}
 
-	private String getResponseBody(int status,HttpURLConnection httpsURLConnection) throws Exception {
+	private String getResponseBody(int status,HttpResponse<String> httpResponse) throws Exception {
 		String repoJson = null;
 		BufferedReader reader = null;
 		try {
-			final InputStream inputStream;
-			if (status != HttpURLConnection.HTTP_OK && status != HttpURLConnection.HTTP_CREATED)
-				inputStream = httpsURLConnection.getErrorStream();
-			else {
-				inputStream = httpsURLConnection.getInputStream();
-			}
-			final StringBuffer stringBuffer = new StringBuffer();
-			if (inputStream == null)
-				repoJson = null;
-			else {
-				reader = new BufferedReader(new InputStreamReader(inputStream));
-
-				String line;
-				while ((line = reader.readLine()) != null) {
-					stringBuffer.append(line).append("\n");
-				}
-				if (stringBuffer.length() == 0)
-					repoJson = null;
-
-				repoJson = stringBuffer.toString();
-				inputStream.close();
-			}
+			repoJson = httpResponse.body();
 		}catch (Exception e){
 			logger.error("Unable to get Response Body ",e);
 			throw e;
-		} finally {
-			if (httpsURLConnection != null)
-				httpsURLConnection.disconnect();
-			if (reader != null) {
-				try {
-					reader.close();
-				} catch (IOException e) {
-					logger.error("error in closing conn", e);
-					throw e;
-				}
-			}
 		}
 		return repoJson;
 	}
 
-	private void setRequestBody(HttpURLConnection httpsURLConnection) throws IOException {
+	private void setRequestBody(HttpRequest.Builder requestBuilder) throws IOException {
 		if(bean.getRequestType().toString().equals("POST") || bean.getRequestType().toString().equals("PATCH")
 				|| bean.getRequestType().toString().equals("PUT")) {
 			Request requestObject = bean.getRequestObject();
@@ -274,98 +119,60 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 				}
 				final String json = builder.toString();
 				logger.debug("request json {}" ,json);
-				httpsURLConnection.setDoOutput(true);
-
-				final OutputStream os = httpsURLConnection.getOutputStream();
-				os.write(json.getBytes("UTF-8"));
-				os.close();
+				requestBuilder.method(bean.getRequestType().toString(),
+						HttpRequest.BodyPublishers.ofString(json));
 			}
+		}else {
+			requestBuilder.method(bean.getRequestType().toString(), HttpRequest.BodyPublishers.noBody());
 		}
 	}
 
-	private void setAuthentication(HttpURLConnection httpsURLConnection) {
+	private void setAuthentication(HttpRequest.Builder requestBuilder) {
 		if(bean.getAuthentication() != null) {
 			final RequestAuthentication auth = bean.getAuthentication();
 			if(auth.getUsername() != null && auth.getPassword() != null) {
 				final String userPassword = auth.getUsername() + ":" + auth.getPassword();
 				final String encodedAuthorization = Base64.encodeBase64String(userPassword.getBytes());
-				httpsURLConnection.setRequestProperty("Authorization", "Basic " +
+				requestBuilder.header("Authorization", "Basic " +
 						encodedAuthorization.replaceAll("\n", ""));
 			}
 		}
-
 		if(bean.getAccessToken() != null)
-			httpsURLConnection.setRequestProperty("Authorization", " token " + bean.getAccessToken());
+			requestBuilder.header("Authorization", " token " + bean.getAccessToken());
 	}
 
-	private void setHeaders(HttpURLConnection httpsURLConnection) {
+	private void setHeaders(HttpRequest.Builder requestBuilder) {
 		//Setting this to fix a bug in jdk which sets illegal "Accept" header
-		httpsURLConnection.setRequestProperty("Accept", "application/json");
+		//httpsURLConnection.setRequestProperty("Accept", "application/json");
 		if(bean.getHeaders() != null && !bean.getHeaders().isEmpty()) {
 			for(Entry<String, String> entry:bean.getHeaders().entrySet()) {
-				httpsURLConnection.setRequestProperty(entry.getKey(), entry.getValue());
+				requestBuilder.header(entry.getKey(), entry.getValue());
 			}
 		}
-	}
-
-	private HttpsURLConnection getConnection() throws IOException {
-		try {
-			final URL url = new URL(bean.getUrl());
-			logger.debug("Going to make connection for {}" , url.toString());
-			if(bean.getProxy() != null){
-				logger.debug("proxy {}" , bean.getProxy());
-				if(bean.getProxy().getUrl() != null) {
-					final Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(
-							bean.getProxy().getUrl(), bean.getProxy().getPort()));
-					if(bean.getProxy().getUsername() != null && bean.getProxy().getPassword() != null) {
-						final Authenticator auth = new Authenticator() {
-							public PasswordAuthentication getPasswordAuthentication(){
-								return(new PasswordAuthentication(
-										bean.getProxy().getUsername(), bean.getProxy().getPassword().toCharArray()));
-							}
-						};
-						Authenticator.setDefault(auth);
-					}
-					return (HttpsURLConnection) url.openConnection(proxy);
-				}else {
-					throw new IllegalArgumentException("Proxy Url is not provided ");
-				}
-
-			}else{
-				return (HttpsURLConnection) url.openConnection();
-			}
-		}catch (MalformedURLException e) {
-			logger.error("Url is malformed "+bean.getUrl(), e);
-			throw e;
-		} catch (IOException e) {
-			logger.error("Unable to establish connection to "+bean.getUrl(), e);
-			throw e;
-		}
-
 	}
 
 	private Class<?> type2Class(Type type) {
-	    if (type instanceof Class) {
-		       return (Class<?>) type;
-		    } else if (type instanceof GenericArrayType) {
-		       // having to create an array instance to get the class is kinda nasty 
-		       // but apparently this is a current limitation of java-reflection concerning array classes.
-		       return Array.newInstance(type2Class(((GenericArrayType)type).getGenericComponentType()), 0).getClass(); // E.g. T[] -> T -> Object.class if <T> or Number.class if <T extends Number & Comparable>
-		    } else if (type instanceof ParameterizedType) {
-		       return type2Class(((ParameterizedType) type).getRawType()); // Eg. List<T> would return List.class
-		    } else if (type instanceof TypeVariable) {
-		       final Type[] bounds = ((TypeVariable<?>) type).getBounds();
-		       return bounds.length == 0 ? Object.class : type2Class(bounds[0]); // erasure is to the left-most bound.
-		    } else if (type instanceof WildcardType) {
-		       final Type[] bounds = ((WildcardType) type).getUpperBounds();
-		       return bounds.length == 0 ? Object.class : type2Class(bounds[0]); // erasure is to the left-most upper bound.
-		    } else { 
-		       throw new UnsupportedOperationException("cannot handle type class: " + type.getClass());
-		    }
-		} 
+		if (type instanceof Class) {
+			return (Class<?>) type;
+		} else if (type instanceof GenericArrayType) {
+			// having to create an array instance to get the class is kinda nasty
+			// but apparently this is a current limitation of java-reflection concerning array classes.
+			return Array.newInstance(type2Class(((GenericArrayType)type).getGenericComponentType()), 0).getClass(); // E.g. T[] -> T -> Object.class if <T> or Number.class if <T extends Number & Comparable>
+		} else if (type instanceof ParameterizedType) {
+			return type2Class(((ParameterizedType) type).getRawType()); // Eg. List<T> would return List.class
+		} else if (type instanceof TypeVariable) {
+			final Type[] bounds = ((TypeVariable<?>) type).getBounds();
+			return bounds.length == 0 ? Object.class : type2Class(bounds[0]); // erasure is to the left-most bound.
+		} else if (type instanceof WildcardType) {
+			final Type[] bounds = ((WildcardType) type).getUpperBounds();
+			return bounds.length == 0 ? Object.class : type2Class(bounds[0]); // erasure is to the left-most upper bound.
+		} else {
+			throw new UnsupportedOperationException("cannot handle type class: " + type.getClass());
+		}
+	}
 
 	private boolean outputIsJson(String repoJson) {
-		
+
 		return repoJson != null && repoJson.startsWith("{");
 	}
 
