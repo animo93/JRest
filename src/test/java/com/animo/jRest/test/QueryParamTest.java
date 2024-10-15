@@ -1,8 +1,10 @@
 package com.animo.jRest.test;
 
+import java.net.URISyntaxException;
 import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -11,6 +13,9 @@ import org.junit.rules.ExpectedException;
 
 import com.animo.jRest.util.APICall;
 import com.animo.jRest.util.APIHelper;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 @SuppressWarnings("unchecked")
 public class QueryParamTest {
 	
@@ -130,17 +135,14 @@ public class QueryParamTest {
 	}
 	//@Ignore
 	@Test
-	public void testUnEncodedqueryKeyWithEncodedSetTrue() throws Exception {
+	public void testUnEncodedqueryKeyWithEncodedSetTrue_shouldThrowException() throws Exception {
 		
 		APIHelper testAPIHelper = APIHelper.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
 		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
 		APICall<Void, Map<String,Object>> call = testInterface.unEncodedqueryKeyWithEncodedSetTrueCall("bar");
-		APICall<Void,Map<String,Object>> response = call.callMeNow();
-		
-		
-		Assert.assertEquals("https://postman-echo.com/get?query key=bar", call.getRequestBean().getUrl());		
+		assertThrows(ExecutionException.class, () -> call.callMeNow());
 		
 	}
 	

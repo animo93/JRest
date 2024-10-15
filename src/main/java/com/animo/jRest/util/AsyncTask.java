@@ -22,7 +22,7 @@ public abstract class AsyncTask<Params,Result> {
 			executor.shutdown();
 		}
 	}
-	
+
 	public Result executeNow(Params params) throws Exception {
 		try {
 			preExecute();
