@@ -14,6 +14,11 @@ import java.util.Map;
  * @param <Response> Response type
  */
 
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter @Setter
 public class APICall<Request, Response> {
     private Response responseBody;
     private int responseCode;
@@ -21,46 +26,6 @@ public class APICall<Request, Response> {
     private Map<String, List<String>> responseHeaders;
     private Type responseType;
 
-    public Map<String, List<String>> getResponseHeaders() {
-        return responseHeaders;
-    }
-
-    public void setResponseHeaders(Map<String, List<String>> responseHeaders) {
-        this.responseHeaders = responseHeaders;
-    }
-
-    public RequestBean<Request> getRequestBean() {
-        return requestBean;
-    }
-
-    public void setRequestBean(RequestBean<Request> requestBean) {
-        this.requestBean = requestBean;
-    }
-
-    public Type getResponseType() {
-        return responseType;
-    }
-
-    public void setResponseType(Type responseType) {
-        this.responseType = responseType;
-    }
-
-    public Response getResponseBody() {
-        return responseBody;
-    }
-
-    public void setResponseBody(Response responseBody) {
-        this.responseBody = responseBody;
-    }
-
-    public int getResponseCode() {
-        return responseCode;
-    }
-
-    public void setResponseCode(int responseCode) {
-        this.responseCode = responseCode;
-    }
-    
     /**
      * Synchronous implementation of {@link com.animo.jRest.util.APICall APICall} , which invokes a blocking call to webserver
      * . And waits for the APICall to complete

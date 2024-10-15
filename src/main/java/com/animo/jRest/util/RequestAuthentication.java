@@ -1,42 +1,12 @@
 package com.animo.jRest.util;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter @Setter
 public class RequestAuthentication {
 
 	private String username;
 	private String password;
 	private String encryptionAlgo;
 	private String encryptionKey;
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getEncryptionAlgo() {
-		return encryptionAlgo;
-	}
-
-	public void setEncryptionAlgo(String encryptionAlgo) {
-		this.encryptionAlgo = encryptionAlgo;
-	}
-
-	public String getEncryptionKey() {
-		return encryptionKey;
-	}
-
-	public void setEncryptionKey(String encryptionKey) {
-		this.encryptionKey = encryptionKey;
-	}
-
 }
