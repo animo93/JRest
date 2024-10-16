@@ -25,4 +25,10 @@ public class AsyncCallable<Params, Result> implements Callable<Result> {
 		return result;
 	}
 
+	public Params getParams() {
+		return params;
+	}
+	public AsyncTask getAsyncTask(){
+		return asyncTask;
+	}
 }
