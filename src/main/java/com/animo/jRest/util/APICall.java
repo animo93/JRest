@@ -70,7 +70,7 @@ public class APICall<Request, Response> {
     public APICall<Request, Response> callMeNow() throws Exception {
 
         final APIAsyncTask<Request, Response> asyncTask = new APIAsyncTask<>(requestBean, responseType);
-        return asyncTask.executeNow(requestBean);
+        return asyncTask.executeNow.apply(requestBean);
     }
     
     /**
@@ -81,7 +81,7 @@ public class APICall<Request, Response> {
      */
     public void callMeLater(APICallBack<Request, Response> callBack) throws Exception {
     	final APIAsyncTask<Request,Response> asyncTask = new APIAsyncTask<>(requestBean, responseType, callBack);
-        asyncTask.executeLater(requestBean);
+        asyncTask.executeLater.accept(requestBean);
     }
 
 }
