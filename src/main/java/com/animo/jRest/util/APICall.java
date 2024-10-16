@@ -3,6 +3,8 @@ package com.animo.jRest.util;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * An invocation of a APIHelper method that sends a request to a webserver and returns a response.
@@ -13,10 +15,6 @@ import java.util.Map;
  * @param <Request> Request type
  * @param <Response> Response type
  */
-
-
-import lombok.Getter;
-import lombok.Setter;
 
 @Getter @Setter
 public class APICall<Request, Response> {
