@@ -4,7 +4,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
-import com.animo.jRest.exception.IThrowingFunction;
 
 public abstract class AsyncTask<Params,Result> {
 
@@ -26,14 +25,16 @@ public abstract class AsyncTask<Params,Result> {
         }
     };
 
-    IThrowingFunction<Params, Result> executeNow = (params) -> {
-        preExecute();
-        Future<Result> future = executor.submit(new SyncCallable<>(params, this));
+    public Result executeNow(Params params) throws Exception {
         try {
+            preExecute();
+            Future<Result> future  = executor.submit(new SyncCallable<>(params, this));
             return future.get();
+        } catch(Exception e) {
+            throw e;
         } finally {
             executor.shutdown();
         }
-    };
+    }
 
 }
