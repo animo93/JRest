@@ -7,11 +7,9 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.lang.reflect.*;
-import java.net.Proxy;
 import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -177,11 +175,11 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 	}
 
 	@Override
-	protected void postExecute(APICall<Request,Response> myCall,Exception e) {
+	protected void postExecute(APICall<Request, Response> myCall, Exception e) {
 		if(e != null)
-			myCallBack.callBackOnFailure(e);
+			myCallBack.callBackOnFailure().accept(e);
 		else
-			myCallBack.callBackOnSuccess(myCall);
+			myCallBack.callBackOnSuccess().accept(myCall);
 	}
 
 	@Override

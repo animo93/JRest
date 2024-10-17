@@ -43,8 +43,7 @@ public class APICall<Request, Response> {
      * @throws Exception if issue occurs with asyncTask executeLater method
      */
     public void callMeLater(APICallBack<Request, Response> callBack) throws Exception {
-    	final APIAsyncTask<Request,Response> asyncTask = new APIAsyncTask<>(requestBean, responseType, callBack);
-        asyncTask.executeLater(requestBean);
+        final APIAsyncTask<Request, Response> asyncTask = new APIAsyncTask<>(requestBean, responseType, callBack);
+        asyncTask.executeLater.accept(requestBean);
     }
-
 }
