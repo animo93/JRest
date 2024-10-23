@@ -3,8 +3,8 @@ package com.animo.jRest.util;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
+import com.animo.jRest.model.RequestBean;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,7 +23,7 @@ import lombok.Setter;
 public class APICall<Request, Response> {
     private Response responseBody;
     private int responseCode;
-    private RequestBean<Request>  requestBean;
+    private RequestBean<Request> requestBean;
     private Map<String, List<String>> responseHeaders;
     private Type responseType;
 
@@ -44,7 +44,6 @@ public class APICall<Request, Response> {
      * Asynchronous implementation of {@link com.animo.jRest.util.APICall APICall} , which invokes a non-blocking call to webserver
      * . It accepts {@link com.animo.jRest.util.APICallBack APICallBack} as a parameter
      * @param callBack APICallBack
-     * @throws Exception if issue occurs with asyncTask executeLater method
      */
     public void callMeLater(APICallBack<APICall<Request,Response>> callBack) {
         final APIAsyncTask<Request, Response> asyncTask = new APIAsyncTask<>(requestBean, responseType, callBack);

@@ -15,9 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SuppressWarnings("unchecked")
 public class QueryParamTest {
 	
-	
-	
-	//@Ignore
+
 	@Test
 	public void testSingleQueryParam() throws Exception {
 		
@@ -32,7 +30,7 @@ public class QueryParamTest {
 		
 	}
 	
-	//@Ignore
+
 	@Test
 	public void testMultipleQueryParam() throws Exception {
 		
@@ -47,7 +45,7 @@ public class QueryParamTest {
 		Assertions.assertEquals("pong", ((Map<String,String>) response.getResponseBody().get("args")).get("ping"));
 		
 	}
-	//@Ignore
+
 	@Test
 	public void testMultipleQueryParamWithGlobalParams() throws Exception {
 		
@@ -63,7 +61,7 @@ public class QueryParamTest {
 		Assertions.assertEquals("pong", ((Map<String,String>) response.getResponseBody().get("args")).get("ping"));
 		
 	}
-	//@Ignore
+
 	@Test
 	public void testNullQueryParam() throws Exception {
 		
@@ -78,7 +76,7 @@ public class QueryParamTest {
 		Assertions.assertTrue(((Map<String,String>) response.getResponseBody().get("args")).isEmpty());
 		
 	}
-	//@Ignore
+
 	@Test
 	public void testInvalidQueryParamFailure() throws Exception {
 		
@@ -96,7 +94,7 @@ public class QueryParamTest {
 		Assertions.assertTrue(exception.getMessage().contains("Query parameter should be passed in string format only"));
 		
 	}
-	//@Ignore
+
 	@Test
 	public void testEmptyQueryParamKeyFailure() throws Exception {
 		
@@ -113,7 +111,7 @@ public class QueryParamTest {
 		
 	}
 	
-	//@Ignore
+
 	@Test
 	public void testQueryParamKeyWithSpace() throws Exception {
 		
@@ -129,7 +127,7 @@ public class QueryParamTest {
 		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponseBody().get("args")).get("query key"));
 		
 	}
-	//@Ignore
+
 	@Test
 	public void testUnEncodedqueryKeyWithEncodedSetTrue_shouldThrowException() throws Exception {
 		
@@ -157,7 +155,7 @@ public class QueryParamTest {
 		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponseBody().get("args")).get("query key"));
 		
 	}
-	//@Ignore
+
 	@Test
 	public void testSingleQueryMap() throws Exception {
 		
@@ -175,7 +173,7 @@ public class QueryParamTest {
 		Assertions.assertEquals("pong", ((Map<String,String>) response.getResponseBody().get("args")).get("ping"));
 		
 	}
-	//@Ignore
+
 	@Test
 	public void testMultipleQueryMap() throws Exception {
 		
@@ -200,7 +198,7 @@ public class QueryParamTest {
 		Assertions.assertEquals("doe", ((Map<String,String>) response.getResponseBody().get("args")).get("john"));
 		
 	}
-	//@Ignore
+
 	@Test
 	public void testBothSingleQueryAndQueryMap() throws Exception {
 		
@@ -218,7 +216,7 @@ public class QueryParamTest {
 		Assertions.assertEquals("pong", ((Map<String,String>) response.getResponseBody().get("args")).get("ping"));
 		
 	}
-	//@Ignore
+
 	@Test
 	public void testQueryMapAndQueryWithGlobalParams() throws Exception {
 		
@@ -240,7 +238,7 @@ public class QueryParamTest {
 		Assertions.assertEquals("tok", ((Map<String,String>) response.getResponseBody().get("args")).get("tik"));
 		
 	}
-	//@Ignore
+
 	@Test
 	public void testInvalidQueryMapFailure() throws Exception {
 		
@@ -258,7 +256,7 @@ public class QueryParamTest {
 		Assertions.assertTrue(exception.getMessage().contains("Query parameter should be passed in Map format only"));
 		
 	}
-	//@Ignore
+
 	@Test
 	public void testNullQueryMap() throws Exception {
 		

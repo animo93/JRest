@@ -1,5 +1,7 @@
 package com.animo.jRest.util;
 
+import com.animo.jRest.model.RequestAuthentication;
+import com.animo.jRest.model.RequestBean;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

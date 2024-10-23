@@ -17,6 +17,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.animo.jRest.model.RequestAuthentication;
+import com.animo.jRest.model.RequestBean;
+import com.animo.jRest.model.RequestProxy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

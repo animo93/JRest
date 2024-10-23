@@ -1,6 +1,8 @@
-package com.animo.jRest.util;
+package com.animo.jRest.model;
 
 import java.util.Map;
+
+import com.animo.jRest.util.HTTP_METHOD;
 import lombok.Getter;
 import lombok.Setter;
 

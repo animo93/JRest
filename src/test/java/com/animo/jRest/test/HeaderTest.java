@@ -11,8 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 public class HeaderTest {
-	
-	//@Ignore
+
 	@Test
 	public void testSingleStaticHeaderKey() throws Exception {
 		
@@ -25,8 +24,7 @@ public class HeaderTest {
 		assertTrue(((Map<String, String>) response.getResponseBody().get("headers")).containsKey("x-foo"));
 		
 	}
-	
-	//@Ignore
+
 	@Test
 	public void testSingleStaticHeaderValue() throws Exception {
 		
@@ -38,8 +36,7 @@ public class HeaderTest {
 		final APICall<Void, Map<String, Object>> response = testCall.callMeNow();
 		assertEquals("Bar", ((Map<String, String>) response.getResponseBody().get("headers")).get("x-foo"));
 	}
-	
-	//@Ignore
+
 	@Test
 	public void testMultipleStaticHeaderKey() throws Exception {
 		
@@ -53,8 +50,7 @@ public class HeaderTest {
 				((Map<String, String>) response.getResponseBody().get("headers")).containsKey("x-ping"));
 		
 	}
-	
-	//@Ignore
+
 	@Test
 	public void testMultipleStaticHeaderValue() throws Exception {
 		
@@ -67,17 +63,13 @@ public class HeaderTest {
 		assertEquals("Bar", ((Map<String, String>) response.getResponseBody().get("headers")).get("x-foo"));
 		assertEquals("Pong", ((Map<String, String>) response.getResponseBody().get("headers")).get("x-ping"));
 	}
-	
-	//@Ignore
+
 	@Test
 	public void testFailureStaticHeader() throws Exception {
 		
 		final APIHelper testAPIHelper = APIHelper.APIBuilder
 				.builder("https://postman-echo.com")
-				.build();		
-		
-		//exceptionRule.expect(RuntimeException.class);
-		//exceptionRule.expectMessage("Header data invalid");
+				.build();
 		
 		final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
 		assertThrows(RuntimeException.class, () -> {
@@ -85,7 +77,6 @@ public class HeaderTest {
 		});
 		
 	}
-	//@Ignore
 	@Test
 	public void testSingleDynamicHeaderKey() throws Exception {
 		
@@ -100,7 +91,7 @@ public class HeaderTest {
 		assertTrue(((Map<String, String>) response.getResponseBody().get("headers")).containsKey("x-foo"));
 		
 	}
-	//@Ignore
+
 	@Test
 	public void testSingleDynamicHeaderValue() throws Exception {
 		
@@ -116,7 +107,7 @@ public class HeaderTest {
 		assertEquals("Bar", ((Map<String, String>) response.getResponseBody().get("headers")).get("x-foo"));
 		
 	}
-	//@Ignore
+
 	@Test
 	public void testBothDynamicStaticHeadersKey() throws Exception {
 		

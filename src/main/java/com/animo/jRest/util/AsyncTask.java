@@ -7,6 +7,7 @@ import java.util.function.Function;
 
 public abstract class AsyncTask<Params,Result> {
 
+    //TODO: Check if multithreaded execution is helpful
     private final ExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     protected abstract Result runInBackground(Params params);
