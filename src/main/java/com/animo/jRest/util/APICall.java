@@ -3,6 +3,8 @@ package com.animo.jRest.util;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +18,8 @@ import lombok.Setter;
  * @param <Response> Response type
  */
 
-@Getter @Setter
+@Getter
+@Setter
 public class APICall<Request, Response> {
     private Response responseBody;
     private int responseCode;
@@ -30,6 +33,7 @@ public class APICall<Request, Response> {
      * @return {@code APICall}
      * @throws Exception Exception if issue with asyncTask executeNow method
      */
+    //TODO: A new return type should be introduced here , not the same as the class APICall
     public APICall<Request, Response> callMeNow() throws Exception {
 
         final APIAsyncTask<Request, Response> asyncTask = new APIAsyncTask<>(requestBean, responseType);
@@ -42,8 +46,8 @@ public class APICall<Request, Response> {
      * @param callBack APICallBack
      * @throws Exception if issue occurs with asyncTask executeLater method
      */
-    public void callMeLater(APICallBack<Request, Response> callBack) throws Exception {
+    public void callMeLater(APICallBack<APICall<Request,Response>> callBack) {
         final APIAsyncTask<Request, Response> asyncTask = new APIAsyncTask<>(requestBean, responseType, callBack);
-        asyncTask.executeLater.accept(requestBean);
-    }
+        asyncTask.executeLater(requestBean,callBack);
+    };
 }

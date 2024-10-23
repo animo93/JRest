@@ -1,34 +1,36 @@
 package com.animo.jRest.util;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public abstract class AsyncTask<Params,Result> {
 
     private final ExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
-    protected abstract Result runInBackground(Params params) throws Exception;
+    protected abstract Result runInBackground(Params params);
+    //TODO: this method needs to redesigned as a Consumer to be supplied along with callmeNow and callmeLater function
     protected abstract void postExecute(Result result,Exception e);
+    //TODO: this method needs to redesigned as a Consumer to be supplied along with callmeNow and callmeLater function
     protected abstract void preExecute();
 
 
-    Consumer<Params> executeLater = (params) ->{
-        try {
-            preExecute();
-            Future<Result> future  = executor.submit(new AsyncCallable<>(params, this));
-        } catch(Exception e) {
-            throw e;
-        } finally {
-            executor.shutdown();
-        }
+    public void executeLater(Params params, APICallBack<Result> callback){
+        CompletableFuture.supplyAsync(() -> {
+            Result result = this.runInBackground(params);
+            return result;
+        }).thenAccept(result -> {
+            callback.callBackOnSuccess(result);
+        }).exceptionally(e -> {
+            callback.callBackOnFailure(e);
+            return null;
+        });
     };
 
     public Result executeNow(Params params) throws Exception {
         try {
-            preExecute();
-            Future<Result> future  = executor.submit(new SyncCallable<>(params, this));
+            Future<Result> future = executor.submit(new SyncCallable<>(params, this));
             return future.get();
         } catch(Exception e) {
             throw e;
