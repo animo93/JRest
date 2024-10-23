@@ -2,9 +2,9 @@ package com.animo.jRest.test;
 
 import com.animo.jRest.util.APICall;
 import com.animo.jRest.util.APIHelper;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Header;
@@ -12,15 +12,11 @@ import org.mockserver.model.Header;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.matchers.Times.exactly;
-import static org.mockserver.model.HttpClassCallback.callback;
-import static org.mockserver.model.HttpForward.forward;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
-import static org.mockserver.model.StringBody.exact;
 /*
 A Web server needs to be running on port 8081 for executing these below tests
  */
@@ -29,12 +25,12 @@ public class TestHttpRESTApi {
 
     private static ClientAndServer mockServer;
 
-    @BeforeClass
+    @BeforeAll
     public static void startServer() {
         mockServer = startClientAndServer(8081);
     }
 
-    @AfterClass
+    @AfterAll
     public static void stopServer() {
         mockServer.stop();
     }

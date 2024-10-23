@@ -2,15 +2,15 @@ package com.animo.jRest.test;
 
 import com.animo.jRest.util.APICall;
 import com.animo.jRest.util.APIHelper;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 
 public class DynamicInvocationTest {
 
@@ -43,8 +43,8 @@ public class DynamicInvocationTest {
         APICall<Void, Map<String,Object>> call = testInterface.dynamicAPIInvocation(queryMap,"pong");
         APICall<Void,Map<String,Object>> response = call.callMeNow();
 
-        Assert.assertEquals("bar", ((Map<String,String>) response.getResponseBody().get("args")).get("foo"));
-        Assert.assertEquals("pong", ((Map<String,String>) response.getResponseBody().get("args")).get("ping"));
+        assertEquals("bar", ((Map<String,String>) response.getResponseBody().get("args")).get("foo"));
+        assertEquals("pong", ((Map<String,String>) response.getResponseBody().get("args")).get("ping"));
     }
 
     @Test
@@ -53,7 +53,7 @@ public class DynamicInvocationTest {
                 .builder("https://postman-echo.com")
                 .build();
 
-        assertThrows(NoSuchMethodException.class,() -> {
+        Assertions.assertThrows(NoSuchMethodException.class,() -> {
                 DynamicInvocationTestInterface testInterface = testAPIHelper.createDynamicApi(DynamicInvocationTestInterface.class,"test");
                 APICall<Void, Map<String,Object>> call = testInterface.dynamicAPIInvocation();
                 APICall<Void,Map<String,Object>> response = call.callMeNow();
@@ -77,9 +77,9 @@ public class DynamicInvocationTest {
         APICall<Void, TestAPIResponse> call = testInterface.dynamicAPIInvocation(queryMap,"pong");
         APICall<Void,TestAPIResponse> response = call.callMeNow();
 
-        Assert.assertEquals("bar",
+        assertEquals("bar",
                 response.getResponseBody().getArgs().get("foo"));
-        Assert.assertEquals("pong",
+        assertEquals("pong",
                 response.getResponseBody().getArgs().get("ping"));
     }
 }

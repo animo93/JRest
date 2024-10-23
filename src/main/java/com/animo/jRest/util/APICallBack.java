@@ -8,22 +8,21 @@ import java.util.function.Consumer;
  * Callbacks are only used when opting for performing an asynchronous non blocking call
  * @author animo
  *
- * @param <Request> Request Type
- * @param <Response> Response Type
+ * @param <Result> Result type
  */
 
-public interface APICallBack<Request, Response> {
+public interface APICallBack<Result> {
 	/**
 	 * Invoked for a received HTTP response
 	 * <p>Note: An HTTP response may still indicate an application-level failure such as a 404 or 500.
 	 * param myCall APICall parameter used for callback
 	 */
-    Consumer<APICall<Request, Response>> callBackOnSuccess();
+    void callBackOnSuccess(Result result);
 
 	/**
 	 * Invoked when a network exception occurred talking to the server or when an unexpected exception
 	 * occurred creating the request or processing the response.
 	 *  e Exception to be returned back
 	 */
-	Consumer<Exception> callBackOnFailure();
+	void callBackOnFailure(Throwable e);
 }

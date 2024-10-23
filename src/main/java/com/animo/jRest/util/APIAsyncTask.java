@@ -1,8 +1,11 @@
 package com.animo.jRest.util;
 
+import com.animo.jRest.model.RequestAuthentication;
+import com.animo.jRest.model.RequestBean;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import lombok.SneakyThrows;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,11 +22,11 @@ import java.util.Map.Entry;
 public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Request>,APICall<Request,Response>>{
 
 	private static final Logger logger = LogManager.getLogger(APIAsyncTask.class);
-	private APICallBack<Request, Response> myCallBack;
+	protected APICallBack<APICall<Request, Response>> myCallBack;
 	private final RequestBean<Request> bean;
 	private final Type type;
 
-	public APIAsyncTask(RequestBean<Request> bean, Type type, APICallBack<Request, Response> myCallBack) {
+	public APIAsyncTask(RequestBean<Request> bean, Type type, APICallBack<APICall<Request, Response>> myCallBack) {
 		this.bean = bean;
 		this.type = type;
 		this.myCallBack = myCallBack;
@@ -34,8 +37,9 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 		this.type = type;
 	}
 
-	@Override
-	protected APICall<Request,Response> runInBackground(RequestBean<Request> myRequestBean) throws Exception {
+	@SneakyThrows
+    @Override
+	protected APICall<Request,Response> runInBackground(RequestBean<Request> myRequestBean) {
 		if(myRequestBean == null)
 			return null;
 		final RequestBean<Request> bean = myRequestBean;
@@ -176,10 +180,6 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 
 	@Override
 	protected void postExecute(APICall<Request, Response> myCall, Exception e) {
-		if(e != null)
-			myCallBack.callBackOnFailure().accept(e);
-		else
-			myCallBack.callBackOnSuccess().accept(myCall);
 	}
 
 	@Override

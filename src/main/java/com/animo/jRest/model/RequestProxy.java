@@ -1,4 +1,4 @@
-package com.animo.jRest.util;
+package com.animo.jRest.model;
 
 import lombok.Getter;
 import lombok.Setter;
