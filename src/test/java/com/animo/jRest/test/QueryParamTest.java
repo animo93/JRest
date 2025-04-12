@@ -271,6 +271,23 @@ public class QueryParamTest {
 		Assertions.assertTrue(((Map<String,String>) response.getResponseBody().get("args")).isEmpty());
 		
 	}
+
+	@Test
+	public void testAddAllParams() throws Exception {
+		Map<String,String> queryParamMap = new HashMap<>();
+		queryParamMap.put("foo","bar");
+
+		APIHelper testAPIHelper = APIHelper.APIBuilder
+				.builder("https://postman-echo.com")
+				.addAllParameters(queryParamMap)
+				.build();
+		TestPostmanEchoAPIInterface testPostmanEchoAPIInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		APICall<Void, Map<String,Object>> call = testPostmanEchoAPIInterface.getCall();
+		APICall<Void, Map<String,Object>> response = call.callMeNow();
+
+		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponseBody().get("args")).get("foo"));
+
+	}
 	
 
 }

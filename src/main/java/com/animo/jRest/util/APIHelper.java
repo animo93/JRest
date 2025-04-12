@@ -84,7 +84,6 @@ public class APIHelper {
 		public APIBuilder addParameter(String key,String value){
 			if(params==null){
 				params = new HashMap<>();
-				System.out.println("key"+key);
 			}
 			params.put(key, value);
 			return this;
