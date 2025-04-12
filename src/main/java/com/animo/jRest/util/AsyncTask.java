@@ -18,15 +18,12 @@ public abstract class AsyncTask<Params,Result> {
 
 
     public void executeLater(Params params, APICallBack<Result> callback){
-        CompletableFuture.supplyAsync(() -> {
-            Result result = this.runInBackground(params);
-            return result;
-        }).thenAccept(result -> {
-            callback.callBackOnSuccess(result);
-        }).exceptionally(e -> {
-            callback.callBackOnFailure(e);
-            return null;
-        });
+        CompletableFuture.supplyAsync(() -> this.runInBackground(params))
+                .thenAccept(callback::callBackOnSuccess)
+                .exceptionally(e -> {
+                    callback.callBackOnFailure(e);
+                    return null;
+                });
     };
 
     public Result executeNow(Params params) throws Exception {
