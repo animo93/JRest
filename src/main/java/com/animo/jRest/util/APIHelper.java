@@ -161,7 +161,7 @@ public class APIHelper {
 	 * <p>The body of a request is denoted by the {@link com.animo.jRest.annotation.Body @Body} annotation.
 	 * The body would be converted to JSON via Google GSON
 	 * 
-	 * <p>By default, methods return a {@link com.animo.jRest.util.APICall APICall} which represents the HTTP request. The generic
+	 * <p>By default, methods return a {@link APIRequest APICall} which represents the HTTP request. The generic
 	 * parameter of the call is the response body type and will be converted by Jackson Object Mapper
 	 * 
 	 * <p>For example :
@@ -288,7 +288,7 @@ public class APIHelper {
 				final Type type =  method.getGenericReturnType();
 				if(type instanceof ParameterizedType pType){
 					// Since APICall<Response> has only one genericType , returning the first one
-					return new APICall<>(myRequestBean,pType.getActualTypeArguments()[0]);
+					return new APIRequest<>(myRequestBean,pType.getActualTypeArguments()[0]);
 				}else{
 					throw new Exception("Invalid method declared in Interface");
 				}

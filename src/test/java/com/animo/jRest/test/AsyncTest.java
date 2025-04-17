@@ -1,6 +1,6 @@
 package com.animo.jRest.test;
 
-import com.animo.jRest.util.APICall;
+import com.animo.jRest.util.APIRequest;
 import com.animo.jRest.util.APICallBack;
 import com.animo.jRest.util.APIHelper;
 import com.animo.jRest.util.APIResponse;
@@ -12,7 +12,6 @@ import java.util.concurrent.CountDownLatch;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
 
 public class AsyncTest {
 
@@ -22,7 +21,7 @@ public class AsyncTest {
                 .builder("https://postman-echo.com")
                 .build();
         final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-        final APICall<Map<String, Object>> testCall = testInterface.getCall();
+        final APIRequest<Map<String, Object>> testCall = testInterface.getCall();
 
         CountDownLatch countDownLatch = new CountDownLatch(1);
         APICallBack<Map<String, Object>> myCallBack = Mockito.spy(new APICallBack<Map<String, Object>>() {
@@ -50,7 +49,7 @@ public class AsyncTest {
                 .builder("https://postman-echo.com1")
                 .build();
         final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-        final APICall<Map<String, Object>> testCall = testInterface.getCall();
+        final APIRequest<Map<String, Object>> testCall = testInterface.getCall();
 
         CountDownLatch countDownLatch = new CountDownLatch(1);
         APICallBack<Map<String, Object>> myCallBack = Mockito.spy(new APICallBack<Map<String, Object>>() {

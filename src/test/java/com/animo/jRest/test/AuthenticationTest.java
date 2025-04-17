@@ -1,6 +1,6 @@
 package com.animo.jRest.test;
 
-import com.animo.jRest.util.APICall;
+import com.animo.jRest.util.APIRequest;
 import com.animo.jRest.util.APIHelper;
 import com.animo.jRest.util.APIResponse;
 import org.apache.commons.codec.binary.Base64;
@@ -18,7 +18,7 @@ public class AuthenticationTest {
                 .addUsernameAndPassword("username", "password")
                 .build();
         TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-        APICall<Map<String, Object>> testCall = testInterface.getCall();
+        APIRequest<Map<String, Object>> testCall = testInterface.getCall();
         APIResponse<Map<String, Object>> response = testCall.callMeNow();
 
         final String encodedCredentials = Base64.encodeBase64String("username:password".getBytes());

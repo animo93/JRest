@@ -1,6 +1,6 @@
 package com.animo.jRest.test;
 
-import com.animo.jRest.util.APICall;
+import com.animo.jRest.util.APIRequest;
 import com.animo.jRest.util.APIHelper;
 import com.animo.jRest.util.APIResponse;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ public class RequestBodyTest {
                 .builder("https://postman-echo.com")
                 .build();
         final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-        final APICall<Map<String, Object>> testCall = testInterface.requestBodyObjectCall(testRequestBody);
+        final APIRequest<Map<String, Object>> testCall = testInterface.requestBodyObjectCall(testRequestBody);
         final APIResponse<Map<String, Object>> response = testCall.callMeNow();
         assertTrue(((Map<String, String>) response.getResponse().get("data")).containsKey("message"));
 
@@ -54,7 +54,7 @@ public class RequestBodyTest {
                 .builder("https://postman-echo.com")
                 .build();
         final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-        final APICall<Map<String, Object>> testCall = testInterface.requestBodyMapCall(requestMap);
+        final APIRequest<Map<String, Object>> testCall = testInterface.requestBodyMapCall(requestMap);
         final APIResponse<Map<String, Object>> response = testCall.callMeNow();
         assertTrue(((Map<String, String>) response.getResponse().get("data")).containsKey("foo"));
 

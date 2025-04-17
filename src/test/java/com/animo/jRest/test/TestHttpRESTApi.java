@@ -1,6 +1,6 @@
 package com.animo.jRest.test;
 
-import com.animo.jRest.util.APICall;
+import com.animo.jRest.util.APIRequest;
 import com.animo.jRest.util.APIHelper;
 import com.animo.jRest.util.APIResponse;
 import org.junit.jupiter.api.AfterAll;
@@ -63,7 +63,7 @@ public class TestHttpRESTApi {
                 .builder("http://localhost:8081")
                 .build();
         final HttpApiInterface testInterface = testAPIHelper.createApi(HttpApiInterface.class);
-        final APICall<Map<String, Object>> testCall = testInterface.getCall();
+        final APIRequest<Map<String, Object>> testCall = testInterface.getCall();
         final APIResponse<Map<String, Object>> response = testCall.callMeNow();
         assertEquals(200,response.getResponseCode());
 

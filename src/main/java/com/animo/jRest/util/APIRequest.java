@@ -14,9 +14,9 @@ import java.lang.reflect.Type;
  * @param <Response> Response type
  */
 //TODO: Rename to APIRequest
-public record APICall<Response>(RequestBean<Object> requestBean, Type responseType) {
+public record APIRequest<Response>(RequestBean<Object> requestBean, Type responseType) {
     /**
-     * Synchronous implementation of {@link com.animo.jRest.util.APICall APICall} , which invokes a blocking call to webserver
+     * Synchronous implementation of {@link APIRequest APICall} , which invokes a blocking call to webserver
      * . And waits for the APICall to complete
      *
      * @return {@code APIResponse<Response>}
@@ -32,7 +32,7 @@ public record APICall<Response>(RequestBean<Object> requestBean, Type responseTy
     //TODO: Add another method executeWithFuture and return a Future Object
 
     /**
-     * Asynchronous implementation of {@link com.animo.jRest.util.APICall APICall} , which invokes a non-blocking call to webserver
+     * Asynchronous implementation of {@link APIRequest APICall} , which invokes a non-blocking call to webserver
      * . It accepts {@link APICallBack APICallBack} as a parameter
      *
      * @param callBack APICallBack
