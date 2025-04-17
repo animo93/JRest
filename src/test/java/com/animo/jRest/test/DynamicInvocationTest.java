@@ -23,7 +23,7 @@ public class DynamicInvocationTest {
 
         DynamicInvocationTestInterface testInterface = testAPIHelper.createDynamicApi(DynamicInvocationTestInterface.class,"noHeadersCall");
         APIRequest<Map<String,Object>> call = testInterface.dynamicAPIInvocation();
-        APIResponse<Map<String,Object>> response = call.callMeNow();
+        APIResponse<Map<String,Object>> response = call.execute();
 
         assertFalse(((Map<String, String>) response.getResponse().get("headers")).containsKey("x-foo"));
     }
@@ -42,7 +42,7 @@ public class DynamicInvocationTest {
         queryMap.put("foo", "bar");
 
         APIRequest<Map<String,Object>> call = testInterface.dynamicAPIInvocation(queryMap,"pong");
-        APIResponse<Map<String,Object>> response = call.callMeNow();
+        APIResponse<Map<String,Object>> response = call.execute();
 
         assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("foo"));
         assertEquals("pong", ((Map<String,String>) response.getResponse().get("args")).get("ping"));
@@ -57,7 +57,7 @@ public class DynamicInvocationTest {
         Assertions.assertThrows(NoSuchMethodException.class,() -> {
                 DynamicInvocationTestInterface testInterface = testAPIHelper.createDynamicApi(DynamicInvocationTestInterface.class,"test");
                 APIRequest<Map<String,Object>> call = testInterface.dynamicAPIInvocation();
-                APIResponse<Map<String,Object>> response = call.callMeNow();
+                APIResponse<Map<String,Object>> response = call.execute();
         });
 
     }
@@ -76,7 +76,7 @@ public class DynamicInvocationTest {
         queryMap.put("foo", "bar");
 
         APIRequest<TestAPIResponse> call = testInterface.dynamicAPIInvocation(queryMap,"pong");
-        APIResponse<TestAPIResponse> response = call.callMeNow();
+        APIResponse<TestAPIResponse> response = call.execute();
 
         assertEquals("bar",
                 response.getResponse().getArgs().get("foo"));

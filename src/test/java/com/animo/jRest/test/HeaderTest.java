@@ -21,7 +21,7 @@ public class HeaderTest {
 				.build();
 		final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
 		final APIRequest<Map<String, Object>> testCall = testInterface.getCall();
-		final APIResponse<Map<String, Object>> response = testCall.callMeNow();
+		final APIResponse<Map<String, Object>> response = testCall.execute();
 		assertTrue(((Map<String, String>) response.getResponse().get("headers")).containsKey("x-foo"));
 		
 	}
@@ -34,7 +34,7 @@ public class HeaderTest {
 				.build();
 		final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
 		final APIRequest<Map<String, Object>> testCall = testInterface.getCall();
-		final APIResponse<Map<String, Object>> response = testCall.callMeNow();
+		final APIResponse<Map<String, Object>> response = testCall.execute();
 		assertEquals("Bar", ((Map<String, String>) response.getResponse().get("headers")).get("x-foo"));
 	}
 
@@ -46,7 +46,7 @@ public class HeaderTest {
 				.build();
 		final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
 		final APIRequest<Map<String, Object>> testCall = testInterface.getMultipleHeadersCall();
-		final APIResponse<Map<String, Object>> response = testCall.callMeNow();
+		final APIResponse<Map<String, Object>> response = testCall.execute();
 		assertTrue(((Map<String, String>) response.getResponse().get("headers")).containsKey("x-foo") &&
 				((Map<String, String>) response.getResponse().get("headers")).containsKey("x-ping"));
 		
@@ -60,7 +60,7 @@ public class HeaderTest {
 				.build();
 		final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
 		final APIRequest<Map<String, Object>> testCall = testInterface.getMultipleHeadersCall();
-		final APIResponse<Map<String, Object>> response = testCall.callMeNow();
+		final APIResponse<Map<String, Object>> response = testCall.execute();
 		assertEquals("Bar", ((Map<String, String>) response.getResponse().get("headers")).get("x-foo"));
 		assertEquals("Pong", ((Map<String, String>) response.getResponse().get("headers")).get("x-ping"));
 	}
@@ -88,7 +88,7 @@ public class HeaderTest {
 		final Map<String, String> testMap = new HashMap<>();
 		testMap.put("x-Foo", "Bar");
 		final APIRequest<Map<String, Object>> testCall = testInterface.getSingleParamHeadersCall(testMap);
-		final APIResponse<Map<String, Object>> response = testCall.callMeNow();
+		final APIResponse<Map<String, Object>> response = testCall.execute();
 		assertTrue(((Map<String, String>) response.getResponse().get("headers")).containsKey("x-foo"));
 		
 	}
@@ -103,7 +103,7 @@ public class HeaderTest {
 		final Map<String, String> testMap = new HashMap<>();
 		testMap.put("x-Foo", "Bar");
 		final APIRequest<Map<String, Object>> testCall = testInterface.getSingleParamHeadersCall(testMap);
-		final APIResponse<Map<String, Object>> response = testCall.callMeNow();
+		final APIResponse<Map<String, Object>> response = testCall.execute();
 		
 		assertEquals("Bar", ((Map<String, String>) response.getResponse().get("headers")).get("x-foo"));
 		
@@ -119,7 +119,7 @@ public class HeaderTest {
 		final Map<String, String> testMap = new HashMap<>();
 		testMap.put("x-Foo", "Bar");
 		final APIRequest<Map<String, Object>> testCall = testInterface.getBothSingleParamStaticHeadersCall(testMap);
-		final APIResponse<Map<String, Object>> response = testCall.callMeNow();
+		final APIResponse<Map<String, Object>> response = testCall.execute();
 		assertTrue(((Map<String, String>) response.getResponse().get("headers")).containsKey("x-foo"));
 		assertTrue(((Map<String, String>) response.getResponse().get("headers")).containsKey("x-ping"));
 		assertTrue(((Map<String, String>) response.getResponse().get("headers")).containsKey("x-static"));
@@ -136,7 +136,7 @@ public class HeaderTest {
 		final Map<String, String> testMap = new HashMap<>();
 		testMap.put("x-Foo", "Bar");
 		final APIRequest<Map<String, Object>> testCall = testInterface.getBothSingleParamStaticHeadersCall(testMap);
-		final APIResponse<Map<String, Object>> response = testCall.callMeNow();
+		final APIResponse<Map<String, Object>> response = testCall.execute();
 		
 		assertEquals("Bar", ((Map<String, String>) response.getResponse().get("headers")).get("x-foo"));
 		assertEquals("Pong", ((Map<String, String>) response.getResponse().get("headers")).get("x-ping"));
@@ -154,7 +154,7 @@ public class HeaderTest {
 		final Map<String, String> testMap = new HashMap<>();
 		testMap.put("x-Foo", "Bar");
 		final APIRequest<Map<String, Object>> testCall = testInterface.noHeadersCall();
-		final APIResponse<Map<String, Object>> response = testCall.callMeNow();
+		final APIResponse<Map<String, Object>> response = testCall.execute();
 		
 		assertFalse(((Map<String, String>) response.getResponse().get("headers")).containsKey("x-foo"));
 		

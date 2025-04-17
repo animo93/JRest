@@ -64,7 +64,7 @@ public class TestHttpRESTApi {
                 .build();
         final HttpApiInterface testInterface = testAPIHelper.createApi(HttpApiInterface.class);
         final APIRequest<Map<String, Object>> testCall = testInterface.getCall();
-        final APIResponse<Map<String, Object>> response = testCall.callMeNow();
+        final APIResponse<Map<String, Object>> response = testCall.execute();
         assertEquals(200,response.getResponseCode());
 
     }

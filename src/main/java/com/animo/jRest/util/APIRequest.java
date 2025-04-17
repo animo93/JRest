@@ -8,7 +8,7 @@ import java.lang.reflect.Type;
  * An invocation of a APIHelper method that sends a request to a webserver and returns a response.
  * Each call yields its own response object
  *
- * <p>Calls may be executed synchronously with {@link #callMeNow}, or asynchronously with {@link
+ * <p>Calls may be executed synchronously with {@link #execute}, or asynchronously with {@link
  * #executeWithCallBack}.
  *
  * @param <Response> Response type
@@ -22,7 +22,7 @@ public record APIRequest<Response>(RequestBean<Object> requestBean, Type respons
      * @throws Exception Exception if issue with asyncTask executeNow method
      */
     //TODO: Rename to execute
-    public APIResponse<Response> callMeNow() throws Exception {
+    public APIResponse<Response> execute() throws Exception {
 
         final APIAsyncTask<Response> asyncTask = new APIAsyncTask<>(requestBean, responseType);
         return asyncTask.executeNow(requestBean);

@@ -26,7 +26,7 @@ public class RequestBodyTest {
                 .build();
         final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
         final APIRequest<Map<String, Object>> testCall = testInterface.requestBodyObjectCall(testRequestBody);
-        final APIResponse<Map<String, Object>> response = testCall.callMeNow();
+        final APIResponse<Map<String, Object>> response = testCall.execute();
         assertTrue(((Map<String, String>) response.getResponse().get("data")).containsKey("message"));
 
     }
@@ -55,7 +55,7 @@ public class RequestBodyTest {
                 .build();
         final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
         final APIRequest<Map<String, Object>> testCall = testInterface.requestBodyMapCall(requestMap);
-        final APIResponse<Map<String, Object>> response = testCall.callMeNow();
+        final APIResponse<Map<String, Object>> response = testCall.execute();
         assertTrue(((Map<String, String>) response.getResponse().get("data")).containsKey("foo"));
 
     }

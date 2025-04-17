@@ -19,7 +19,7 @@ public class AuthenticationTest {
                 .build();
         TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
         APIRequest<Map<String, Object>> testCall = testInterface.getCall();
-        APIResponse<Map<String, Object>> response = testCall.callMeNow();
+        APIResponse<Map<String, Object>> response = testCall.execute();
 
         final String encodedCredentials = Base64.encodeBase64String("username:password".getBytes());
         Assertions.assertEquals("Basic "+encodedCredentials,((Map<String, String>)response.getResponse().get("headers")).get("authorization"));
