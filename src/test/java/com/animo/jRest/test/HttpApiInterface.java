@@ -10,5 +10,5 @@ import java.util.Map;
 public interface HttpApiInterface {
 
     @REQUEST(endpoint = "/get", type = HTTP_METHOD.GET)
-    APICall<Void, Map<String, Object>> getCall();
+    APICall<Map<String, Object>> getCall();
 }

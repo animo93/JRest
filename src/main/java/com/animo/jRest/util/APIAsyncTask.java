@@ -19,34 +19,35 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Map.Entry;
 
-public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Request>,APICall<Request,Response>>{
+public class APIAsyncTask<Response> extends AsyncTask<Response>{
 
 	private static final Logger logger = LogManager.getLogger(APIAsyncTask.class);
-	protected APICallBack<APICall<Request, Response>> myCallBack;
-	private final RequestBean<Request> bean;
+	protected APICallBack<Response> myCallBack;
+	private final RequestBean<Object> bean;
 	private final Type type;
 
-	public APIAsyncTask(RequestBean<Request> bean, Type type, APICallBack<APICall<Request, Response>> myCallBack) {
+	public APIAsyncTask(RequestBean<Object> bean, Type type, APICallBack<Response> myCallBack) {
 		this.bean = bean;
 		this.type = type;
 		this.myCallBack = myCallBack;
 	}
 
-	public APIAsyncTask(RequestBean<Request> bean, Type type) {
+	public APIAsyncTask(RequestBean<Object> bean, Type type) {
 		this.bean = bean;
 		this.type = type;
 	}
 
 	@SneakyThrows
     @Override
-	protected APICall<Request,Response> runInBackground(RequestBean<Request> myRequestBean) {
+	protected APIResponse<Response> runInBackground(RequestBean<Object> myRequestBean) {
 		if(myRequestBean == null)
 			return null;
-		final RequestBean<Request> bean = myRequestBean;
+		final RequestBean<Object> bean = myRequestBean;
 		final HttpURLConnection httpURLConnection = null;
 		final BufferedReader reader = null;
 		final String repoJson = null;
-		APICall<Request, Response> myCall = new APICall<>();
+		//APICall<Object, Response> myCall = new APICall<>();
+		APIResponse<Response> apiResponse = new APIResponse<Response>();
 		final URL url = new URL(this.bean.getUrl());
 		HttpRequest.Builder builder = HttpRequest.newBuilder()
 				.uri(url.toURI());
@@ -60,33 +61,35 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 					.proxy(bean.getProxy() != null ? ProxySelector.of(new InetSocketAddress(bean.getProxy().getUrl(), bean.getProxy().getPort())) : ProxySelector.getDefault())
 					.build()
 					.send(builder.build(), HttpResponse.BodyHandlers.ofString());
-			myCall.setResponseHeaders(response.headers().map());
-			myCall.setResponseCode(response.statusCode());
+			//myCall.setResponseHeaders(response.headers().map());
+			apiResponse.setResponseHeaders(response.headers().map());
+			apiResponse.setResponseCode(response.statusCode());
+			//myCall.setResponseCode(response.statusCode());
 			String responseJson = getResponseBody(response.statusCode(),response);
-			convertResponse(responseJson, myCall);
+			convertResponse(responseJson, apiResponse);
 		} catch (Exception e) {
 			logger.error("Could not make connection ", e);
 			throw e;
 		}
-		return myCall;
+		return apiResponse;
 	}
 
-	private void convertResponse(String repoJson, APICall<Request, Response> myCall) throws Exception{
+	private void convertResponse(String repoJson, APIResponse<Response> apiResponse) throws Exception{
 		Gson gson = new Gson();
 		try {
 			if(repoJson != null) {
 
 				logger.debug("repoJson {}" ,repoJson);
-
+				//TODO: Never tested
 				if(!outputIsJson(repoJson)) {
-					myCall.setResponseBody((Response) repoJson);
+					apiResponse.setResponse((Response) repoJson);
 				} else {
 					logger.debug("type {}" , type.getClass());
 					final ObjectMapper mapper = new ObjectMapper();
 					final Class<?> t = type2Class(type);
 					Response res = (Response) mapper.readValue(repoJson, t);
 
-					myCall.setResponseBody(res);
+					apiResponse.setResponse(res);
 				}
 
 			}
@@ -111,7 +114,7 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 	private void setRequestBody(HttpRequest.Builder requestBuilder) throws IOException {
 		if(bean.getRequestType().toString().equals("POST") || bean.getRequestType().toString().equals("PATCH")
 				|| bean.getRequestType().toString().equals("PUT")) {
-			Request requestObject = bean.getRequestObject();
+			Object requestObject = bean.getRequestObject();
 			if(null != requestObject) {
 				StringBuilder builder = new StringBuilder();
 				if(requestObject instanceof ParameterizedType) {
@@ -123,7 +126,7 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 				logger.debug("request json {}" ,json);
 				requestBuilder.method(bean.getRequestType().toString(),
 						HttpRequest.BodyPublishers.ofString(json));
-			}
+			}//TODO Add else block for null values
 		}else {
 			requestBuilder.method(bean.getRequestType().toString(), HttpRequest.BodyPublishers.noBody());
 		}
@@ -179,7 +182,7 @@ public class APIAsyncTask<Request,Response> extends AsyncTask<RequestBean<Reques
 	}
 
 	@Override
-	protected void postExecute(APICall<Request, Response> myCall, Exception e) {
+	protected void postExecute(Response reponse, Exception e) {
 	}
 
 	@Override

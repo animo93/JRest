@@ -2,7 +2,7 @@ package com.animo.jRest.util;
 
 import java.util.Map;
 
-public interface JRestDynamicAPiInterface<T> {
+public interface JRestDynamicAPiInterface<Response> {
 
     /**
      * This is the method which should be used for dynamically invoking any JREST API , which is
@@ -18,5 +18,5 @@ public interface JRestDynamicAPiInterface<T> {
      * @param args The actual arguments which are going to be passed to the method to be invoked
      * @return {@link com.animo.jRest.util.APICall}
      */
-    APICall<Void, T> dynamicAPIInvocation(Object... args);
+    APICall<Response> dynamicAPIInvocation(Object... args);
 }

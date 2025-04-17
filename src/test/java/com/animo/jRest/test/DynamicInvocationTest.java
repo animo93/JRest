@@ -2,6 +2,7 @@ package com.animo.jRest.test;
 
 import com.animo.jRest.util.APICall;
 import com.animo.jRest.util.APIHelper;
+import com.animo.jRest.util.APIResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,10 +22,10 @@ public class DynamicInvocationTest {
                 .build();
 
         DynamicInvocationTestInterface testInterface = testAPIHelper.createDynamicApi(DynamicInvocationTestInterface.class,"noHeadersCall");
-        APICall<Void, Map<String,Object>> call = testInterface.dynamicAPIInvocation();
-        APICall<Void,Map<String,Object>> response = call.callMeNow();
+        APICall<Map<String,Object>> call = testInterface.dynamicAPIInvocation();
+        APIResponse<Map<String,Object>> response = call.callMeNow();
 
-        assertFalse(((Map<String, String>) response.getResponseBody().get("headers")).containsKey("x-foo"));
+        assertFalse(((Map<String, String>) response.getResponse().get("headers")).containsKey("x-foo"));
     }
 
 
@@ -40,11 +41,11 @@ public class DynamicInvocationTest {
         Map<String,String> queryMap = new HashMap<String,String>();
         queryMap.put("foo", "bar");
 
-        APICall<Void, Map<String,Object>> call = testInterface.dynamicAPIInvocation(queryMap,"pong");
-        APICall<Void,Map<String,Object>> response = call.callMeNow();
+        APICall<Map<String,Object>> call = testInterface.dynamicAPIInvocation(queryMap,"pong");
+        APIResponse<Map<String,Object>> response = call.callMeNow();
 
-        assertEquals("bar", ((Map<String,String>) response.getResponseBody().get("args")).get("foo"));
-        assertEquals("pong", ((Map<String,String>) response.getResponseBody().get("args")).get("ping"));
+        assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("foo"));
+        assertEquals("pong", ((Map<String,String>) response.getResponse().get("args")).get("ping"));
     }
 
     @Test
@@ -55,8 +56,8 @@ public class DynamicInvocationTest {
 
         Assertions.assertThrows(NoSuchMethodException.class,() -> {
                 DynamicInvocationTestInterface testInterface = testAPIHelper.createDynamicApi(DynamicInvocationTestInterface.class,"test");
-                APICall<Void, Map<String,Object>> call = testInterface.dynamicAPIInvocation();
-                APICall<Void,Map<String,Object>> response = call.callMeNow();
+                APICall<Map<String,Object>> call = testInterface.dynamicAPIInvocation();
+                APIResponse<Map<String,Object>> response = call.callMeNow();
         });
 
     }
@@ -74,12 +75,12 @@ public class DynamicInvocationTest {
         Map<String,String> queryMap = new HashMap<String,String>();
         queryMap.put("foo", "bar");
 
-        APICall<Void, TestAPIResponse> call = testInterface.dynamicAPIInvocation(queryMap,"pong");
-        APICall<Void,TestAPIResponse> response = call.callMeNow();
+        APICall<TestAPIResponse> call = testInterface.dynamicAPIInvocation(queryMap,"pong");
+        APIResponse<TestAPIResponse> response = call.callMeNow();
 
         assertEquals("bar",
-                response.getResponseBody().getArgs().get("foo"));
+                response.getResponse().getArgs().get("foo"));
         assertEquals("pong",
-                response.getResponseBody().getArgs().get("ping"));
+                response.getResponse().getArgs().get("ping"));
     }
 }

@@ -12,10 +12,10 @@ import java.util.Map;
 public interface DynamicInvocationTestInterface extends JRestDynamicAPiInterface<Map<String,Object>> {
 
     @REQUEST(endpoint = "/get", type = HTTP_METHOD.GET)
-    APICall<Void, Map<String, Object>> noHeadersCall();
+    APICall<Map<String, Object>> noHeadersCall();
 
     @REQUEST(endpoint = "/get",type=HTTP_METHOD.GET)
-    APICall<Void,Map<String,Object>> bothQueryAndQueryMapCall(@QueryMap Map<String,String> queryMap ,
+    APICall<Map<String,Object>> bothQueryAndQueryMapCall(@QueryMap Map<String,String> queryMap ,
                                                               @Query("ping") String pong);
 
 }

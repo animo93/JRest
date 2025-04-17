@@ -12,6 +12,6 @@ import java.util.Map;
 public interface DynamicInvocationTestResponseInterface extends JRestDynamicAPiInterface<TestAPIResponse> {
 
     @REQUEST(endpoint = "/get",type= HTTP_METHOD.GET)
-    APICall<Void,TestAPIResponse> bothQueryAndQueryMapCallWithResponse(@QueryMap Map<String,String> queryMap ,
+    APICall<TestAPIResponse> bothQueryAndQueryMapCallWithResponse(@QueryMap Map<String,String> queryMap ,
                                                                        @Query("ping") String pong);
 }

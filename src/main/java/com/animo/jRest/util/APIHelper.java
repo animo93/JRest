@@ -169,7 +169,7 @@ public class APIHelper {
 	 * public interface MyApiInterface {
 	 *
 	 *	&#64;REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
-	 *	APICall&#60;Void,ApiResponse&#62; listRepos(@PATH(value = "user") String user);
+	 *	APICall<Void,ApiResponse> listRepos(@PATH(value = "user") String user);
 	 *
 	 *}</code></pre>
 	 * 
@@ -199,17 +199,17 @@ public class APIHelper {
 	 * public interface MyApiInterface extends JRestDynamicAPiInterface&#60;ApiResponse&#62;{
 	 *
 	 *	&#64;REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
-	 *	APICall&#60;Void,ApiResponse&#62; listRepos(@PATH(value = "user") String user);
+	 *	APICall<Void,ApiResponse> listRepos(@PATH(value = "user") String user);
 	 *
-	 *  APICall&#60;Void,ApiResponse&#62; dynamicApiInvocation(Object... args)
+	 *  APICall<Void,ApiResponse> dynamicApiInvocation(Object... args)
 	 *
 	 *}</code></pre>
 	 *
 	 * <p> For example : (Service Execution) </p>
 	 * <pre><code>
 	 *     MyApiInterface testInterface = testAPIHelper.createDynamicApi(MyApiInterface.class,"listRepos");
-	 *     APICall&#60;Void, Map&#60;String,Object&#62;&#62; call = testInterface.dynamicAPIInvocation("testUser");
-	 *     APICall&#60;Void,Map&#60;String,Object&#62;&#62; response = call.callMeNow();
+	 *     APICall<Map<String,Object> call = testInterface.dynamicAPIInvocation("testUser");
+	 *     APIResponse<Map<String,Object>> response = call.callMeNow();
 	 * </code></pre>
 	 *
 	 * @param clazz service.class
@@ -219,6 +219,7 @@ public class APIHelper {
 	 * @throws NoSuchMethodException When the method doesn't exists in service class
 	 * @return {@code service}
 	 */
+	//TODO Check why do we need methodName here
 	public <S> S createDynamicApi(Class<S> clazz,String methodName,Class... parameterTypes) throws NoSuchMethodException {
 
 		final ClassLoader loader = clazz.getClassLoader();
@@ -278,9 +279,10 @@ public class APIHelper {
 				if(followRedirectsAnnotation != null)
 					myRequestBean.setFollowRedirects(followRedirectsAnnotation.value());
 
+				//TODO Add validation check to prevent misuse
 				final Class<?> clazz = APICall.class;
 				final Object object = clazz.newInstance();
-				final APICall<Object, ?> myCall = (APICall<Object, ?>) object;
+				final APICall<?> myCall = (APICall<?>) object;
 				myCall.setRequestBean(myRequestBean);
 				final Type type =  method.getGenericReturnType();
 				if(type instanceof ParameterizedType){
@@ -365,6 +367,10 @@ public class APIHelper {
 						if(parameters[i].getAnnotation(Body.class)!=null){
 							Body body = (Body) parameters[i].getAnnotation(Body.class);
 							logger.debug("Going to set request body {}",args[i]);
+							if(args[i]==null){
+								throw new NullPointerException("Request Body cannot be Null");
+							}
+							//TODO: Add null check and throw exception
 							myRequestBean.setRequestObject(args[i]);
 						}
 					}

@@ -1,26 +1,26 @@
 package com.animo.jRest.util;
 
+import com.animo.jRest.model.RequestBean;
+
 import java.util.concurrent.Callable;
 
-public class SyncCallable<Params, Result> implements Callable<Result> {
+public class SyncCallable<Response> implements Callable<APIResponse<Response>> {
 
-	private final Params params;
-	private final AsyncTask<Params, Result> asyncTask;
+	private final RequestBean<Object> params;
+	private final AsyncTask<Response> asyncTask;
 	
-	public SyncCallable(Params params, AsyncTask<Params, Result> asyncTask) {
+	public SyncCallable(RequestBean<Object> params, AsyncTask<Response> asyncTask) {
 		this.params = params;
 		this.asyncTask = asyncTask;
 	}
 
 	@Override
-	public Result call() throws Exception {
-		Result result;
+	public APIResponse<Response> call() throws Exception {
 		try {
-			result = asyncTask.runInBackground(params);
+			return asyncTask.runInBackground(params);
 		} catch(Exception e) {
 			throw e;
 		}
-		return result;
 	}
 
 }

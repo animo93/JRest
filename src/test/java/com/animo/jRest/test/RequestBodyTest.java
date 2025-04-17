@@ -2,11 +2,13 @@ package com.animo.jRest.test;
 
 import com.animo.jRest.util.APICall;
 import com.animo.jRest.util.APIHelper;
+import com.animo.jRest.util.APIResponse;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -23,9 +25,22 @@ public class RequestBodyTest {
                 .builder("https://postman-echo.com")
                 .build();
         final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-        final APICall<TestRequestBody, Map<String, Object>> testCall = testInterface.requestBodyObjectCall(testRequestBody);
-        final APICall<TestRequestBody, Map<String, Object>> response = testCall.callMeNow();
-        assertTrue(((Map<String, String>) response.getResponseBody().get("data")).containsKey("message"));
+        final APICall<Map<String, Object>> testCall = testInterface.requestBodyObjectCall(testRequestBody);
+        final APIResponse<Map<String, Object>> response = testCall.callMeNow();
+        assertTrue(((Map<String, String>) response.getResponse().get("data")).containsKey("message"));
+
+    }
+
+    @Test
+    public void testRequestBodyAsNull() throws Exception {
+
+        TestRequestBody testRequestBody = null;
+
+        final APIHelper testAPIHelper = APIHelper.APIBuilder
+                .builder("https://postman-echo.com")
+                .build();
+        final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+        assertThrows(NullPointerException.class, () -> testInterface.requestBodyObjectCall(testRequestBody));
 
     }
 
@@ -39,9 +54,9 @@ public class RequestBodyTest {
                 .builder("https://postman-echo.com")
                 .build();
         final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-        final APICall<Void, Map<String, Object>> testCall = testInterface.requestBodyMapCall(requestMap);
-        final APICall<Void, Map<String, Object>> response = testCall.callMeNow();
-        assertTrue(((Map<String, String>) response.getResponseBody().get("data")).containsKey("foo"));
+        final APICall<Map<String, Object>> testCall = testInterface.requestBodyMapCall(requestMap);
+        final APIResponse<Map<String, Object>> response = testCall.callMeNow();
+        assertTrue(((Map<String, String>) response.getResponse().get("data")).containsKey("foo"));
 
     }
 }

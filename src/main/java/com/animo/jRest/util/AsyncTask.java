@@ -1,23 +1,22 @@
 package com.animo.jRest.util;
 
-import java.util.concurrent.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import com.animo.jRest.model.RequestBean;
 
-public abstract class AsyncTask<Params,Result> {
+import java.util.concurrent.*;
+
+public abstract class AsyncTask<Response> {
 
     //TODO: Check if multithreaded execution is helpful
     private final ExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
-    protected abstract Result runInBackground(Params params);
+    protected abstract APIResponse<Response> runInBackground(RequestBean<Object> requestBean);
     //TODO: this method needs to redesigned as a Consumer to be supplied along with callmeNow and callmeLater function
-    protected abstract void postExecute(Result result,Exception e);
+    protected abstract void postExecute(Response result, Exception e);
     //TODO: this method needs to redesigned as a Consumer to be supplied along with callmeNow and callmeLater function
     protected abstract void preExecute();
 
 
-    public void executeLater(Params params, APICallBack<Result> callback){
+    public final void executeLater(RequestBean<Object> params, APICallBack<Response> callback){
         CompletableFuture.supplyAsync(() -> this.runInBackground(params))
                 .thenAccept(callback::callBackOnSuccess)
                 .exceptionally(e -> {
@@ -26,9 +25,9 @@ public abstract class AsyncTask<Params,Result> {
                 });
     };
 
-    public Result executeNow(Params params) throws Exception {
+    public final APIResponse<Response> executeNow(RequestBean<Object> params) throws Exception {
         try {
-            Future<Result> future = executor.submit(new SyncCallable<>(params, this));
+            Future<APIResponse<Response>> future = executor.submit(new SyncCallable<>(params,this));
             return future.get();
         } catch(Exception e) {
             throw e;

@@ -2,6 +2,7 @@ package com.animo.jRest.test;
 
 import com.animo.jRest.util.APICall;
 import com.animo.jRest.util.APIHelper;
+import com.animo.jRest.util.APIResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,10 +24,10 @@ public class QueryParamTest {
 				.builder("https://postman-echo.com")
 				.build();
 		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-		APICall<Void, Map<String,Object>> call = testInterface.singleQueryParamsCall("bar");
-		APICall<Void,Map<String,Object>> response = call.callMeNow();
+		APICall<Map<String,Object>> call = testInterface.singleQueryParamsCall("bar");
+		APIResponse<Map<String,Object>> response = call.callMeNow();
 		
-		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponseBody().get("args")).get("foo"));
+		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("foo"));
 		
 	}
 	
@@ -38,11 +39,11 @@ public class QueryParamTest {
 				.builder("https://postman-echo.com")
 				.build();
 		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-		APICall<Void, Map<String,Object>> call = testInterface.multipleQueryParamsCall("bar","pong");
-		APICall<Void,Map<String,Object>> response = call.callMeNow();
+		APICall<Map<String,Object>> call = testInterface.multipleQueryParamsCall("bar","pong");
+		APIResponse<Map<String,Object>> response = call.callMeNow();
 
-		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponseBody().get("args")).get("foo"));
-		Assertions.assertEquals("pong", ((Map<String,String>) response.getResponseBody().get("args")).get("ping"));
+		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("foo"));
+		Assertions.assertEquals("pong", ((Map<String,String>) response.getResponse().get("args")).get("ping"));
 		
 	}
 
@@ -54,11 +55,11 @@ public class QueryParamTest {
 				.addParameter("ping", "pong")
 				.build();
 		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-		APICall<Void, Map<String,Object>> call = testInterface.singleQueryParamsCall("bar");
-		APICall<Void,Map<String,Object>> response = call.callMeNow();
+		APICall<Map<String,Object>> call = testInterface.singleQueryParamsCall("bar");
+		APIResponse<Map<String,Object>> response = call.callMeNow();
 
-		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponseBody().get("args")).get("foo"));
-		Assertions.assertEquals("pong", ((Map<String,String>) response.getResponseBody().get("args")).get("ping"));
+		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("foo"));
+		Assertions.assertEquals("pong", ((Map<String,String>) response.getResponse().get("args")).get("ping"));
 		
 	}
 
@@ -69,11 +70,11 @@ public class QueryParamTest {
 				.builder("https://postman-echo.com")
 				.build();
 		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-		APICall<Void, Map<String,Object>> call = testInterface.singleQueryParamsCall(null);
-		APICall<Void,Map<String,Object>> response = call.callMeNow();
+		APICall<Map<String,Object>> call = testInterface.singleQueryParamsCall(null);
+		APIResponse<Map<String,Object>> response = call.callMeNow();
 
 		Assertions.assertEquals("https://postman-echo.com/get", call.getRequestBean().getUrl());
-		Assertions.assertTrue(((Map<String,String>) response.getResponseBody().get("args")).isEmpty());
+		Assertions.assertTrue(((Map<String,String>) response.getResponse().get("args")).isEmpty());
 		
 	}
 
@@ -87,8 +88,8 @@ public class QueryParamTest {
 		
 		
 		Exception exception = Assertions.assertThrows(InvalidParameterException.class, () -> {
-			APICall<Void, Map<String,Object>> call = testInterface.singleQueryParamsFailureCall(0);
-			APICall<Void,Map<String,Object>> response = call.callMeNow();
+			APICall<Map<String,Object>> call = testInterface.singleQueryParamsFailureCall(0);
+			APIResponse<Map<String,Object>> response = call.callMeNow();
 		});
 
 		Assertions.assertTrue(exception.getMessage().contains("Query parameter should be passed in string format only"));
@@ -102,12 +103,12 @@ public class QueryParamTest {
 				.builder("https://postman-echo.com")
 				.build();
 		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-		APICall<Void, Map<String,Object>> call = testInterface.emptyQueryKeyFailureCall("bar");
-		APICall<Void,Map<String,Object>> response = call.callMeNow();
+		APICall<Map<String,Object>> call = testInterface.emptyQueryKeyFailureCall("bar");
+		APIResponse<Map<String,Object>> response = call.callMeNow();
 
 
 		Assertions.assertEquals("https://postman-echo.com/get", call.getRequestBean().getUrl());
-		Assertions.assertTrue(((Map<String,String>) response.getResponseBody().get("args")).isEmpty());
+		Assertions.assertTrue(((Map<String,String>) response.getResponse().get("args")).isEmpty());
 		
 	}
 	
@@ -119,12 +120,12 @@ public class QueryParamTest {
 				.builder("https://postman-echo.com")
 				.build();
 		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-		APICall<Void, Map<String,Object>> call = testInterface.queryKeyWithSpaceCall("bar");
-		APICall<Void,Map<String,Object>> response = call.callMeNow();
+		APICall<Map<String,Object>> call = testInterface.queryKeyWithSpaceCall("bar");
+		APIResponse<Map<String,Object>> response = call.callMeNow();
 		
 		
 		//Assert.assertEquals("https://postman-echo.com/get", call.getRequestBean().getUrl());		
-		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponseBody().get("args")).get("query key"));
+		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("query key"));
 		
 	}
 
@@ -135,7 +136,7 @@ public class QueryParamTest {
 				.builder("https://postman-echo.com")
 				.build();
 		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-		APICall<Void, Map<String,Object>> call = testInterface.unEncodedqueryKeyWithEncodedSetTrueCall("bar");
+		APICall<Map<String,Object>> call = testInterface.unEncodedqueryKeyWithEncodedSetTrueCall("bar");
 		assertThrows(ExecutionException.class, () -> call.callMeNow());
 		
 	}
@@ -147,12 +148,12 @@ public class QueryParamTest {
 				.builder("https://postman-echo.com")
 				.build();
 		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-		APICall<Void, Map<String,Object>> call = testInterface.encodedqueryKeyWithEncodedSetTrueCall("bar");
-		APICall<Void,Map<String,Object>> response = call.callMeNow();
+		APICall<Map<String,Object>> call = testInterface.encodedqueryKeyWithEncodedSetTrueCall("bar");
+		APIResponse<Map<String,Object>> response = call.callMeNow();
 
 
 		Assertions.assertEquals("https://postman-echo.com/get?query+key=bar", call.getRequestBean().getUrl());
-		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponseBody().get("args")).get("query key"));
+		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("query key"));
 		
 	}
 
@@ -166,11 +167,11 @@ public class QueryParamTest {
 		Map<String,String> queryMap = new HashMap<String,String>();
 		queryMap.put("foo", "bar");
 		queryMap.put("ping","pong");
-		APICall<Void, Map<String,Object>> call = testInterface.singleQueryMapCall(queryMap);
-		APICall<Void,Map<String,Object>> response = call.callMeNow();
+		APICall<Map<String,Object>> call = testInterface.singleQueryMapCall(queryMap);
+		APIResponse<Map<String,Object>> response = call.callMeNow();
 
-		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponseBody().get("args")).get("foo"));
-		Assertions.assertEquals("pong", ((Map<String,String>) response.getResponseBody().get("args")).get("ping"));
+		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("foo"));
+		Assertions.assertEquals("pong", ((Map<String,String>) response.getResponse().get("args")).get("ping"));
 		
 	}
 
@@ -189,13 +190,13 @@ public class QueryParamTest {
 		queryMap2.put("tik", "tok");
 		queryMap2.put("john","doe");
 		
-		APICall<Void, Map<String,Object>> call = testInterface.multipleQueryMapCall(queryMap,queryMap2);
-		APICall<Void,Map<String,Object>> response = call.callMeNow();
+		APICall<Map<String,Object>> call = testInterface.multipleQueryMapCall(queryMap,queryMap2);
+		APIResponse<Map<String,Object>> response = call.callMeNow();
 
-		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponseBody().get("args")).get("foo"));
-		Assertions.assertEquals("pong",((Map<String,String>) response.getResponseBody().get("args")).get("ping"));
-		Assertions.assertEquals("tok", ((Map<String,String>) response.getResponseBody().get("args")).get("tik"));
-		Assertions.assertEquals("doe", ((Map<String,String>) response.getResponseBody().get("args")).get("john"));
+		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("foo"));
+		Assertions.assertEquals("pong",((Map<String,String>) response.getResponse().get("args")).get("ping"));
+		Assertions.assertEquals("tok", ((Map<String,String>) response.getResponse().get("args")).get("tik"));
+		Assertions.assertEquals("doe", ((Map<String,String>) response.getResponse().get("args")).get("john"));
 		
 	}
 
@@ -209,11 +210,11 @@ public class QueryParamTest {
 		Map<String,String> queryMap = new HashMap<String,String>();
 		queryMap.put("foo", "bar");
 		
-		APICall<Void, Map<String,Object>> call = testInterface.bothQueryAndQueryMapCall(queryMap, "pong");
-		APICall<Void,Map<String,Object>> response = call.callMeNow();
+		APICall<Map<String,Object>> call = testInterface.bothQueryAndQueryMapCall(queryMap, "pong");
+		APIResponse<Map<String,Object>> response = call.callMeNow();
 
-		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponseBody().get("args")).get("foo"));
-		Assertions.assertEquals("pong", ((Map<String,String>) response.getResponseBody().get("args")).get("ping"));
+		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("foo"));
+		Assertions.assertEquals("pong", ((Map<String,String>) response.getResponse().get("args")).get("ping"));
 		
 	}
 
@@ -230,12 +231,12 @@ public class QueryParamTest {
 		
 		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
 		
-		APICall<Void, Map<String,Object>> call = testInterface.bothQueryAndQueryMapCall(queryMap, "pong");
-		APICall<Void,Map<String,Object>> response = call.callMeNow();
+		APICall<Map<String,Object>> call = testInterface.bothQueryAndQueryMapCall(queryMap, "pong");
+		APIResponse<Map<String,Object>> response = call.callMeNow();
 
-		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponseBody().get("args")).get("foo"));
-		Assertions.assertEquals("pong", ((Map<String,String>) response.getResponseBody().get("args")).get("ping"));
-		Assertions.assertEquals("tok", ((Map<String,String>) response.getResponseBody().get("args")).get("tik"));
+		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("foo"));
+		Assertions.assertEquals("pong", ((Map<String,String>) response.getResponse().get("args")).get("ping"));
+		Assertions.assertEquals("tok", ((Map<String,String>) response.getResponse().get("args")).get("tik"));
 		
 	}
 
@@ -249,8 +250,8 @@ public class QueryParamTest {
 		
 		
 		Exception exception = Assertions.assertThrows(InvalidParameterException.class, () -> {
-			APICall<Void, Map<String,Object>> call = testInterface.singleQueryMapFailureCall(0);
-			APICall<Void,Map<String,Object>> response = call.callMeNow();
+			APICall<Map<String,Object>> call = testInterface.singleQueryMapFailureCall(0);
+			APIResponse<Map<String,Object>> response = call.callMeNow();
 		});
 
 		Assertions.assertTrue(exception.getMessage().contains("Query parameter should be passed in Map format only"));
@@ -264,11 +265,11 @@ public class QueryParamTest {
 				.builder("https://postman-echo.com")
 				.build();
 		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-		APICall<Void, Map<String,Object>> call = testInterface.singleQueryMapCall(null);
-		APICall<Void,Map<String,Object>> response = call.callMeNow();
+		APICall<Map<String,Object>> call = testInterface.singleQueryMapCall(null);
+		APIResponse<Map<String,Object>> response = call.callMeNow();
 
 		Assertions.assertEquals("https://postman-echo.com/get", call.getRequestBean().getUrl());
-		Assertions.assertTrue(((Map<String,String>) response.getResponseBody().get("args")).isEmpty());
+		Assertions.assertTrue(((Map<String,String>) response.getResponse().get("args")).isEmpty());
 		
 	}
 
@@ -282,10 +283,10 @@ public class QueryParamTest {
 				.addAllParameters(queryParamMap)
 				.build();
 		TestPostmanEchoAPIInterface testPostmanEchoAPIInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-		APICall<Void, Map<String,Object>> call = testPostmanEchoAPIInterface.getCall();
-		APICall<Void, Map<String,Object>> response = call.callMeNow();
+		APICall<Map<String,Object>> call = testPostmanEchoAPIInterface.getCall();
+		APIResponse<Map<String,Object>> response = call.callMeNow();
 
-		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponseBody().get("args")).get("foo"));
+		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("foo"));
 
 	}
 	

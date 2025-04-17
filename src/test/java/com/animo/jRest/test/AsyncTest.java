@@ -3,6 +3,7 @@ package com.animo.jRest.test;
 import com.animo.jRest.util.APICall;
 import com.animo.jRest.util.APICallBack;
 import com.animo.jRest.util.APIHelper;
+import com.animo.jRest.util.APIResponse;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -21,12 +22,12 @@ public class AsyncTest {
                 .builder("https://postman-echo.com")
                 .build();
         final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-        final APICall<Void, Map<String, Object>> testCall = testInterface.getCall();
+        final APICall<Map<String, Object>> testCall = testInterface.getCall();
 
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        APICallBack<APICall<Void, Map<String, Object>>> myCallBack = Mockito.spy(new APICallBack<APICall<Void, Map<String, Object>>>() {
+        APICallBack<Map<String, Object>> myCallBack = Mockito.spy(new APICallBack<Map<String, Object>>() {
             @Override
-            public void callBackOnSuccess(APICall<Void, Map<String, Object>> result) {
+            public void callBackOnSuccess(APIResponse<Map<String, Object>> result) {
                 countDownLatch.countDown();
             }
             @Override
@@ -49,12 +50,12 @@ public class AsyncTest {
                 .builder("https://postman-echo.com1")
                 .build();
         final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
-        final APICall<Void, Map<String, Object>> testCall = testInterface.getCall();
+        final APICall<Map<String, Object>> testCall = testInterface.getCall();
 
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        APICallBack<APICall<Void, Map<String, Object>>> myCallBack = Mockito.spy(new APICallBack<APICall<Void, Map<String, Object>>>() {
+        APICallBack<Map<String, Object>> myCallBack = Mockito.spy(new APICallBack<Map<String, Object>>() {
             @Override
-            public void callBackOnSuccess(APICall<Void, Map<String, Object>> result) {
+            public void callBackOnSuccess(APIResponse<Map<String, Object>> result) {
 
             }
             @Override
