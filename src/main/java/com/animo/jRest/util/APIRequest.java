@@ -9,15 +9,14 @@ import java.lang.reflect.Type;
  * Each call yields its own response object
  *
  * <p>Calls may be executed synchronously with {@link #callMeNow}, or asynchronously with {@link
- * #callMeLater}.
+ * #executeWithCallBack}.
  *
  * @param <Response> Response type
  */
-//TODO: Rename to APIRequest
 public record APIRequest<Response>(RequestBean<Object> requestBean, Type responseType) {
     /**
-     * Synchronous implementation of {@link APIRequest APICall} , which invokes a blocking call to webserver
-     * . And waits for the APICall to complete
+     * Synchronous implementation of {@link APIRequest APIRequest} , which invokes a blocking call to webserver
+     * . And waits for the APIRequest to complete
      *
      * @return {@code APIResponse<Response>}
      * @throws Exception Exception if issue with asyncTask executeNow method
@@ -32,13 +31,12 @@ public record APIRequest<Response>(RequestBean<Object> requestBean, Type respons
     //TODO: Add another method executeWithFuture and return a Future Object
 
     /**
-     * Asynchronous implementation of {@link APIRequest APICall} , which invokes a non-blocking call to webserver
+     * Asynchronous implementation of {@link APIRequest APIRequest} , which invokes a non-blocking call to webserver
      * . It accepts {@link APICallBack APICallBack} as a parameter
      *
      * @param callBack APICallBack
      */
-    //TODO: Rename to executeWithCallback
-    public void callMeLater(APICallBack<Response> callBack) {
+    public void executeWithCallBack(APICallBack<Response> callBack) {
         final APIAsyncTask<Response> asyncTask = new APIAsyncTask<>(requestBean, responseType, callBack);
         asyncTask.executeLater(requestBean, callBack);
     }

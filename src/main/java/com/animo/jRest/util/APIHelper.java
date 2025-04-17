@@ -161,7 +161,7 @@ public class APIHelper {
 	 * <p>The body of a request is denoted by the {@link com.animo.jRest.annotation.Body @Body} annotation.
 	 * The body would be converted to JSON via Google GSON
 	 * 
-	 * <p>By default, methods return a {@link APIRequest APICall} which represents the HTTP request. The generic
+	 * <p>By default, methods return a {@link APIRequest APIRequest} which represents the HTTP request. The generic
 	 * parameter of the call is the response body type and will be converted by Jackson Object Mapper
 	 * 
 	 * <p>For example :
@@ -169,7 +169,7 @@ public class APIHelper {
 	 * public interface MyApiInterface {
 	 *
 	 *	&#64;REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
-	 *	APICall<Void,ApiResponse> listRepos(@PATH(value = "user") String user);
+	 *	APIRequest<ApiResponse> listRepos(@PATH(value = "user") String user);
 	 *
 	 *}</code></pre>
 	 * 
@@ -199,16 +199,16 @@ public class APIHelper {
 	 * public interface MyApiInterface extends JRestDynamicAPiInterface&#60;ApiResponse&#62;{
 	 *
 	 *	&#64;REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
-	 *	APICall<Void,ApiResponse> listRepos(@PATH(value = "user") String user);
+	 *	APIRequest<ApiResponse> listRepos(@PATH(value = "user") String user);
 	 *
-	 *  APICall<Void,ApiResponse> dynamicApiInvocation(Object... args)
+	 *  APIRequest<ApiResponse> dynamicApiInvocation(Object... args)
 	 *
 	 *}</code></pre>
 	 *
 	 * <p> For example : (Service Execution) </p>
 	 * <pre><code>
 	 *     MyApiInterface testInterface = testAPIHelper.createDynamicApi(MyApiInterface.class,"listRepos");
-	 *     APICall<Map<String,Object> call = testInterface.dynamicAPIInvocation("testUser");
+	 *     APIRequest<Map<String,Object> call = testInterface.dynamicAPIInvocation("testUser");
 	 *     APIResponse<Map<String,Object>> response = call.callMeNow();
 	 * </code></pre>
 	 *

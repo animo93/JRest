@@ -33,7 +33,7 @@ public class AsyncTest {
             public void callBackOnFailure(Throwable e) {
             }
         });
-        testCall.callMeLater(myCallBack);
+        testCall.executeWithCallBack(myCallBack);
 
         // To wait for the main thread to complete
         countDownLatch.await();
@@ -62,7 +62,7 @@ public class AsyncTest {
                 countDownLatch.countDown();
             }
         });
-        testCall.callMeLater(myCallBack);
+        testCall.executeWithCallBack(myCallBack);
 
         // To wait for the main thread to complete
         countDownLatch.await();
