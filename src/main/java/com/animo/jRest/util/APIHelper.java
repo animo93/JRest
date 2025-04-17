@@ -280,22 +280,18 @@ public class APIHelper {
 					myRequestBean.setFollowRedirects(followRedirectsAnnotation.value());
 
 				//TODO Add validation check to prevent misuse
-				final Class<?> clazz = APICall.class;
-				final Object object = clazz.newInstance();
-				final APICall<?> myCall = (APICall<?>) object;
-				myCall.setRequestBean(myRequestBean);
-				final Type type =  method.getGenericReturnType();
-				if(type instanceof ParameterizedType){
-					final ParameterizedType pType = (ParameterizedType) type;
-					for(Type t:pType.getActualTypeArguments()) {
-						myCall.setResponseType(t);
-					}
-				}
-				// This block will never get executed
-				else
-					myCall.setResponseType(type);
+				/*final Class<?> clazz = APICall.class;
+				final Object object = clazz.getDeclaredConstructor().newInstance();
+				final APICall<?> myCall = (APICall<?>) object;*/
 
-				return myCall;
+				//myCall.setRequestBean(myRequestBean);
+				final Type type =  method.getGenericReturnType();
+				if(type instanceof ParameterizedType pType){
+					// Since APICall<Response> has only one genericType , returning the first one
+					return new APICall<>(myRequestBean,pType.getActualTypeArguments()[0]);
+				}else{
+					throw new Exception("Invalid method declared in Interface");
+				}
 			}
 
 			private void addHeaders(RequestBean<Object> myRequestBean, Annotation headersAnnotation, Parameter[] parameters, Object[] args) {

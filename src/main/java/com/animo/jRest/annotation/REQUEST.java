@@ -19,6 +19,7 @@ import com.animo.jRest.util.HTTP_METHOD;
  * @author animo
  *
  */
+//TODO: Remove this and instead introduce @GET , @POST , @PUT , @PATCH & @DELETE
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

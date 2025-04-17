@@ -73,7 +73,7 @@ public class QueryParamTest {
 		APICall<Map<String,Object>> call = testInterface.singleQueryParamsCall(null);
 		APIResponse<Map<String,Object>> response = call.callMeNow();
 
-		Assertions.assertEquals("https://postman-echo.com/get", call.getRequestBean().getUrl());
+		Assertions.assertEquals("https://postman-echo.com/get", call.requestBean().getUrl());
 		Assertions.assertTrue(((Map<String,String>) response.getResponse().get("args")).isEmpty());
 		
 	}
@@ -107,7 +107,7 @@ public class QueryParamTest {
 		APIResponse<Map<String,Object>> response = call.callMeNow();
 
 
-		Assertions.assertEquals("https://postman-echo.com/get", call.getRequestBean().getUrl());
+		Assertions.assertEquals("https://postman-echo.com/get", call.requestBean().getUrl());
 		Assertions.assertTrue(((Map<String,String>) response.getResponse().get("args")).isEmpty());
 		
 	}
@@ -152,7 +152,7 @@ public class QueryParamTest {
 		APIResponse<Map<String,Object>> response = call.callMeNow();
 
 
-		Assertions.assertEquals("https://postman-echo.com/get?query+key=bar", call.getRequestBean().getUrl());
+		Assertions.assertEquals("https://postman-echo.com/get?query+key=bar", call.requestBean().getUrl());
 		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("query key"));
 		
 	}
@@ -268,7 +268,7 @@ public class QueryParamTest {
 		APICall<Map<String,Object>> call = testInterface.singleQueryMapCall(null);
 		APIResponse<Map<String,Object>> response = call.callMeNow();
 
-		Assertions.assertEquals("https://postman-echo.com/get", call.getRequestBean().getUrl());
+		Assertions.assertEquals("https://postman-echo.com/get", call.requestBean().getUrl());
 		Assertions.assertTrue(((Map<String,String>) response.getResponse().get("args")).isEmpty());
 		
 	}
