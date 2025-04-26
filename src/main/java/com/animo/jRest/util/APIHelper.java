@@ -8,7 +8,9 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -393,9 +395,10 @@ public class APIHelper {
 
 							if (queryValue != null) {
 								if (!query.encoded()) {
-									queryKey = URLEncoder.encode(queryKey, "UTF-8");
-									queryValue = URLEncoder.encode(queryValue, "UTF-8");
+									queryKey = URLEncoder.encode(queryKey, StandardCharsets.UTF_8);
+									queryValue = URLEncoder.encode(queryValue, StandardCharsets.UTF_8);
 								}
+
 								params.put(queryKey, queryValue);
 							}
 						}

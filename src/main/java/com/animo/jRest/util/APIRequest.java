@@ -3,13 +3,14 @@ package com.animo.jRest.util;
 import com.animo.jRest.model.RequestBean;
 
 import java.lang.reflect.Type;
+import java.util.concurrent.Future;
 
 /**
  * An invocation of a APIHelper method that sends a request to a webserver and returns a response.
  * Each call yields its own response object
  *
  * <p>Calls may be executed synchronously with {@link #execute}, or asynchronously with {@link
- * #executeWithCallBack}.
+ * #executeWithCallBack(APICallBack)} and {@link #executeWithFuture()}.
  *
  * @param <Response> Response type
  */
@@ -18,17 +19,24 @@ public record APIRequest<Response>(RequestBean<Object> requestBean, Type respons
      * Synchronous implementation of {@link APIRequest APIRequest} , which invokes a blocking call to webserver
      * . And waits for the APIRequest to complete
      *
-     * @return {@code APIResponse<Response>}
+     * @return {@link APIResponse<Response>}
      * @throws Exception Exception if issue with asyncTask executeNow method
      */
-    //TODO: Rename to execute
     public APIResponse<Response> execute() throws Exception {
 
-        final APIAsyncTask<Response> asyncTask = new APIAsyncTask<>(requestBean, responseType);
-        return asyncTask.executeNow(requestBean);
+        final APIClient<Response> client = new RESTAdapter<>(requestBean,responseType);
+        return client.fetch();
     }
 
-    //TODO: Add another method executeWithFuture and return a Future Object
+    //TODO: Add test cases
+    /**
+     * Asynchronous implementation of {@link APIRequest APIRequest} via Future.
+     * @return a Future of {@link APIResponse<Response>}
+     */
+    public Future<APIResponse<Response>> executeWithFuture() {
+        final APIClient<Response> client = new RESTAdapter<>(requestBean,responseType);
+        return client.fetchWithFuture();
+    }
 
     /**
      * Asynchronous implementation of {@link APIRequest APIRequest} , which invokes a non-blocking call to webserver
@@ -37,8 +45,9 @@ public record APIRequest<Response>(RequestBean<Object> requestBean, Type respons
      * @param callBack APICallBack
      */
     public void executeWithCallBack(APICallBack<Response> callBack) {
-        final APIAsyncTask<Response> asyncTask = new APIAsyncTask<>(requestBean, responseType, callBack);
-        asyncTask.executeLater(requestBean, callBack);
+        
+        final APIClient<Response> client = new RESTAdapter<>(requestBean,responseType);
+        client.fetchWithCallBack(callBack);
     }
 
     ;

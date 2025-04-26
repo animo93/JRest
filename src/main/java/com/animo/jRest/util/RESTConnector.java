@@ -19,34 +19,22 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Map.Entry;
 
-public class APIAsyncTask<Response> extends AsyncTask<Response>{
+public class RESTConnector<Response>{
 
-	private static final Logger logger = LogManager.getLogger(APIAsyncTask.class);
+	private static final Logger logger = LogManager.getLogger(RESTConnector.class);
 	protected APICallBack<Response> myCallBack;
 	private final RequestBean<Object> bean;
 	private final Type type;
 
-	public APIAsyncTask(RequestBean<Object> bean, Type type, APICallBack<Response> myCallBack) {
-		this.bean = bean;
-		this.type = type;
-		this.myCallBack = myCallBack;
-	}
-
-	public APIAsyncTask(RequestBean<Object> bean, Type type) {
+	public RESTConnector(RequestBean<Object> bean, Type type) {
 		this.bean = bean;
 		this.type = type;
 	}
 
 	@SneakyThrows
-    @Override
-	protected APIResponse<Response> runInBackground(RequestBean<Object> myRequestBean) {
-		if(myRequestBean == null)
+	public APIResponse<Response> fetch() {
+		if(bean == null)
 			return null;
-		final RequestBean<Object> bean = myRequestBean;
-		final HttpURLConnection httpURLConnection = null;
-		final BufferedReader reader = null;
-		final String repoJson = null;
-		//APICall<Object, Response> myCall = new APICall<>();
 		APIResponse<Response> apiResponse = new APIResponse<Response>();
 		final URL url = new URL(this.bean.getUrl());
 		HttpRequest.Builder builder = HttpRequest.newBuilder()
@@ -61,10 +49,10 @@ public class APIAsyncTask<Response> extends AsyncTask<Response>{
 					.proxy(bean.getProxy() != null ? ProxySelector.of(new InetSocketAddress(bean.getProxy().getUrl(), bean.getProxy().getPort())) : ProxySelector.getDefault())
 					.build()
 					.send(builder.build(), HttpResponse.BodyHandlers.ofString());
-			//myCall.setResponseHeaders(response.headers().map());
+
 			apiResponse.setResponseHeaders(response.headers().map());
 			apiResponse.setResponseCode(response.statusCode());
-			//myCall.setResponseCode(response.statusCode());
+
 			String responseJson = getResponseBody(response.statusCode(),response);
 			convertResponse(responseJson, apiResponse);
 		} catch (Exception e) {
@@ -74,6 +62,7 @@ public class APIAsyncTask<Response> extends AsyncTask<Response>{
 		return apiResponse;
 	}
 
+	//TODO: Inject Converter (String , Json & GSON) as a dependency
 	private void convertResponse(String repoJson, APIResponse<Response> apiResponse) throws Exception{
 		Gson gson = new Gson();
 		try {
@@ -179,14 +168,5 @@ public class APIAsyncTask<Response> extends AsyncTask<Response>{
 	private boolean outputIsJson(String repoJson) {
 
 		return repoJson != null && repoJson.startsWith("{");
-	}
-
-	@Override
-	protected void postExecute(Response reponse, Exception e) {
-	}
-
-	@Override
-	protected void preExecute() {
-		// TODO Auto-generated method stub
 	}
 }

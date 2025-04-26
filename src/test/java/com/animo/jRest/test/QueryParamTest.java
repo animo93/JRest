@@ -6,6 +6,7 @@ import com.animo.jRest.util.APIResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.net.URISyntaxException;
 import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.Map;
@@ -137,7 +138,7 @@ public class QueryParamTest {
 				.build();
 		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
 		APIRequest<Map<String,Object>> call = testInterface.unEncodedqueryKeyWithEncodedSetTrueCall("bar");
-		assertThrows(ExecutionException.class, () -> call.execute());
+		assertThrows(URISyntaxException.class, () -> call.execute());
 		
 	}
 	
