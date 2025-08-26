@@ -12,7 +12,8 @@ import java.util.concurrent.Future;
  * <p>Calls may be executed synchronously with {@link #execute}, or asynchronously with {@link
  * #executeWithCallBack(APICallBack)} and {@link #executeWithFuture()}.
  *
- * @param <Response> Response type
+ * @param requestBean
+ * @param responseType
  */
 public record APIRequest<Response>(RequestBean<Object> requestBean, Type responseType) {
     /**

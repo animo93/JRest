@@ -49,7 +49,7 @@ import com.animo.jRest.annotation.REQUEST;
  * 
  * @author animo
  */
-public class APIHelper {
+public final class APIHelper {
 
 	private final String baseURL;
 	private Map<String, String> params;
@@ -66,8 +66,6 @@ public class APIHelper {
 		this.disableSSLVerification = builder.disableSSLVerification;
 	}
 
-
-
 	public static class APIBuilder {
 		private final String baseURL;
 		private Map<String,String> params;
@@ -75,15 +73,15 @@ public class APIHelper {
 		private RequestProxy proxy;
 		private boolean disableSSLVerification;
 
-		public APIBuilder(String baseURL){
+		public APIBuilder(final String baseURL){
 			this.baseURL = baseURL;
 		}
 
-		public static APIBuilder builder(String baseURL){
+		public static APIBuilder builder(final String baseURL){
 			return new APIBuilder(baseURL);
 		}
 
-		public APIBuilder addParameter(String key,String value){
+		public APIBuilder addParameter(final String key,final String value){
 			if(params==null){
 				params = new HashMap<>();
 			}
@@ -91,7 +89,7 @@ public class APIHelper {
 			return this;
 		}
 
-		public APIBuilder addAllParameters(Map<String,String> params) {
+		public APIBuilder addAllParameters(final Map<String,String> params) {
 			if(this.params == null){
 				this.params = new HashMap<>();
 			}
@@ -105,7 +103,7 @@ public class APIHelper {
 		 * @param password String used for password
 		 * @return APIBuilder object with adjusted fields
 		 */
-		public APIBuilder addUsernameAndPassword(String username,String password) {
+		public APIBuilder addUsernameAndPassword(final String username,final String password) {
 			if(this.auth == null){
 				this.auth = new RequestAuthentication();
 			}
@@ -122,8 +120,7 @@ public class APIHelper {
 		 * @param port integer port number
 		 * @return APIBuilder object with adjusted fields
 		 */
-
-		public APIBuilder addProxy(String proxyURL, String username, String password, int port) {
+		public APIBuilder addProxy(final String proxyURL, final String username, final String password, final int port) {
 			if(this.proxy ==null){
 				this.proxy = new RequestProxy();
 			}
@@ -142,7 +139,7 @@ public class APIHelper {
 		 * @return APIBuilder object with adjusted fields
 		 */
 
-		public APIBuilder setDisableSSLVerification(boolean disableSSLVerification) {
+		public APIBuilder setDisableSSLVerification(final boolean disableSSLVerification) {
 			this.disableSSLVerification = disableSSLVerification;
 			return this;
 		}
@@ -171,7 +168,7 @@ public class APIHelper {
 	 * public interface MyApiInterface {
 	 *
 	 *	&#64;REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
-	 *	APIRequest<ApiResponse> listRepos(@PATH(value = "user") String user);
+	 *	{@code APIRequest<ApiResponse> listRepos(@PATH(value = "user") String user);}
 	 *
 	 *}</code></pre>
 	 * 
@@ -180,7 +177,7 @@ public class APIHelper {
 	 * @return {@code service}
 	 */
 	@SuppressWarnings("unchecked")
-	public <S> S createApi(Class<S> clazz) {
+	public final <S> S createApi(final Class<S> clazz) {
 		final ClassLoader loader = clazz.getClassLoader();
 		final Class[] interfaces = new Class[]{clazz};
 
@@ -201,17 +198,17 @@ public class APIHelper {
 	 * public interface MyApiInterface extends JRestDynamicAPiInterface&#60;ApiResponse&#62;{
 	 *
 	 *	&#64;REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
-	 *	APIRequest<ApiResponse> listRepos(@PATH(value = "user") String user);
+	 *	{@code APIRequest<ApiResponse> listRepos(@PATH(value = "user") String user);}
 	 *
-	 *  APIRequest<ApiResponse> dynamicApiInvocation(Object... args)
+	 *  {@code APIRequest<ApiResponse> dynamicApiInvocation(Object... args)}
 	 *
 	 *}</code></pre>
 	 *
 	 * <p> For example : (Service Execution) </p>
 	 * <pre><code>
 	 *     MyApiInterface testInterface = testAPIHelper.createDynamicApi(MyApiInterface.class,"listRepos");
-	 *     APIRequest<Map<String,Object> call = testInterface.dynamicAPIInvocation("testUser");
-	 *     APIResponse<Map<String,Object>> response = call.callMeNow();
+	 *     {@code APIRequest<Map<String,Object> call = testInterface.dynamicAPIInvocation("testUser");}
+	 *     {@code APIResponse<Map<String,Object>> response = call.callMeNow();}
 	 * </code></pre>
 	 *
 	 * @param clazz service.class
@@ -222,7 +219,7 @@ public class APIHelper {
 	 * @return {@code service}
 	 */
 	//TODO Check why do we need methodName here
-	public <S> S createDynamicApi(Class<S> clazz,String methodName,Class... parameterTypes) throws NoSuchMethodException {
+	public final <S> S createDynamicApi(final Class<S> clazz,final String methodName,Class... parameterTypes) throws NoSuchMethodException {
 
 		final ClassLoader loader = clazz.getClassLoader();
 		final Class[] interfaces = new Class[]{clazz};
@@ -234,7 +231,7 @@ public class APIHelper {
 
 	}
 
-	private InvocationHandler setInvocationHandler(Method methodToCall){
+	private InvocationHandler setInvocationHandler(final Method methodToCall){
 		return new InvocationHandler() {
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -256,7 +253,7 @@ public class APIHelper {
 					throw new Exception("No Request Annotation found");
 				}
 
-				final RequestBean<Object> myRequestBean = new RequestBean<>();
+				final RequestBean<Object> requestBean = new RequestBean<>();
 				final StringBuilder urlBuilder = new StringBuilder(baseURL);
 				urlBuilder.append(request.endpoint());
 
@@ -266,37 +263,41 @@ public class APIHelper {
 
 				addQueryParameters(args, urlBuilder, parameters);
 
-				addHeaders(myRequestBean, headersAnnotation, parameters, args);
+				addHeaders(requestBean, headersAnnotation, parameters, args);
 
 				logger.debug("final Url {}",urlBuilder.toString());
-				myRequestBean.setUrl(urlBuilder.toString());
+				requestBean.setUrl(urlBuilder.toString());
 
-				myRequestBean.setAuthentication(auth);
-				myRequestBean.setProxy(reqProxy);
-				myRequestBean.setRequestType(request.type());
-				myRequestBean.setDisableSSLVerification(disableSSLVerification);
+				requestBean.setAuthentication(auth);
+				requestBean.setProxy(reqProxy);
+				requestBean.setRequestType(request.type());
+				requestBean.setDisableSSLVerification(disableSSLVerification);
 
-				addRequestBody(args, request, myRequestBean,parameters);
+				addRequestBody(args, request, requestBean,parameters);
 
-				if(followRedirectsAnnotation != null)
-					myRequestBean.setFollowRedirects(followRedirectsAnnotation.value());
-
-				//TODO Add validation check to prevent misuse
-				/*final Class<?> clazz = APICall.class;
-				final Object object = clazz.getDeclaredConstructor().newInstance();
-				final APICall<?> myCall = (APICall<?>) object;*/
-
-				//myCall.setRequestBean(myRequestBean);
-				final Type type =  method.getGenericReturnType();
-				if(type instanceof ParameterizedType pType){
-					// Since APICall<Response> has only one genericType , returning the first one
-					return new APIRequest<>(myRequestBean,pType.getActualTypeArguments()[0]);
+				if(followRedirectsAnnotation != null){
+                    requestBean.setFollowRedirects(followRedirectsAnnotation.value());
+                }
+				final Type apiResponseType =  method.getGenericReturnType();
+                // Return type should always be of type APIRequest<Response>
+				if(apiResponseType instanceof ParameterizedType pType && pType.getRawType().equals(APIRequest.class)){
+                    // Since APIRequest<Response> has only one genericType , returning the first one
+                    var responseType = pType.getActualTypeArguments()[0];
+                    Class<?> responseClass;
+                    if(responseType instanceof ParameterizedType){
+                        responseClass = (Class<?>) ((ParameterizedType) responseType).getRawType();
+                    } else if (responseType instanceof Class){
+                        responseClass = (Class<?>) responseType;
+                    } else{
+                        throw new Exception("Invalid Response Type");
+                    }
+					return new APIRequest<>(requestBean,responseClass);
 				}else{
 					throw new Exception("Invalid method declared in Interface");
 				}
 			}
 
-			private void addHeaders(RequestBean<Object> myRequestBean, Annotation headersAnnotation, Parameter[] parameters, Object[] args) {
+			private void addHeaders(final RequestBean<Object> myRequestBean, final Annotation headersAnnotation, final Parameter[] parameters, final Object[] args) {
 				final HEADERS headers = (HEADERS) headersAnnotation;
 				final String[] requestHeadersFromMethod;
 				Map<String, String> requestHeadersMap = new HashMap<>();
@@ -317,7 +318,7 @@ public class APIHelper {
 
 			}
 
-			private String[] concatenateHeaders(String[] requestHeadersFromMethod, String[] requestHeadersFromParam) {
+			private String[] concatenateHeaders(final String[] requestHeadersFromMethod, final String[] requestHeadersFromParam) {
 				final String[] requestHeaders = new String[] {};
 				System.arraycopy(requestHeadersFromMethod, 0, requestHeaders, 0, requestHeadersFromParam.length);
 				System.arraycopy(requestHeadersFromParam, 0, requestHeaders, requestHeadersFromParam.length, requestHeadersFromParam.length);
@@ -325,7 +326,7 @@ public class APIHelper {
 				return requestHeaders;
 			}
 
-			private Map<String, String> getParamHeaders(Parameter[] parameters, Object[] args) {
+			private Map<String, String> getParamHeaders(final Parameter[] parameters, final Object[] args) {
 				Map<String, String> paramValues = new HashMap<>();
 				try {
 					for(int i = 0,j = 0; i < parameters.length; i++) {
@@ -344,7 +345,7 @@ public class APIHelper {
 				return paramValues;
 			}
 
-			private Map<String, String> convertToHeadersMap(String[] requestHeaders) {
+			private Map<String, String> convertToHeadersMap(final String[] requestHeaders) {
 				Map<String, String> headersMap = new HashMap<>();
 				for(String header:requestHeaders) {
 					if(!header.contains(":")) {
@@ -356,8 +357,8 @@ public class APIHelper {
 				return headersMap;
 			}
 
-			private void addRequestBody(Object[] args,REQUEST request,
-										RequestBean<Object> myRequestBean,Parameter[] parameters) {
+			private void addRequestBody(final Object[] args,final REQUEST request,
+										final RequestBean<Object> myRequestBean,final Parameter[] parameters) {
 				if(request.type().equals(HTTP_METHOD.POST) ||
 						request.type().equals(HTTP_METHOD.PATCH) ||
 						request.type().equals(HTTP_METHOD.PUT)){
@@ -375,7 +376,7 @@ public class APIHelper {
 				}
 			}
 
-			private void prepareQueryParamMap(Object args[],Parameter[] parameters) throws UnsupportedEncodingException {
+			private void prepareQueryParamMap(final Object[] args, final Parameter[] parameters) throws UnsupportedEncodingException {
 				/* put all the found query parameters in Query and QueryMap,
 				into the paramters map to be converted into query string*/
 				for (int i = 0; i < parameters.length; i++) {
@@ -422,7 +423,7 @@ public class APIHelper {
 				logger.debug("Query params fetched from Params " + params);
 			}
 
-			private void addQueryParameters(Object[] args, StringBuilder urlBuilder, Parameter[] parameters) throws UnsupportedEncodingException {
+			private void addQueryParameters(final Object[] args, final StringBuilder urlBuilder, final Parameter[] parameters) throws UnsupportedEncodingException {
 				prepareQueryParamMap(args,parameters);
 				if(params != null && params.size() > 0) {
 					urlBuilder.append("?");
@@ -431,7 +432,7 @@ public class APIHelper {
 				}
 			}
 
-			private void addPathParameters(Object[] args, StringBuilder urlBuilder, Parameter[] parameters)
+			private void addPathParameters(final Object[] args, final StringBuilder urlBuilder, final Parameter[] parameters)
 					throws Exception {
 				for(int i = 0 ; i < parameters.length ; i++) {
 					if(parameters[i].getAnnotation(PATH.class) != null) {

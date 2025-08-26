@@ -7,6 +7,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
+//TODO: Convert to record
 @Getter @Setter
 public final class APIResponse<Response> {
     private Response response;

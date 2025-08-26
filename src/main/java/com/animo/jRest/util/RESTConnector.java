@@ -53,8 +53,13 @@ public class RESTConnector<Response>{
 			apiResponse.setResponseHeaders(response.headers().map());
 			apiResponse.setResponseCode(response.statusCode());
 
-			String responseJson = getResponseBody(response.statusCode(),response);
-			convertResponse(responseJson, apiResponse);
+			String responseJson = getResponseBody(response);
+			GsonConverter converter = ConverterFactory.getGsonConverter();
+			Response response1 = (Response) converter.fromString(responseJson, type);
+            apiResponse.setResponse(response1);
+			//TODO: Create a converter with strategy pattern to convert response
+			//TODO: Converter should use factory pattern to create appropriate converter
+			//convertResponse(responseJson, apiResponse);
 		} catch (Exception e) {
 			logger.error("Could not make connection ", e);
 			throw e;
@@ -88,16 +93,14 @@ public class RESTConnector<Response>{
 		}
 	}
 
-	private String getResponseBody(int status,HttpResponse<String> httpResponse) throws Exception {
-		String repoJson = null;
-		BufferedReader reader = null;
+    //TODO: Return optional
+	private String getResponseBody(HttpResponse<String> httpResponse) throws Exception {
 		try {
-			repoJson = httpResponse.body();
+			return httpResponse.body();
 		}catch (Exception e){
 			logger.error("Unable to get Response Body ",e);
 			throw e;
 		}
-		return repoJson;
 	}
 
 	private void setRequestBody(HttpRequest.Builder requestBuilder) throws IOException {

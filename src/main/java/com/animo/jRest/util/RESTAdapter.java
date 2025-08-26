@@ -17,6 +17,7 @@ public class RESTAdapter<Response> implements APIClient<Response>{
         this.connector = new RESTConnector<>(requestBean,responseType);
     }
     //TODO: Check if multithreaded execution is helpful
+    //TODO: Add support for virtual threads
     private final ExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     @Override
