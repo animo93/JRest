@@ -6,7 +6,7 @@ import java.lang.reflect.Type;
 import java.util.concurrent.Future;
 
 /**
- * An invocation of a APIHelper method that sends a request to a webserver and returns a response.
+ * An invocation of a APIService method that sends a request to a webserver and returns a response.
  * Each call yields its own response object
  *
  * <p>Calls may be executed synchronously with {@link #execute}, or asynchronously with {@link
@@ -15,6 +15,8 @@ import java.util.concurrent.Future;
  * @param requestBean
  * @param responseType
  */
+//TODO: Rename to APIExecutorService
+//TODO: Move back to class instead of record
 public record APIRequest<Response>(RequestBean<Object> requestBean, Type responseType) {
     /**
      * Synchronous implementation of {@link APIRequest APIRequest} , which invokes a blocking call to webserver

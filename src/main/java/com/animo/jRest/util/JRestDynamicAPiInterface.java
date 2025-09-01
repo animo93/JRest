@@ -9,7 +9,7 @@ public interface JRestDynamicAPiInterface<Response> {
      * in the service interface </p>
      * <p> For example : (Service Execution) </p>
      * 	 <pre><code>
-     * 	     MyApiInterface testInterface = testAPIHelper.createDynamicApi(MyApiInterface.class,"listRepos");
+     * 	     MyApiInterface testInterface = apiService.createDynamicApi(MyApiInterface.class,"listRepos");
      * 	     APICall&#60;Void, Map&#60;String,Object&#62;&#62; call = testInterface.dynamicAPIInvocation("testUser");
      * 	     APICall&#60;Void,Map&#60;String,Object&#62;&#62; response = call.callMeNow();
      * 	 </code></pre>

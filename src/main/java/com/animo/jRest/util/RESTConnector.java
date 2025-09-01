@@ -55,7 +55,7 @@ public class RESTConnector<Response>{
 
 			String responseJson = getResponseBody(response);
 			GsonConverter converter = ConverterFactory.getGsonConverter();
-			Response response1 = (Response) converter.fromString(responseJson, type);
+			Response response1 = converter.fromString(responseJson, type);
             apiResponse.setResponse(response1);
 			//TODO: Create a converter with strategy pattern to convert response
 			//TODO: Converter should use factory pattern to create appropriate converter

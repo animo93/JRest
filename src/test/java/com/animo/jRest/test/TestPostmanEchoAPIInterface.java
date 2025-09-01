@@ -83,4 +83,8 @@ public interface TestPostmanEchoAPIInterface {
 	@HEADERS("Content-Type: application/json")
 	APIRequest<Map<String,Object>> requestBodyMapCall(@Body Map<String,Object> requestBody);
 
+    @REQUEST(endpoint = "/get",type = HTTP_METHOD.GET)
+    @HEADERS("Content-Type: application/json")
+    APIRequest<String> responseAsString();
+
 }

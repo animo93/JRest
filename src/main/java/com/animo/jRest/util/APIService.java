@@ -8,7 +8,6 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
@@ -41,31 +40,32 @@ import com.animo.jRest.annotation.REQUEST;
  * by passing the builder method to generate an implementation.<p>
  * For example :-
  * <pre><code>
- * APIHelper myApiHelper = APIHelper.APIBuilder
+ * APIService apiService = APIService.APIBuilder
  *			.builder("https://api.github.com/")
  *			.build();
- * MyApiInterface myApiInterface = myApiHelper.createApi(MyApiInterface.class);
+ * MyApiInterface myApiInterface = apiService.createApi(MyApiInterface.class);
  * </code></pre>
  * 
  * @author animo
  */
-public final class APIHelper {
+//TODO: Rename to APIClient or APIService
+public final class APIService {
 
 	private final String baseURL;
 	private Map<String, String> params;
 	private final RequestAuthentication auth;
 	private final RequestProxy reqProxy;
 	private final boolean disableSSLVerification;
-	private final static Logger logger = LogManager.getLogger(APIHelper.class);
+	private final static Logger logger = LogManager.getLogger(APIService.class);
 
-	private APIHelper(APIBuilder builder) {
+	private APIService(APIBuilder builder) {
 		this.baseURL = builder.baseURL;
 		this.params = builder.params;
 		this.auth = builder.auth;
 		this.reqProxy = builder.proxy;
 		this.disableSSLVerification = builder.disableSSLVerification;
 	}
-
+    //TODO: Rename to APIClientBuilder
 	public static class APIBuilder {
 		private final String baseURL;
 		private Map<String,String> params;
@@ -144,8 +144,8 @@ public final class APIHelper {
 			return this;
 		}
 
-		public APIHelper build(){
-			return new APIHelper(this);
+		public APIService build(){
+			return new APIService(this);
 		}
 
 	}
@@ -178,6 +178,7 @@ public final class APIHelper {
 	 */
 	@SuppressWarnings("unchecked")
 	public final <S> S createApi(final Class<S> clazz) {
+        //TODO: Add test scenario where a random interface is passed which doesn't have any REQUEST annotation
 		final ClassLoader loader = clazz.getClassLoader();
 		final Class[] interfaces = new Class[]{clazz};
 
@@ -206,7 +207,7 @@ public final class APIHelper {
 	 *
 	 * <p> For example : (Service Execution) </p>
 	 * <pre><code>
-	 *     MyApiInterface testInterface = testAPIHelper.createDynamicApi(MyApiInterface.class,"listRepos");
+	 *     MyApiInterface testInterface = apiService.createDynamicApi(MyApiInterface.class,"listRepos");
 	 *     {@code APIRequest<Map<String,Object> call = testInterface.dynamicAPIInvocation("testUser");}
 	 *     {@code APIResponse<Map<String,Object>> response = call.callMeNow();}
 	 * </code></pre>
@@ -279,6 +280,11 @@ public final class APIHelper {
                     requestBean.setFollowRedirects(followRedirectsAnnotation.value());
                 }
 				final Type apiResponseType =  method.getGenericReturnType();
+                /** TODO: Validate the return type
+                 * If the return type is of type APIResponse , execute synchronously
+                 * If the return type is of type Future<APIResponse> , execute asynchronously and return a Future
+                 * If the return type is of type void and has APICallBack as parameter , execute asynchronously and return via callback
+                 **/
                 // Return type should always be of type APIRequest<Response>
 				if(apiResponseType instanceof ParameterizedType pType && pType.getRawType().equals(APIRequest.class)){
                     // Since APIRequest<Response> has only one genericType , returning the first one
@@ -291,6 +297,7 @@ public final class APIHelper {
                     } else{
                         throw new Exception("Invalid Response Type");
                     }
+                    //TODO: invoking a method should ideally make the api call and return a result
 					return new APIRequest<>(requestBean,responseClass);
 				}else{
 					throw new Exception("Invalid method declared in Interface");

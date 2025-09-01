@@ -1,7 +1,7 @@
 package com.animo.jRest.test;
 
 import com.animo.jRest.util.APIRequest;
-import com.animo.jRest.util.APIHelper;
+import com.animo.jRest.util.APIService;
 import com.animo.jRest.util.APIResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -10,7 +10,6 @@ import java.net.URISyntaxException;
 import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -21,10 +20,10 @@ public class QueryParamTest {
 	@Test
 	public void testSingleQueryParam() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		APIService testAPIService = APIService.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
 		APIRequest<Map<String,Object>> call = testInterface.singleQueryParamsCall("bar");
 		APIResponse<Map<String,Object>> response = call.execute();
 		
@@ -36,10 +35,10 @@ public class QueryParamTest {
 	@Test
 	public void testMultipleQueryParam() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		APIService testAPIService = APIService.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
 		APIRequest<Map<String,Object>> call = testInterface.multipleQueryParamsCall("bar","pong");
 		APIResponse<Map<String,Object>> response = call.execute();
 
@@ -51,11 +50,11 @@ public class QueryParamTest {
 	@Test
 	public void testMultipleQueryParamWithGlobalParams() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		APIService testAPIService = APIService.APIBuilder
 				.builder("https://postman-echo.com")
 				.addParameter("ping", "pong")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
 		APIRequest<Map<String,Object>> call = testInterface.singleQueryParamsCall("bar");
 		APIResponse<Map<String,Object>> response = call.execute();
 
@@ -67,10 +66,10 @@ public class QueryParamTest {
 	@Test
 	public void testNullQueryParam() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		APIService testAPIService = APIService.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
 		APIRequest<Map<String,Object>> call = testInterface.singleQueryParamsCall(null);
 		APIResponse<Map<String,Object>> response = call.execute();
 
@@ -82,10 +81,10 @@ public class QueryParamTest {
 	@Test
 	public void testInvalidQueryParamFailure() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		APIService testAPIService = APIService.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
 		
 		
 		Exception exception = Assertions.assertThrows(InvalidParameterException.class, () -> {
@@ -100,10 +99,10 @@ public class QueryParamTest {
 	@Test
 	public void testEmptyQueryParamKeyFailure() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		APIService testAPIService = APIService.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
 		APIRequest<Map<String,Object>> call = testInterface.emptyQueryKeyFailureCall("bar");
 		APIResponse<Map<String,Object>> response = call.execute();
 
@@ -117,10 +116,10 @@ public class QueryParamTest {
 	@Test
 	public void testQueryParamKeyWithSpace() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		APIService testAPIService = APIService.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
 		APIRequest<Map<String,Object>> call = testInterface.queryKeyWithSpaceCall("bar");
 		APIResponse<Map<String,Object>> response = call.execute();
 		
@@ -133,10 +132,10 @@ public class QueryParamTest {
 	@Test
 	public void testUnEncodedqueryKeyWithEncodedSetTrue_shouldThrowException() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		APIService testAPIService = APIService.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
 		APIRequest<Map<String,Object>> call = testInterface.unEncodedqueryKeyWithEncodedSetTrueCall("bar");
 		assertThrows(URISyntaxException.class, () -> call.execute());
 		
@@ -145,10 +144,10 @@ public class QueryParamTest {
 	@Test
 	public void testEncodedqueryKeyWithEncodedSetTrue() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		APIService testAPIService = APIService.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
 		APIRequest<Map<String,Object>> call = testInterface.encodedqueryKeyWithEncodedSetTrueCall("bar");
 		APIResponse<Map<String,Object>> response = call.execute();
 
@@ -161,10 +160,10 @@ public class QueryParamTest {
 	@Test
 	public void testSingleQueryMap() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		APIService testAPIService = APIService.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
 		Map<String,String> queryMap = new HashMap<String,String>();
 		queryMap.put("foo", "bar");
 		queryMap.put("ping","pong");
@@ -179,10 +178,10 @@ public class QueryParamTest {
 	@Test
 	public void testMultipleQueryMap() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		APIService testAPIService = APIService.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
 		Map<String,String> queryMap = new HashMap<String,String>();
 		queryMap.put("foo", "bar");
 		queryMap.put("ping","pong");
@@ -204,10 +203,10 @@ public class QueryParamTest {
 	@Test
 	public void testBothSingleQueryAndQueryMap() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		APIService testAPIService = APIService.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
 		Map<String,String> queryMap = new HashMap<String,String>();
 		queryMap.put("foo", "bar");
 		
@@ -222,7 +221,7 @@ public class QueryParamTest {
 	@Test
 	public void testQueryMapAndQueryWithGlobalParams() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		APIService testAPIService = APIService.APIBuilder
 				.builder("https://postman-echo.com")
 				.addParameter("tik", "tok")
 				.build();
@@ -230,7 +229,7 @@ public class QueryParamTest {
 		Map<String,String> queryMap = new HashMap<String,String>();
 		queryMap.put("foo", "bar");
 		
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
 		
 		APIRequest<Map<String,Object>> call = testInterface.bothQueryAndQueryMapCall(queryMap, "pong");
 		APIResponse<Map<String,Object>> response = call.execute();
@@ -244,10 +243,10 @@ public class QueryParamTest {
 	@Test
 	public void testInvalidQueryMapFailure() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		APIService testAPIService = APIService.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
 		
 		
 		Exception exception = Assertions.assertThrows(InvalidParameterException.class, () -> {
@@ -262,10 +261,10 @@ public class QueryParamTest {
 	@Test
 	public void testNullQueryMap() throws Exception {
 		
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		APIService testAPIService = APIService.APIBuilder
 				.builder("https://postman-echo.com")
 				.build();
-		TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
 		APIRequest<Map<String,Object>> call = testInterface.singleQueryMapCall(null);
 		APIResponse<Map<String,Object>> response = call.execute();
 
@@ -279,11 +278,11 @@ public class QueryParamTest {
 		Map<String,String> queryParamMap = new HashMap<>();
 		queryParamMap.put("foo","bar");
 
-		APIHelper testAPIHelper = APIHelper.APIBuilder
+		APIService testAPIService = APIService.APIBuilder
 				.builder("https://postman-echo.com")
 				.addAllParameters(queryParamMap)
 				.build();
-		TestPostmanEchoAPIInterface testPostmanEchoAPIInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+		TestPostmanEchoAPIInterface testPostmanEchoAPIInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
 		APIRequest<Map<String,Object>> call = testPostmanEchoAPIInterface.getCall();
 		APIResponse<Map<String,Object>> response = call.execute();
 

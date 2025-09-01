@@ -2,7 +2,7 @@ package com.animo.jRest.test;
 
 import com.animo.jRest.util.APIRequest;
 import com.animo.jRest.util.APICallBack;
-import com.animo.jRest.util.APIHelper;
+import com.animo.jRest.util.APIService;
 import com.animo.jRest.util.APIResponse;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -17,10 +17,10 @@ public class AsyncTest {
 
     @Test
     public void callMeLater_shouldInvokeCallBackOnSuccess() throws InterruptedException {
-        final APIHelper testAPIHelper = APIHelper.APIBuilder
+        final APIService testAPIService = APIService.APIBuilder
                 .builder("https://postman-echo.com")
                 .build();
-        final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+        final TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
         final APIRequest<Map<String, Object>> testCall = testInterface.getCall();
 
         CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -44,11 +44,11 @@ public class AsyncTest {
 
     @Test
     public void callMeLater_shouldInvokeCallBackOnFailure_whenExecutionFails() throws InterruptedException {
-        final APIHelper testAPIHelper = APIHelper.APIBuilder
+        final APIService testAPIService = APIService.APIBuilder
                 //Wrong url provided to simulate exception
                 .builder("https://postman-echo.com1")
                 .build();
-        final TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+        final TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
         final APIRequest<Map<String, Object>> testCall = testInterface.getCall();
 
         CountDownLatch countDownLatch = new CountDownLatch(1);

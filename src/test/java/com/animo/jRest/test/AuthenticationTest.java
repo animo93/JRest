@@ -1,7 +1,7 @@
 package com.animo.jRest.test;
 
 import com.animo.jRest.util.APIRequest;
-import com.animo.jRest.util.APIHelper;
+import com.animo.jRest.util.APIService;
 import com.animo.jRest.util.APIResponse;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.Assertions;
@@ -13,11 +13,11 @@ public class AuthenticationTest {
 
     @Test
     public void testUsernamePasswordAuthentication() throws Exception {
-        APIHelper testAPIHelper = APIHelper.APIBuilder
+        APIService testAPIService = APIService.APIBuilder
                 .builder("https://postman-echo.com")
                 .addUsernameAndPassword("username", "password")
                 .build();
-        TestPostmanEchoAPIInterface testInterface = testAPIHelper.createApi(TestPostmanEchoAPIInterface.class);
+        TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
         APIRequest<Map<String, Object>> testCall = testInterface.getCall();
         APIResponse<Map<String, Object>> response = testCall.execute();
 
