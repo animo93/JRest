@@ -1,5 +1,5 @@
 # JRest
-A Java Rest Client developed on the lines of HttpUrlConnection
+A Declarative Java Rest Client developed on the lines of Spring Feign Client
 
 For more information please visit [the website][1].
 
