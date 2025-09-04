@@ -17,11 +17,10 @@ public class DynamicInvocationTest {
 
     @Test
     public void testDynamicInvocation_noHeadersCall() throws Exception {
-        APIService testAPIService = APIService.APIBuilder
+        DynamicInvocationTestInterface testInterface = APIService.APIBuilder
                 .builder("https://postman-echo.com")
-                .build();
+                .buildDynamic(DynamicInvocationTestInterface.class,"noHeadersCall");
 
-        DynamicInvocationTestInterface testInterface = testAPIService.createDynamicApi(DynamicInvocationTestInterface.class,"noHeadersCall");
         APIRequest<Map<String,Object>> call = testInterface.dynamicAPIInvocation();
         APIResponse<Map<String,Object>> response = call.execute();
 
@@ -31,12 +30,10 @@ public class DynamicInvocationTest {
 
     @Test
     public void testDynamicInvocation_bothQueryAndQueryMapCall() throws Exception {
-        APIService testAPIService = APIService.APIBuilder
+        DynamicInvocationTestInterface testInterface = APIService.APIBuilder
                 .builder("https://postman-echo.com")
-                .build();
-
-        DynamicInvocationTestInterface testInterface = testAPIService.createDynamicApi(DynamicInvocationTestInterface.class,
-                "bothQueryAndQueryMapCall",Map.class,String.class);
+                .buildDynamic(DynamicInvocationTestInterface.class,
+                        "bothQueryAndQueryMapCall",Map.class,String.class);
 
         Map<String,String> queryMap = new HashMap<String,String>();
         queryMap.put("foo", "bar");
@@ -50,14 +47,12 @@ public class DynamicInvocationTest {
 
     @Test
     public void testDynamicInvocationForInvalidMethod() throws Exception {
-        APIService testAPIService = APIService.APIBuilder
-                .builder("https://postman-echo.com")
-                .build();
-
         Assertions.assertThrows(NoSuchMethodException.class,() -> {
-                DynamicInvocationTestInterface testInterface = testAPIService.createDynamicApi(DynamicInvocationTestInterface.class,"test");
-                APIRequest<Map<String,Object>> call = testInterface.dynamicAPIInvocation();
-                APIResponse<Map<String,Object>> response = call.execute();
+            final DynamicInvocationTestInterface testInterface = APIService.APIBuilder
+                    .builder("https://postman-echo.com")
+                    .buildDynamic(DynamicInvocationTestInterface.class,"test");
+            APIRequest<Map<String,Object>> call = testInterface.dynamicAPIInvocation();
+            APIResponse<Map<String,Object>> response = call.execute();
         });
 
     }
@@ -65,12 +60,10 @@ public class DynamicInvocationTest {
 
     @Test
     public void testDynamicInvocation_bothQueryAndQueryMapCallWithResponse() throws Exception {
-        APIService testAPIService = APIService.APIBuilder
+        DynamicInvocationTestResponseInterface testInterface = APIService.APIBuilder
                 .builder("https://postman-echo.com")
-                .build();
-
-        DynamicInvocationTestResponseInterface testInterface = testAPIService.createDynamicApi(DynamicInvocationTestResponseInterface.class,
-                "bothQueryAndQueryMapCallWithResponse",Map.class,String.class);
+                .buildDynamic(DynamicInvocationTestResponseInterface.class,
+                        "bothQueryAndQueryMapCallWithResponse",Map.class,String.class);
 
         Map<String,String> queryMap = new HashMap<String,String>();
         queryMap.put("foo", "bar");

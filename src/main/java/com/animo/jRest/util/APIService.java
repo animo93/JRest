@@ -14,28 +14,19 @@ import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.animo.jRest.annotation.*;
+import com.animo.jRest.model.APIRequestRecord;
 import com.animo.jRest.model.RequestAuthentication;
 import com.animo.jRest.model.RequestBean;
 import com.animo.jRest.model.RequestProxy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.animo.jRest.annotation.Body;
-import com.animo.jRest.annotation.FollowRedirects;
-import com.animo.jRest.annotation.HEADER;
-import com.animo.jRest.annotation.HEADERS;
-import com.animo.jRest.annotation.PATH;
-import com.animo.jRest.annotation.Query;
-import com.animo.jRest.annotation.QueryMap;
-import com.animo.jRest.annotation.REQUEST;
-
-
 /**
- * Helper method which is used for initializing and building the initial API request.
+ * API Service method which is used for initializing and building the initial API request.
  * <p>It adapts a Java Interface to HTTP calls by using annotation on the declared method. Instances can be created
  * by passing the builder method to generate an implementation.<p>
  * For example :-
@@ -48,7 +39,7 @@ import com.animo.jRest.annotation.REQUEST;
  * 
  * @author animo
  */
-//TODO: Rename to APIClient or APIService
+//TODO: Rename this to JRest
 public final class APIService {
 
 	private final String baseURL;
@@ -144,45 +135,54 @@ public final class APIService {
 			return this;
 		}
 
-		public APIService build(){
-			return new APIService(this);
+		public <S> S build(final Class<S> clazz) {
+            var apiRequestRecord = new APIRequestRecord(baseURL,params,auth,proxy,disableSSLVerification);
+            //TODO: Instead of returning APIService , call the createApi method here & return the interface
+			return createApi(clazz,apiRequestRecord);
 		}
+
+        public <S> S buildDynamic(final Class<S> clazz,final String methodName,final Class... parameterTypes) throws NoSuchMethodException {
+            var apiRequestRecord = new APIRequestRecord(baseURL,params,auth,proxy,disableSSLVerification);
+            //TODO: Instead of returning APIService , call the createApi method here & return the interface
+            return createDynamicApi(clazz,apiRequestRecord,methodName,parameterTypes);
+        }
 
 	}
 
 	/**
-	 * Create an implementation of the API endpoints defined by the {@code service} interface.
-	 * <p>The relative path for a given method is obtained from an annotation on the method describing
-	 * the request type.The built in methods are {GET},{PUT} ,{POST},{PATCH} , {DELETE}
-	 * <p>Method parameters can be used to replace parts of the URL by annotating them with {Path}. Replacement sections are denoted by an identifier surrounded by
-	 * curly braces (e.g., "{foo}").
-	 * 
-	 * <p>The body of a request is denoted by the {@link com.animo.jRest.annotation.Body @Body} annotation.
-	 * The body would be converted to JSON via Google GSON
-	 * 
-	 * <p>By default, methods return a {@link APIRequest APIRequest} which represents the HTTP request. The generic
-	 * parameter of the call is the response body type and will be converted by Jackson Object Mapper
-	 * 
-	 * <p>For example :
-	 * <pre><code>
-	 * public interface MyApiInterface {
-	 *
-	 *	&#64;REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
-	 *	{@code APIRequest<ApiResponse> listRepos(@PATH(value = "user") String user);}
-	 *
-	 *}</code></pre>
-	 * 
-	 * @param clazz service.class
-	 * @param <S> Service Class
-	 * @return {@code service}
-	 */
+     * Create an implementation of the API endpoints defined by the {@code service} interface.
+     * <p>The relative path for a given method is obtained from an annotation on the method describing
+     * the request type.The built-in methods are {GET},{PUT} ,{POST},{PATCH} , {DELETE}
+     * <p>Method parameters can be used to replace parts of the URL by annotating them with {Path}. Replacement sections are denoted by an identifier surrounded by
+     * curly braces (e.g., "{foo}").
+     *
+     * <p>The body of a request is denoted by the {@link com.animo.jRest.annotation.Body @Body} annotation.
+     * The body would be converted to JSON via Google GSON
+     *
+     * <p>By default, methods return a {@link APIRequest APIRequest} which represents the HTTP request. The generic
+     * parameter of the call is the response body type and will be converted by Jackson Object Mapper
+     *
+     * <p>For example :
+     * <pre><code>
+     * public interface MyApiInterface {
+     *
+     * 	&#64;REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
+     *    {@code APIRequest<ApiResponse> listRepos(@PATH(value = "user") String user);}
+     *
+     * }</code></pre>
+     *
+     * @param <S>              Service Class
+     * @param clazz            service.class
+     * @param apiRequestRecord
+     * @return {@code service}
+     */
 	@SuppressWarnings("unchecked")
-	public final <S> S createApi(final Class<S> clazz) {
+	private static <S> S createApi(final Class<S> clazz, APIRequestRecord apiRequestRecord) {
         //TODO: Add test scenario where a random interface is passed which doesn't have any REQUEST annotation
 		final ClassLoader loader = clazz.getClassLoader();
 		final Class[] interfaces = new Class[]{clazz};
 
-		final Object object = Proxy.newProxyInstance(loader, interfaces,setInvocationHandler(null));
+		final Object object = Proxy.newProxyInstance(loader, interfaces,setInvocationHandler(null,apiRequestRecord));
 
 		return (S) object;
 	}
@@ -200,8 +200,7 @@ public final class APIService {
 	 *
 	 *	&#64;REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
 	 *	{@code APIRequest<ApiResponse> listRepos(@PATH(value = "user") String user);}
-	 *
-	 *  {@code APIRequest<ApiResponse> dynamicApiInvocation(Object... args)}
+	 *  {@code APIRequest<ApiResponse> dynamicApiInvocation(Object... args);}
 	 *
 	 *}</code></pre>
 	 *
@@ -219,20 +218,19 @@ public final class APIService {
 	 * @throws NoSuchMethodException When the method doesn't exists in service class
 	 * @return {@code service}
 	 */
-	//TODO Check why do we need methodName here
-	public final <S> S createDynamicApi(final Class<S> clazz,final String methodName,Class... parameterTypes) throws NoSuchMethodException {
+	private static <S> S createDynamicApi(final Class<S> clazz,final APIRequestRecord apiRequestRecord,final String methodName,Class... parameterTypes) throws NoSuchMethodException {
 
 		final ClassLoader loader = clazz.getClassLoader();
 		final Class[] interfaces = new Class[]{clazz};
 
 		Method methodToCall = clazz.getMethod(methodName,parameterTypes);
-		final Object object = Proxy.newProxyInstance(loader, interfaces,setInvocationHandler(methodToCall));
+		final Object object = Proxy.newProxyInstance(loader, interfaces,setInvocationHandler(methodToCall, apiRequestRecord));
 
 		return (S) object;
 
 	}
 
-	private InvocationHandler setInvocationHandler(final Method methodToCall){
+	private static InvocationHandler setInvocationHandler(final Method methodToCall, APIRequestRecord apiRequestRecord){
 		return new InvocationHandler() {
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -255,24 +253,24 @@ public final class APIService {
 				}
 
 				final RequestBean<Object> requestBean = new RequestBean<>();
-				final StringBuilder urlBuilder = new StringBuilder(baseURL);
+				final StringBuilder urlBuilder = new StringBuilder(apiRequestRecord.baseUrl());
 				urlBuilder.append(request.endpoint());
 
 				final Parameter[] parameters = method.getParameters();
 
 				addPathParameters(args, urlBuilder, parameters);
 
-				addQueryParameters(args, urlBuilder, parameters);
+				addQueryParameters(args, urlBuilder, parameters,apiRequestRecord);
 
 				addHeaders(requestBean, headersAnnotation, parameters, args);
 
 				logger.debug("final Url {}",urlBuilder.toString());
 				requestBean.setUrl(urlBuilder.toString());
 
-				requestBean.setAuthentication(auth);
-				requestBean.setProxy(reqProxy);
+				requestBean.setAuthentication(apiRequestRecord.auth());
+				requestBean.setProxy(apiRequestRecord.reqProxy());
 				requestBean.setRequestType(request.type());
-				requestBean.setDisableSSLVerification(disableSSLVerification);
+				requestBean.setDisableSSLVerification(apiRequestRecord.disableSSLVerification());
 
 				addRequestBody(args, request, requestBean,parameters);
 
@@ -364,6 +362,7 @@ public final class APIService {
 				return headersMap;
 			}
 
+            //TODO: Return request body object
 			private void addRequestBody(final Object[] args,final REQUEST request,
 										final RequestBean<Object> myRequestBean,final Parameter[] parameters) {
 				if(request.type().equals(HTTP_METHOD.POST) ||
@@ -383,9 +382,10 @@ public final class APIService {
 				}
 			}
 
-			private void prepareQueryParamMap(final Object[] args, final Parameter[] parameters) throws UnsupportedEncodingException {
+			private Map<String, String> prepareQueryParamMap(final Object[] args, final Parameter[] parameters, APIRequestRecord apiRequestRecord) throws UnsupportedEncodingException {
 				/* put all the found query parameters in Query and QueryMap,
 				into the paramters map to be converted into query string*/
+                var params = apiRequestRecord.params();
 				for (int i = 0; i < parameters.length; i++) {
 					if (parameters[i].getAnnotation(Query.class) != null) {
 						if (params == null) params = new HashMap<>();
@@ -428,38 +428,39 @@ public final class APIService {
 
 				}
 				logger.debug("Query params fetched from Params " + params);
+                return params;
 			}
 
-			private void addQueryParameters(final Object[] args, final StringBuilder urlBuilder, final Parameter[] parameters) throws UnsupportedEncodingException {
-				prepareQueryParamMap(args,parameters);
-				if(params != null && params.size() > 0) {
+			private void addQueryParameters(final Object[] args, final StringBuilder urlBuilder, final Parameter[] parameters, APIRequestRecord apiRequestRecord) throws UnsupportedEncodingException {
+				var params = prepareQueryParamMap(args,parameters,apiRequestRecord);
+				if(params != null && !params.isEmpty()) {
 					urlBuilder.append("?");
 					params.forEach((k, v) -> urlBuilder.append(k).append("=").append(v).append("&"));
 					urlBuilder.deleteCharAt(urlBuilder.length()-1);
 				}
 			}
 
-			private void addPathParameters(final Object[] args, final StringBuilder urlBuilder, final Parameter[] parameters)
-					throws Exception {
-				for(int i = 0 ; i < parameters.length ; i++) {
-					if(parameters[i].getAnnotation(PATH.class) != null) {
-						PATH path = (PATH) parameters[i].getAnnotation(PATH.class);
-						final String value = path.value();
-						final Pattern pattern = Pattern.compile("\\{" + value + "\\}");
-						final Matcher matcher = pattern.matcher(urlBuilder);
-						int start = 0;
-						while(matcher.find(start)) {
-							urlBuilder.replace(matcher.start(), matcher.end(), String.valueOf(args[i]));
-							start = matcher.start() + String.valueOf(args[i]).length();
-						}
-					}
-				}
+            private void addPathParameters(final Object[] args, final StringBuilder urlBuilder, final Parameter[] parameters)
+                    throws Exception {
+                for(int i = 0 ; i < parameters.length ; i++) {
+                    if(parameters[i].getAnnotation(PATH.class) != null) {
+                        PATH path = (PATH) parameters[i].getAnnotation(PATH.class);
+                        final String value = path.value();
+                        final Pattern pattern = Pattern.compile("\\{" + value + "\\}");
+                        final Matcher matcher = pattern.matcher(urlBuilder);
+                        int start = 0;
+                        while(matcher.find(start)) {
+                            urlBuilder.replace(matcher.start(), matcher.end(), String.valueOf(args[i]));
+                            start = matcher.start() + String.valueOf(args[i]).length();
+                        }
+                    }
+                }
 
-				if(urlBuilder.toString().contains("{") &&
-						urlBuilder.toString().contains("}")) {
-					throw new Exception("Undeclared PATH variable found ..Please declare them in the interface");
-				}
-			}
+                if(urlBuilder.toString().contains("{") &&
+                        urlBuilder.toString().contains("}")) {
+                    throw new Exception("Undeclared PATH variable found ..Please declare them in the interface");
+                }
+            }
 		};
 	}
 }

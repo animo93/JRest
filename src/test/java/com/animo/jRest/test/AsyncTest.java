@@ -17,10 +17,9 @@ public class AsyncTest {
 
     @Test
     public void callMeLater_shouldInvokeCallBackOnSuccess() throws InterruptedException {
-        final APIService testAPIService = APIService.APIBuilder
+        final TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
                 .builder("https://postman-echo.com")
-                .build();
-        final TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
+                .build(TestPostmanEchoAPIInterface.class);
         final APIRequest<Map<String, Object>> testCall = testInterface.getCall();
 
         CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -44,11 +43,10 @@ public class AsyncTest {
 
     @Test
     public void callMeLater_shouldInvokeCallBackOnFailure_whenExecutionFails() throws InterruptedException {
-        final APIService testAPIService = APIService.APIBuilder
+        final TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
                 //Wrong url provided to simulate exception
                 .builder("https://postman-echo.com1")
-                .build();
-        final TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
+                .build(TestPostmanEchoAPIInterface.class);
         final APIRequest<Map<String, Object>> testCall = testInterface.getCall();
 
         CountDownLatch countDownLatch = new CountDownLatch(1);

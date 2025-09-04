@@ -13,11 +13,10 @@ public class AuthenticationTest {
 
     @Test
     public void testUsernamePasswordAuthentication() throws Exception {
-        APIService testAPIService = APIService.APIBuilder
+        final TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
                 .builder("https://postman-echo.com")
                 .addUsernameAndPassword("username", "password")
-                .build();
-        TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
+                .build(TestPostmanEchoAPIInterface.class);
         APIRequest<Map<String, Object>> testCall = testInterface.getCall();
         APIResponse<Map<String, Object>> response = testCall.execute();
 

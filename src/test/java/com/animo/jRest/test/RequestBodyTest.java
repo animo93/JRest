@@ -21,10 +21,10 @@ public class RequestBodyTest {
         testRequestBody.setBody("foo");
         testRequestBody.setMessage("bar");
 
-        final APIService testAPIService = APIService.APIBuilder
+        final TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
                 .builder("https://postman-echo.com")
-                .build();
-        final TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
+                .build(TestPostmanEchoAPIInterface.class);
+
         final APIRequest<Map<String, Object>> testCall = testInterface.requestBodyObjectCall(testRequestBody);
         final APIResponse<Map<String, Object>> response = testCall.execute();
         assertTrue(((Map<String, String>) response.getResponse().get("data")).containsKey("message"));
@@ -36,10 +36,10 @@ public class RequestBodyTest {
 
         TestRequestBody testRequestBody = null;
 
-        final APIService testAPIService = APIService.APIBuilder
+        final TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
                 .builder("https://postman-echo.com")
-                .build();
-        final TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
+                .build(TestPostmanEchoAPIInterface.class);
+
         assertThrows(NullPointerException.class, () -> testInterface.requestBodyObjectCall(testRequestBody));
 
     }
@@ -50,10 +50,10 @@ public class RequestBodyTest {
         Map<String ,Object> requestMap = new HashMap<>();
         requestMap.put("foo","bar");
 
-        final APIService testAPIService = APIService.APIBuilder
+        final TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
                 .builder("https://postman-echo.com")
-                .build();
-        final TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
+                .build(TestPostmanEchoAPIInterface.class);
+
         final APIRequest<Map<String, Object>> testCall = testInterface.requestBodyMapCall(requestMap);
         final APIResponse<Map<String, Object>> response = testCall.execute();
         assertTrue(((Map<String, String>) response.getResponse().get("data")).containsKey("foo"));

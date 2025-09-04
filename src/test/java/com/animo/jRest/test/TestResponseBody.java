@@ -13,10 +13,10 @@ public class TestResponseBody {
     //TODO: Add wiremock support for testing this
     @Test
     public void testResponseBodyAsString() throws Exception {
-        final APIService testAPIService = APIService.APIBuilder
+        final TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
                 .builder("https://postman-echo.com")
-                .build();
-        final TestPostmanEchoAPIInterface testInterface = testAPIService.createApi(TestPostmanEchoAPIInterface.class);
+                .build(TestPostmanEchoAPIInterface.class);
+
         final APIRequest<String> testCall = testInterface.responseAsString();
         final APIResponse<String> response = testCall.execute();
         assertNotNull(response.getResponse());
