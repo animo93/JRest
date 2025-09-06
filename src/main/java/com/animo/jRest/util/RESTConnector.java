@@ -54,6 +54,7 @@ public class RESTConnector<Response>{
 			apiResponse.setResponseCode(response.statusCode());
 
 			String responseJson = getResponseBody(response);
+            logger.debug("response json {}" ,responseJson);
 			GsonConverter converter = ConverterFactory.getGsonConverter();
 			Response response1 = converter.fromString(responseJson, type);
             apiResponse.setResponse(response1);

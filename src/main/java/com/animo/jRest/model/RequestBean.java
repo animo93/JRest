@@ -10,6 +10,7 @@ import lombok.Setter;
 public class RequestBean<T> {
 
 	private String accessToken;
+    //TODO: Rename to httpMethod
 	private HTTP_METHOD requestType;
 	private String url;
 	private T requestObject;

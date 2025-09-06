@@ -41,22 +41,11 @@ import org.apache.logging.log4j.Logger;
  */
 //TODO: Rename this to JRest
 public final class APIService {
-
-	private final String baseURL;
-	private Map<String, String> params;
-	private final RequestAuthentication auth;
-	private final RequestProxy reqProxy;
-	private final boolean disableSSLVerification;
 	private final static Logger logger = LogManager.getLogger(APIService.class);
 
-	private APIService(APIBuilder builder) {
-		this.baseURL = builder.baseURL;
-		this.params = builder.params;
-		this.auth = builder.auth;
-		this.reqProxy = builder.proxy;
-		this.disableSSLVerification = builder.disableSSLVerification;
-	}
+	private APIService(APIBuilder builder) {}
     //TODO: Rename to APIClientBuilder
+    //TODO: Check what would happen if two threads are trying to execute
 	public static class APIBuilder {
 		private final String baseURL;
 		private Map<String,String> params;
@@ -252,31 +241,20 @@ public final class APIService {
 					throw new Exception("No Request Annotation found");
 				}
 
-				final RequestBean<Object> requestBean = new RequestBean<>();
-				final StringBuilder urlBuilder = new StringBuilder(apiRequestRecord.baseUrl());
-				urlBuilder.append(request.endpoint());
-
 				final Parameter[] parameters = method.getParameters();
 
-				addPathParameters(args, urlBuilder, parameters);
+                final RequestBean<Object> requestBean = APIServiceHelper.URLBuilder.builder(args,parameters,apiRequestRecord.baseUrl(),request)
+                        .addPathParameters()
+                        .addQueryParameters(apiRequestRecord)
+                        .addHeaders(headersAnnotation)
+                        .addRequestBody(request)
+                        .addAuthentication(apiRequestRecord.auth())
+                        .addProxy(apiRequestRecord.reqProxy())
+                        .addFollowRedirects(followRedirectsAnnotation)
+                        .addDisableSSLVerification(apiRequestRecord.disableSSLVerification())
+                        .build();
 
-				addQueryParameters(args, urlBuilder, parameters,apiRequestRecord);
 
-				addHeaders(requestBean, headersAnnotation, parameters, args);
-
-				logger.debug("final Url {}",urlBuilder.toString());
-				requestBean.setUrl(urlBuilder.toString());
-
-				requestBean.setAuthentication(apiRequestRecord.auth());
-				requestBean.setProxy(apiRequestRecord.reqProxy());
-				requestBean.setRequestType(request.type());
-				requestBean.setDisableSSLVerification(apiRequestRecord.disableSSLVerification());
-
-				addRequestBody(args, request, requestBean,parameters);
-
-				if(followRedirectsAnnotation != null){
-                    requestBean.setFollowRedirects(followRedirectsAnnotation.value());
-                }
 				final Type apiResponseType =  method.getGenericReturnType();
                 /** TODO: Validate the return type
                  * If the return type is of type APIResponse , execute synchronously
@@ -301,166 +279,6 @@ public final class APIService {
 					throw new Exception("Invalid method declared in Interface");
 				}
 			}
-
-			private void addHeaders(final RequestBean<Object> myRequestBean, final Annotation headersAnnotation, final Parameter[] parameters, final Object[] args) {
-				final HEADERS headers = (HEADERS) headersAnnotation;
-				final String[] requestHeadersFromMethod;
-				Map<String, String> requestHeadersMap = new HashMap<>();
-				if(headers != null) {
-					requestHeadersFromMethod = headers.value();
-
-					logger.debug("Request Headers from Method {} " , Arrays.toString(requestHeadersFromMethod));
-					requestHeadersMap = convertToHeadersMap(requestHeadersFromMethod);
-				}
-
-				final Map<String, String> requestHeadersFromParam = getParamHeaders(parameters, args);
-
-				//String[] requestHeaders = concatenateHeaders(requestHeadersFromMethod,requestHeadersFromParam);
-
-				requestHeadersMap.putAll(requestHeadersFromParam);
-
-				myRequestBean.setHeaders(requestHeadersMap);
-
-			}
-
-			private String[] concatenateHeaders(final String[] requestHeadersFromMethod, final String[] requestHeadersFromParam) {
-				final String[] requestHeaders = new String[] {};
-				System.arraycopy(requestHeadersFromMethod, 0, requestHeaders, 0, requestHeadersFromParam.length);
-				System.arraycopy(requestHeadersFromParam, 0, requestHeaders, requestHeadersFromParam.length, requestHeadersFromParam.length);
-
-				return requestHeaders;
-			}
-
-			private Map<String, String> getParamHeaders(final Parameter[] parameters, final Object[] args) {
-				Map<String, String> paramValues = new HashMap<>();
-				try {
-					for(int i = 0,j = 0; i < parameters.length; i++) {
-						if(parameters[i].getAnnotation(HEADER.class)!=null) {
-							HEADER header = parameters[i].getAnnotation(HEADER.class);
-							paramValues = (Map<String, String>) args[i];
-						}
-					}
-				}catch (ClassCastException ex) {
-					logger.error("Unable to get ParamHeaders " + ex);
-					throw new RuntimeException("Header Parameters should be passed in Map<key:value> format ");
-				}
-
-
-				logger.debug("Request Headers from Params {}" ,paramValues);
-				return paramValues;
-			}
-
-			private Map<String, String> convertToHeadersMap(final String[] requestHeaders) {
-				Map<String, String> headersMap = new HashMap<>();
-				for(String header:requestHeaders) {
-					if(!header.contains(":")) {
-						throw new RuntimeException("Header data invalid ...Should be using <key>:<value> String format " + header);
-					}
-					headersMap.put(header.split(":")[0], header.split(":")[1]);
-				}
-				logger.debug("Final Request Headers Map {} " ,headersMap);
-				return headersMap;
-			}
-
-            //TODO: Return request body object
-			private void addRequestBody(final Object[] args,final REQUEST request,
-										final RequestBean<Object> myRequestBean,final Parameter[] parameters) {
-				if(request.type().equals(HTTP_METHOD.POST) ||
-						request.type().equals(HTTP_METHOD.PATCH) ||
-						request.type().equals(HTTP_METHOD.PUT)){
-					for (int i = 0; i < parameters.length; i++) {
-						if(parameters[i].getAnnotation(Body.class)!=null){
-							Body body = (Body) parameters[i].getAnnotation(Body.class);
-							logger.debug("Going to set request body {}",args[i]);
-							if(args[i]==null){
-								throw new NullPointerException("Request Body cannot be Null");
-							}
-							//TODO: Add null check and throw exception
-							myRequestBean.setRequestObject(args[i]);
-						}
-					}
-				}
-			}
-
-			private Map<String, String> prepareQueryParamMap(final Object[] args, final Parameter[] parameters, APIRequestRecord apiRequestRecord) throws UnsupportedEncodingException {
-				/* put all the found query parameters in Query and QueryMap,
-				into the paramters map to be converted into query string*/
-                var params = apiRequestRecord.params();
-				for (int i = 0; i < parameters.length; i++) {
-					if (parameters[i].getAnnotation(Query.class) != null) {
-						if (params == null) params = new HashMap<>();
-						Query query = (Query) parameters[i].getAnnotation(Query.class);
-						String queryKey = query.value();
-						if (queryKey != null && !queryKey.isEmpty()) {
-
-							String queryValue = null;
-							try {
-								queryValue = (String) args[i];
-							} catch (ClassCastException ex) {
-								logger.error("Unable to add Query Params ", ex);
-								throw new InvalidParameterException("Query parameter should be passed in string format only ");
-							}
-
-							if (queryValue != null) {
-								if (!query.encoded()) {
-									queryKey = URLEncoder.encode(queryKey, StandardCharsets.UTF_8);
-									queryValue = URLEncoder.encode(queryValue, StandardCharsets.UTF_8);
-								}
-
-								params.put(queryKey, queryValue);
-							}
-						}
-					} else if (parameters[i].getAnnotation(QueryMap.class) != null) {
-						if (params == null) params = new HashMap<>();
-						QueryMap queryMap = (QueryMap) parameters[i].getAnnotation(QueryMap.class);
-						Map<String, String> queryMapValue = null;
-						try {
-							queryMapValue = (Map<String, String>) args[i];
-						} catch (ClassCastException ex) {
-							logger.error("Unable to add Query Params ", ex);
-							throw new InvalidParameterException("Query parameter should be passed in Map format only ");
-						}
-
-						if (queryMapValue != null && !queryMapValue.isEmpty()) {
-							params.putAll(queryMapValue);
-						}
-					}
-
-				}
-				logger.debug("Query params fetched from Params " + params);
-                return params;
-			}
-
-			private void addQueryParameters(final Object[] args, final StringBuilder urlBuilder, final Parameter[] parameters, APIRequestRecord apiRequestRecord) throws UnsupportedEncodingException {
-				var params = prepareQueryParamMap(args,parameters,apiRequestRecord);
-				if(params != null && !params.isEmpty()) {
-					urlBuilder.append("?");
-					params.forEach((k, v) -> urlBuilder.append(k).append("=").append(v).append("&"));
-					urlBuilder.deleteCharAt(urlBuilder.length()-1);
-				}
-			}
-
-            private void addPathParameters(final Object[] args, final StringBuilder urlBuilder, final Parameter[] parameters)
-                    throws Exception {
-                for(int i = 0 ; i < parameters.length ; i++) {
-                    if(parameters[i].getAnnotation(PATH.class) != null) {
-                        PATH path = (PATH) parameters[i].getAnnotation(PATH.class);
-                        final String value = path.value();
-                        final Pattern pattern = Pattern.compile("\\{" + value + "\\}");
-                        final Matcher matcher = pattern.matcher(urlBuilder);
-                        int start = 0;
-                        while(matcher.find(start)) {
-                            urlBuilder.replace(matcher.start(), matcher.end(), String.valueOf(args[i]));
-                            start = matcher.start() + String.valueOf(args[i]).length();
-                        }
-                    }
-                }
-
-                if(urlBuilder.toString().contains("{") &&
-                        urlBuilder.toString().contains("}")) {
-                    throw new Exception("Undeclared PATH variable found ..Please declare them in the interface");
-                }
-            }
 		};
 	}
 }
