@@ -78,10 +78,10 @@ public final class APIServiceHelper {
         private Map<String, String> prepareQueryParamMap(APIRequestRecord apiRequestRecord) throws UnsupportedEncodingException {
 				/* put all the found query parameters in Query and QueryMap,
 				into the paramters map to be converted into query string*/
-            var params = apiRequestRecord.params();
+            var queryParams = apiRequestRecord.queryParams();
             for (int i = 0; i < parameters.length; i++) {
                 if (parameters[i].getAnnotation(Query.class) != null) {
-                    if (params == null) params = new HashMap<>();
+                    if (queryParams == null) queryParams = new HashMap<>();
                     Query query = (Query) parameters[i].getAnnotation(Query.class);
                     String queryKey = query.value();
                     if (queryKey != null && !queryKey.isEmpty()) {
@@ -100,11 +100,11 @@ public final class APIServiceHelper {
                                 queryValue = URLEncoder.encode(queryValue, StandardCharsets.UTF_8);
                             }
 
-                            params.put(queryKey, queryValue);
+                            queryParams.put(queryKey, queryValue);
                         }
                     }
                 } else if (parameters[i].getAnnotation(QueryMap.class) != null) {
-                    if (params == null) params = new HashMap<>();
+                    if (queryParams == null) queryParams = new HashMap<>();
                     QueryMap queryMap = (QueryMap) parameters[i].getAnnotation(QueryMap.class);
                     Map<String, String> queryMapValue = null;
                     try {
@@ -115,13 +115,13 @@ public final class APIServiceHelper {
                     }
 
                     if (queryMapValue != null && !queryMapValue.isEmpty()) {
-                        params.putAll(queryMapValue);
+                        queryParams.putAll(queryMapValue);
                     }
                 }
 
             }
-            logger.debug("Query params fetched from Params " + params);
-            return params;
+            logger.debug("Query queryParams fetched from Params " + queryParams);
+            return queryParams;
         }
 
         //TODO: Needs refactoring

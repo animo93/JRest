@@ -52,7 +52,7 @@ public class QueryParamTest {
 
         TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
 				.builder("https://postman-echo.com")
-				.addParameter("ping", "pong")
+				.addQueryParameter("ping", "pong")
 				.build(TestPostmanEchoAPIInterface.class);
 
 		APIRequest<Map<String,Object>> call = testInterface.singleQueryParamsCall("bar");
@@ -221,7 +221,7 @@ public class QueryParamTest {
 
         TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
 				.builder("https://postman-echo.com")
-				.addParameter("tik", "tok")
+				.addQueryParameter("tik", "tok")
 				.build(TestPostmanEchoAPIInterface.class);
 		
 		Map<String,String> queryMap = new HashMap<String,String>();
@@ -275,7 +275,7 @@ public class QueryParamTest {
 
         TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
 				.builder("https://postman-echo.com")
-				.addAllParameters(queryParamMap)
+				.addQueryMap(queryParamMap)
 				.build(TestPostmanEchoAPIInterface.class);
 
 		APIRequest<Map<String,Object>> call = testInterface.getCall();

@@ -1,29 +1,19 @@
 package com.animo.jRest.util;
 
-import java.io.UnsupportedEncodingException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Proxy;
-import java.lang.reflect.Type;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidParameterException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import com.animo.jRest.annotation.*;
+import com.animo.jRest.annotation.FollowRedirects;
+import com.animo.jRest.annotation.HEADERS;
+import com.animo.jRest.annotation.REQUEST;
 import com.animo.jRest.model.APIRequestRecord;
 import com.animo.jRest.model.RequestAuthentication;
 import com.animo.jRest.model.RequestBean;
 import com.animo.jRest.model.RequestProxy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * API Service method which is used for initializing and building the initial API request.
@@ -48,7 +38,7 @@ public final class APIService {
     //TODO: Check what would happen if two threads are trying to execute
 	public static class APIBuilder {
 		private final String baseURL;
-		private Map<String,String> params;
+		private Map<String,String> queryParams;
 		private RequestAuthentication auth;
 		private RequestProxy proxy;
 		private boolean disableSSLVerification;
@@ -61,19 +51,19 @@ public final class APIService {
 			return new APIBuilder(baseURL);
 		}
 
-		public APIBuilder addParameter(final String key,final String value){
-			if(params==null){
-				params = new HashMap<>();
+		public APIBuilder addQueryParameter(final String key, final String value){
+			if(queryParams ==null){
+				queryParams = new HashMap<>();
 			}
-			params.put(key, value);
+			queryParams.put(key, value);
 			return this;
 		}
 
-		public APIBuilder addAllParameters(final Map<String,String> params) {
-			if(this.params == null){
-				this.params = new HashMap<>();
+		public APIBuilder addQueryMap(final Map<String,String> params) {
+			if(this.queryParams == null){
+				this.queryParams = new HashMap<>();
 			}
-			this.params.putAll(params);
+			this.queryParams.putAll(params);
 			return this;
 		}
 
@@ -125,12 +115,12 @@ public final class APIService {
 		}
 
 		public <S> S build(final Class<S> clazz) {
-            var apiRequestRecord = new APIRequestRecord(baseURL,params,auth,proxy,disableSSLVerification);
+            var apiRequestRecord = new APIRequestRecord(baseURL, queryParams,auth,proxy,disableSSLVerification);
 			return createApi(clazz,apiRequestRecord);
 		}
 
         public <S> S buildDynamic(final Class<S> clazz,final String methodName,final Class... parameterTypes) throws NoSuchMethodException {
-            var apiRequestRecord = new APIRequestRecord(baseURL,params,auth,proxy,disableSSLVerification);
+            var apiRequestRecord = new APIRequestRecord(baseURL, queryParams,auth,proxy,disableSSLVerification);
             return createDynamicApi(clazz,apiRequestRecord,methodName,parameterTypes);
         }
 
