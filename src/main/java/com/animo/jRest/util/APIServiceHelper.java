@@ -149,8 +149,8 @@ public final class APIServiceHelper {
             Map<String, String> paramValues = new HashMap<>();
             try {
                 for(int i = 0,j = 0; i < parameters.length; i++) {
-                    if(parameters[i].getAnnotation(HEADER.class)!=null) {
-                        HEADER header = parameters[i].getAnnotation(HEADER.class);
+                    if(parameters[i].getAnnotation(HeaderMap.class)!=null) {
+                        HeaderMap headerMap = parameters[i].getAnnotation(HeaderMap.class);
                         paramValues = (Map<String, String>) requestArgs[i];
                     }
                 }

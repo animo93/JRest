@@ -126,13 +126,11 @@ public final class APIService {
 
 		public <S> S build(final Class<S> clazz) {
             var apiRequestRecord = new APIRequestRecord(baseURL,params,auth,proxy,disableSSLVerification);
-            //TODO: Instead of returning APIService , call the createApi method here & return the interface
 			return createApi(clazz,apiRequestRecord);
 		}
 
         public <S> S buildDynamic(final Class<S> clazz,final String methodName,final Class... parameterTypes) throws NoSuchMethodException {
             var apiRequestRecord = new APIRequestRecord(baseURL,params,auth,proxy,disableSSLVerification);
-            //TODO: Instead of returning APIService , call the createApi method here & return the interface
             return createDynamicApi(clazz,apiRequestRecord,methodName,parameterTypes);
         }
 

@@ -24,20 +24,20 @@ public interface TestPostmanEchoAPIInterface {
 	APIRequest<Map<String, Object>> getIncorrectHeader();
 	
 	@REQUEST(endpoint = "/get", type = HTTP_METHOD.GET)
-	APIRequest<Map<String, Object>> getSingleParamHeadersCall(@HEADER Map<String, String> header);
+	APIRequest<Map<String, Object>> getSingleParamHeadersCall(@HeaderMap Map<String, String> header);
 	
 	@REQUEST(endpoint = "/get", type = HTTP_METHOD.GET)
 	@HEADERS({
 		"X-Ping:Pong",
 		"X-Static:True"
 	})
-	APIRequest<Map<String, Object>> getBothSingleParamStaticHeadersCall(@HEADER Map<String, String> header);
+	APIRequest<Map<String, Object>> getBothSingleParamStaticHeadersCall(@HeaderMap Map<String, String> header);
 	
 	@REQUEST(endpoint = "/get", type = HTTP_METHOD.GET)
 	APIRequest<Map<String, Object>> noHeadersCall();
 	
 	@REQUEST(endpoint = "/get",type=HTTP_METHOD.GET)
-	APIRequest<Map<String, Object>> incorrectHeadersCall(@HEADER String headers);
+	APIRequest<Map<String, Object>> incorrectHeadersCall(@HeaderMap String headers);
 	
 	@REQUEST(endpoint = "/get",type=HTTP_METHOD.GET)
 	APIRequest<Map<String,Object>> singleQueryParamsCall(@Query("foo") String bar);
