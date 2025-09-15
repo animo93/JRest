@@ -1,12 +1,12 @@
 package com.animo.jRest.util;
 
 import java.util.concurrent.Callable;
-
+//TODO: Refactor to use CompletableFuture
 public class SyncCallable<Response> implements Callable<APIResponse<Response>> {
 
-	private final RESTConnector<Response> restConnector;
+	private final RESTConnector restConnector;
 	
-	public SyncCallable(RESTConnector<Response> restConnector) {
+	public SyncCallable(RESTConnector restConnector) {
 		this.restConnector= restConnector;
 	}
 

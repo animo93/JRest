@@ -1,9 +1,8 @@
 package com.animo.jRest.test;
 
-import com.animo.jRest.util.APIRequest;
 import com.animo.jRest.util.APICallBack;
-import com.animo.jRest.util.APIService;
 import com.animo.jRest.util.APIResponse;
+import com.animo.jRest.util.JRest;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -11,19 +10,16 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 
 public class AsyncTest {
 
     @Test
     public void callMeLater_shouldInvokeCallBackOnSuccess() throws InterruptedException {
-        final TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
-                .builder("https://postman-echo.com")
+        final TestPostmanEchoAPIInterface testInterface = new JRest.APIBuilder("https://postman-echo.com")
                 .build(TestPostmanEchoAPIInterface.class);
-        final APIRequest<Map<String, Object>> testCall = testInterface.getCall();
 
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        APICallBack<Map<String, Object>> myCallBack = Mockito.spy(new APICallBack<Map<String, Object>>() {
+        APICallBack<Map<String, Object>> callback = Mockito.spy(new APICallBack<Map<String, Object>>() {
             @Override
             public void callBackOnSuccess(APIResponse<Map<String, Object>> result) {
                 countDownLatch.countDown();
@@ -32,25 +28,23 @@ public class AsyncTest {
             public void callBackOnFailure(Throwable e) {
             }
         });
-        testCall.executeWithCallBack(myCallBack);
+        testInterface.asyncCall(callback);
 
         // To wait for the main thread to complete
-        countDownLatch.await(1000, java.util.concurrent.TimeUnit.MILLISECONDS);
+        countDownLatch.await(3000, java.util.concurrent.TimeUnit.MILLISECONDS);
 
-        Mockito.verify(myCallBack).callBackOnSuccess(any());
-        Mockito.verify(myCallBack, Mockito.never()).callBackOnFailure(any());
+        Mockito.verify(callback).callBackOnSuccess(any());
+        Mockito.verify(callback, Mockito.never()).callBackOnFailure(any());
     }
 
     @Test
     public void callMeLater_shouldInvokeCallBackOnFailure_whenExecutionFails() throws InterruptedException {
-        final TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
-                //Wrong url provided to simulate exception
-                .builder("https://postman-echo.com1")
+        //Wrong url provided to simulate exception
+        final TestPostmanEchoAPIInterface testInterface = new JRest.APIBuilder("https://postman-echo.com1")
                 .build(TestPostmanEchoAPIInterface.class);
-        final APIRequest<Map<String, Object>> testCall = testInterface.getCall();
 
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        APICallBack<Map<String, Object>> myCallBack = Mockito.spy(new APICallBack<Map<String, Object>>() {
+        APICallBack<Map<String, Object>> callback = Mockito.spy(new APICallBack<Map<String, Object>>() {
             @Override
             public void callBackOnSuccess(APIResponse<Map<String, Object>> result) {
 
@@ -60,12 +54,12 @@ public class AsyncTest {
                 countDownLatch.countDown();
             }
         });
-        testCall.executeWithCallBack(myCallBack);
+        testInterface.asyncCall(callback);
 
         // To wait for the main thread to complete
-        countDownLatch.await(1000, java.util.concurrent.TimeUnit.MILLISECONDS);
+        countDownLatch.await(3000, java.util.concurrent.TimeUnit.MILLISECONDS);
 
-        Mockito.verify(myCallBack,Mockito.never()).callBackOnSuccess(any());
-        Mockito.verify(myCallBack).callBackOnFailure(any());
+        Mockito.verify(callback,Mockito.never()).callBackOnSuccess(any());
+        Mockito.verify(callback).callBackOnFailure(any());
     }
 }

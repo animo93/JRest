@@ -1,10 +1,10 @@
 package com.animo.jRest.util;
 
 import java.util.concurrent.Future;
+//TODO: Add documentation
+public interface APIClient {
 
-public interface APIClient<Response> {
-
-    APIResponse<Response> fetch();
-    Future<APIResponse<Response>> fetchWithFuture();
-    void fetchWithCallBack(APICallBack<Response> callBack);
+    <Response> APIResponse<Response> fetch() throws Exception;
+    <Response> Future<APIResponse<Response>> fetchWithFuture();
+    <Response> void fetchWithCallBack(APICallBack<Response> callBack);
 }

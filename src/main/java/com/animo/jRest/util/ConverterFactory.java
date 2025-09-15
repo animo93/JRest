@@ -3,6 +3,7 @@ package com.animo.jRest.util;
 public final class ConverterFactory {
 
     private static ConverterFactory instance;
+    private static GsonConverter gsonConverter;
 
     public static ConverterFactory getInstance() {
         if(instance == null) {
@@ -12,8 +13,11 @@ public final class ConverterFactory {
     }
     private ConverterFactory() {}
 
-    public static GsonConverter getGsonConverter() {
-        return new GsonConverter();
+    public GsonConverter getGsonConverter() {
+        if(gsonConverter == null) {
+            gsonConverter = new GsonConverter();
+        }
+        return gsonConverter;
     }
 
 }

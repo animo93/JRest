@@ -8,7 +8,6 @@ package com.animo.jRest.util;
  *
  * @param <Response> Result type
  */
-
 public interface APICallBack<Response> {
 	/**
 	 * Invoked for a received HTTP response

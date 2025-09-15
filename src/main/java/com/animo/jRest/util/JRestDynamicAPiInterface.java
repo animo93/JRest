@@ -1,6 +1,6 @@
 package com.animo.jRest.util;
 
-public interface JRestDynamicAPiInterface<Response> {
+public interface JRestDynamicAPiInterface {
 
     /**
      * This is the method which should be used for dynamically invoking any JREST API , which is
@@ -14,7 +14,7 @@ public interface JRestDynamicAPiInterface<Response> {
      * 	     APICall&#60;Void,Map&#60;String,Object&#62;&#62; response = call.callMeNow();
      * 	 </code></pre>
      * @param args The actual arguments which are going to be passed to the method to be invoked
-     * @return {@link APIRequest}
+     * @return {@link APIExecutorService}
      */
-    APIRequest<Response> dynamicAPIInvocation(Object... args);
+    APIResponse<?> dynamicAPIInvocation(Object... args);
 }

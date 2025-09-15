@@ -5,7 +5,7 @@ import com.animo.jRest.annotation.HEADERS;
 import com.animo.jRest.annotation.REQUEST;
 import com.animo.jRest.model.APIRequestRecord;
 import com.animo.jRest.model.RequestAuthentication;
-import com.animo.jRest.model.RequestBean;
+import com.animo.jRest.model.APIRequest;
 import com.animo.jRest.model.RequestProxy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,13 +29,13 @@ import java.util.Map;
  * 
  * @author animo
  */
-//TODO: Rename this to JRest
-public final class APIService {
-	private final static Logger logger = LogManager.getLogger(APIService.class);
+public final class JRest {
+	private final static Logger logger = LogManager.getLogger(JRest.class);
 
-	private APIService(APIBuilder builder) {}
+	private JRest() {}
     //TODO: Rename to APIClientBuilder
     //TODO: Check what would happen if two threads are trying to execute
+    //TODO: Test what would happen if two separate JRest instances are created for the same interface
 	public static class APIBuilder {
 		private final String baseURL;
 		private Map<String,String> queryParams;
@@ -45,10 +45,6 @@ public final class APIService {
 
 		public APIBuilder(final String baseURL){
 			this.baseURL = baseURL;
-		}
-
-		public static APIBuilder builder(final String baseURL){
-			return new APIBuilder(baseURL);
 		}
 
 		public APIBuilder addQueryParameter(final String key, final String value){
@@ -114,14 +110,14 @@ public final class APIService {
 			return this;
 		}
 
-		public <S> S build(final Class<S> clazz) {
+		public <S> S build(final Class<S> interfaceClass) {
             var apiRequestRecord = new APIRequestRecord(baseURL, queryParams,auth,proxy,disableSSLVerification);
-			return createApi(clazz,apiRequestRecord);
+			return createApi(interfaceClass,apiRequestRecord);
 		}
 
-        public <S> S buildDynamic(final Class<S> clazz,final String methodName,final Class... parameterTypes) throws NoSuchMethodException {
+        public <S> S buildDynamic(final Class<S> interfaceClass,final String methodName,final Class... parameterTypes) throws NoSuchMethodException {
             var apiRequestRecord = new APIRequestRecord(baseURL, queryParams,auth,proxy,disableSSLVerification);
-            return createDynamicApi(clazz,apiRequestRecord,methodName,parameterTypes);
+            return createDynamicApi(interfaceClass,apiRequestRecord,methodName,parameterTypes);
         }
 
 	}
@@ -136,7 +132,7 @@ public final class APIService {
      * <p>The body of a request is denoted by the {@link com.animo.jRest.annotation.Body @Body} annotation.
      * The body would be converted to JSON via Google GSON
      *
-     * <p>By default, methods return a {@link APIRequest APIRequest} which represents the HTTP request. The generic
+     * <p>By default, methods return a {@link APIExecutorService APIRequest} which represents the HTTP request. The generic
      * parameter of the call is the response body type and will be converted by Jackson Object Mapper
      *
      * <p>For example :
@@ -149,15 +145,15 @@ public final class APIService {
      * }</code></pre>
      *
      * @param <S>              Service Class
-     * @param clazz            service.class
+     * @param interfaceClass            service.class
      * @param apiRequestRecord
      * @return {@code service}
      */
 	@SuppressWarnings("unchecked")
-	private static <S> S createApi(final Class<S> clazz, APIRequestRecord apiRequestRecord) {
+	private static <S> S createApi(final Class<S> interfaceClass, APIRequestRecord apiRequestRecord) {
         //TODO: Add test scenario where a random interface is passed which doesn't have any REQUEST annotation
-		final ClassLoader loader = clazz.getClassLoader();
-		final Class[] interfaces = new Class[]{clazz};
+		final ClassLoader loader = interfaceClass.getClassLoader();
+		final Class[] interfaces = new Class[]{interfaceClass};
 
 		final Object object = Proxy.newProxyInstance(loader, interfaces,setInvocationHandler(null,apiRequestRecord));
 
@@ -188,26 +184,26 @@ public final class APIService {
 	 *     {@code APIResponse<Map<String,Object>> response = call.callMeNow();}
 	 * </code></pre>
 	 *
-	 * @param clazz service.class
+	 * @param interfaceClass service.class
 	 * @param <S> Service Class
 	 * @param methodName The method name which is going to be dynamically invoked
 	 * @param parameterTypes The parameter types for the method going to be dynamically invoked
 	 * @throws NoSuchMethodException When the method doesn't exists in service class
 	 * @return {@code service}
 	 */
-	private static <S> S createDynamicApi(final Class<S> clazz,final APIRequestRecord apiRequestRecord,final String methodName,Class... parameterTypes) throws NoSuchMethodException {
+	private static <S> S createDynamicApi(final Class<S> interfaceClass,final APIRequestRecord apiRequestRecord,final String methodName,Class... parameterTypes) throws NoSuchMethodException {
 
-		final ClassLoader loader = clazz.getClassLoader();
-		final Class[] interfaces = new Class[]{clazz};
+		final ClassLoader loader = interfaceClass.getClassLoader();
+		final Class[] interfaces = new Class[]{interfaceClass};
 
-		Method methodToCall = clazz.getMethod(methodName,parameterTypes);
+		Method methodToCall = interfaceClass.getMethod(methodName,parameterTypes);
 		final Object object = Proxy.newProxyInstance(loader, interfaces,setInvocationHandler(methodToCall, apiRequestRecord));
 
 		return (S) object;
 
 	}
 
-	private static InvocationHandler setInvocationHandler(final Method methodToCall, APIRequestRecord apiRequestRecord){
+	private static InvocationHandler setInvocationHandler(final Method methodToCall, APIRequestRecord apiRequestRecord) {
 		return new InvocationHandler() {
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -216,56 +212,29 @@ public final class APIService {
 					args = (Object[]) args[0];
 				}
 				final Annotation requestAnnotation = method.getAnnotation(REQUEST.class);
-				final Annotation[][] parameterAnnotation = method.getParameterAnnotations();
-				final Class[] parameterTypes = method.getParameterTypes();
-
 				final Annotation headersAnnotation = method.getAnnotation(HEADERS.class);
-
 				FollowRedirects followRedirectsAnnotation = method.getAnnotation(FollowRedirects.class);
-
 				REQUEST request = (REQUEST) requestAnnotation;
-				//Annotation t=att[0][0];
+
 				if(request == null){
 					throw new Exception("No Request Annotation found");
 				}
-
 				final Parameter[] parameters = method.getParameters();
-
-                final RequestBean<Object> requestBean = APIServiceHelper.URLBuilder.builder(args,parameters,apiRequestRecord.baseUrl(),request)
+                final APIRequest apiRequest = APIRequestBuilderService.builder(args,parameters,apiRequestRecord.baseUrl(),request,method.getGenericReturnType())
                         .addPathParameters()
-                        .addQueryParameters(apiRequestRecord)
+                        .addQueryParameters(apiRequestRecord.queryParams())
                         .addHeaders(headersAnnotation)
                         .addRequestBody(request)
+                        .addResponseType()
                         .addAuthentication(apiRequestRecord.auth())
                         .addProxy(apiRequestRecord.reqProxy())
                         .addFollowRedirects(followRedirectsAnnotation)
                         .addDisableSSLVerification(apiRequestRecord.disableSSLVerification())
                         .build();
 
-
-				final Type apiResponseType =  method.getGenericReturnType();
-                /** TODO: Validate the return type
-                 * If the return type is of type APIResponse , execute synchronously
-                 * If the return type is of type Future<APIResponse> , execute asynchronously and return a Future
-                 * If the return type is of type void and has APICallBack as parameter , execute asynchronously and return via callback
-                 **/
-                // Return type should always be of type APIRequest<Response>
-				if(apiResponseType instanceof ParameterizedType pType && pType.getRawType().equals(APIRequest.class)){
-                    // Since APIRequest<Response> has only one genericType , returning the first one
-                    var responseType = pType.getActualTypeArguments()[0];
-                    Class<?> responseClass;
-                    if(responseType instanceof ParameterizedType){
-                        responseClass = (Class<?>) ((ParameterizedType) responseType).getRawType();
-                    } else if (responseType instanceof Class){
-                        responseClass = (Class<?>) responseType;
-                    } else{
-                        throw new Exception("Invalid Response Type");
-                    }
-                    //TODO: invoking a method should ideally make the api call and return a result
-					return new APIRequest<>(requestBean,responseClass);
-				}else{
-					throw new Exception("Invalid method declared in Interface");
-				}
+                final var apiExecutor = new APIExecutorService(apiRequest);
+                final var apiResponseOptional = apiExecutor.executeAPI();
+                return apiResponseOptional.orElse(null);
 			}
 		};
 	}

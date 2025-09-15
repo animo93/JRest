@@ -1,7 +1,6 @@
 package com.animo.jRest.test;
 
-import com.animo.jRest.util.APIRequest;
-import com.animo.jRest.util.APIService;
+import com.animo.jRest.util.JRest;
 import com.animo.jRest.util.APIResponse;
 import org.junit.jupiter.api.Test;
 
@@ -16,11 +15,9 @@ public class HeaderTest {
 	@Test
 	public void testSingleStaticHeaderKey() throws Exception {
 
-        final TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
-				.builder("https://postman-echo.com")
+        final TestPostmanEchoAPIInterface testInterface = new JRest.APIBuilder("https://postman-echo.com")
 				.build(TestPostmanEchoAPIInterface.class);
-		final APIRequest<Map<String, Object>> testCall = testInterface.getCall();
-		final APIResponse<Map<String, Object>> response = testCall.execute();
+		final APIResponse<Map<String, Object>> response = testInterface.getCall();
 		assertTrue(((Map<String, String>) response.getResponse().get("headers")).containsKey("x-foo"));
 		
 	}
@@ -28,23 +25,20 @@ public class HeaderTest {
 	@Test
 	public void testSingleStaticHeaderValue() throws Exception {
 
-        final TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
-				.builder("https://postman-echo.com")
+        final TestPostmanEchoAPIInterface testInterface = new JRest.APIBuilder("https://postman-echo.com")
 				.build(TestPostmanEchoAPIInterface.class);
 
-		final APIRequest<Map<String, Object>> testCall = testInterface.getCall();
-		final APIResponse<Map<String, Object>> response = testCall.execute();
+		final APIResponse<Map<String, Object>> response = testInterface.getCall();
 		assertEquals("Bar", ((Map<String, String>) response.getResponse().get("headers")).get("x-foo"));
 	}
 
 	@Test
 	public void testMultipleStaticHeaderKey() throws Exception {
 
-        final TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
-				.builder("https://postman-echo.com")
+        final TestPostmanEchoAPIInterface testInterface = new JRest.APIBuilder("https://postman-echo.com")
 				.build(TestPostmanEchoAPIInterface.class);
-		final APIRequest<Map<String, Object>> testCall = testInterface.getMultipleHeadersCall();
-		final APIResponse<Map<String, Object>> response = testCall.execute();
+		final APIResponse<Map<String, Object>> response = testInterface.getMultipleHeadersCall();
+		//final APIResponse<Map<String, Object>> response = testCall.execute();
 		assertTrue(((Map<String, String>) response.getResponse().get("headers")).containsKey("x-foo") &&
 				((Map<String, String>) response.getResponse().get("headers")).containsKey("x-ping"));
 		
@@ -53,11 +47,10 @@ public class HeaderTest {
 	@Test
 	public void testMultipleStaticHeaderValue() throws Exception {
 
-        final TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
-				.builder("https://postman-echo.com")
+        final TestPostmanEchoAPIInterface testInterface = new JRest.APIBuilder("https://postman-echo.com")
 				.build(TestPostmanEchoAPIInterface.class);
-		final APIRequest<Map<String, Object>> testCall = testInterface.getMultipleHeadersCall();
-		final APIResponse<Map<String, Object>> response = testCall.execute();
+		final APIResponse<Map<String, Object>> response = testInterface.getMultipleHeadersCall();
+		//final APIResponse<Map<String, Object>> response = testCall.execute();
 		assertEquals("Bar", ((Map<String, String>) response.getResponse().get("headers")).get("x-foo"));
 		assertEquals("Pong", ((Map<String, String>) response.getResponse().get("headers")).get("x-ping"));
 	}
@@ -65,25 +58,23 @@ public class HeaderTest {
 	@Test
 	public void testFailureStaticHeader() throws Exception {
 
-        final TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
-				.builder("https://postman-echo.com")
+        final TestPostmanEchoAPIInterface testInterface = new JRest.APIBuilder("https://postman-echo.com")
 				.build(TestPostmanEchoAPIInterface.class);
 
 		assertThrows(RuntimeException.class, () -> {
-			final APIRequest<Map<String, Object>> testCall = testInterface.getIncorrectHeader();
+			final APIResponse<Map<String, Object>> testCall = testInterface.getIncorrectHeader();
 		});
 		
 	}
 	@Test
 	public void testSingleDynamicHeaderKey() throws Exception {
 
-        final TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
-				.builder("https://postman-echo.com")
+        final TestPostmanEchoAPIInterface testInterface = new JRest.APIBuilder("https://postman-echo.com")
 				.build(TestPostmanEchoAPIInterface.class);
 		final Map<String, String> testMap = new HashMap<>();
 		testMap.put("x-Foo", "Bar");
-		final APIRequest<Map<String, Object>> testCall = testInterface.getSingleParamHeadersCall(testMap);
-		final APIResponse<Map<String, Object>> response = testCall.execute();
+
+		final APIResponse<Map<String, Object>> response = testInterface.getSingleParamHeadersCall(testMap);
 		assertTrue(((Map<String, String>) response.getResponse().get("headers")).containsKey("x-foo"));
 		
 	}
@@ -91,13 +82,12 @@ public class HeaderTest {
 	@Test
 	public void testSingleDynamicHeaderValue() throws Exception {
 
-        final TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
-				.builder("https://postman-echo.com")
+        final TestPostmanEchoAPIInterface testInterface = new JRest.APIBuilder("https://postman-echo.com")
 				.build(TestPostmanEchoAPIInterface.class);
 		final Map<String, String> testMap = new HashMap<>();
 		testMap.put("x-Foo", "Bar");
-		final APIRequest<Map<String, Object>> testCall = testInterface.getSingleParamHeadersCall(testMap);
-		final APIResponse<Map<String, Object>> response = testCall.execute();
+
+		final APIResponse<Map<String, Object>> response = testInterface.getSingleParamHeadersCall(testMap);
 		
 		assertEquals("Bar", ((Map<String, String>) response.getResponse().get("headers")).get("x-foo"));
 		
@@ -106,13 +96,12 @@ public class HeaderTest {
 	@Test
 	public void testBothDynamicStaticHeadersKey() throws Exception {
 
-        final TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
-				.builder("https://postman-echo.com")
+        final TestPostmanEchoAPIInterface testInterface = new JRest.APIBuilder("https://postman-echo.com")
 				.build(TestPostmanEchoAPIInterface.class);
 		final Map<String, String> testMap = new HashMap<>();
 		testMap.put("x-Foo", "Bar");
-		final APIRequest<Map<String, Object>> testCall = testInterface.getBothSingleParamStaticHeadersCall(testMap);
-		final APIResponse<Map<String, Object>> response = testCall.execute();
+
+		final APIResponse<Map<String, Object>> response = testInterface.getBothSingleParamStaticHeadersCall(testMap);
 		assertTrue(((Map<String, String>) response.getResponse().get("headers")).containsKey("x-foo"));
 		assertTrue(((Map<String, String>) response.getResponse().get("headers")).containsKey("x-ping"));
 		assertTrue(((Map<String, String>) response.getResponse().get("headers")).containsKey("x-static"));
@@ -122,13 +111,12 @@ public class HeaderTest {
 	@Test
 	public void testBothDynamicStaticHeadersValue() throws Exception {
 
-        final TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
-				.builder("https://postman-echo.com")
+        final TestPostmanEchoAPIInterface testInterface = new JRest.APIBuilder("https://postman-echo.com")
 				.build(TestPostmanEchoAPIInterface.class);
 		final Map<String, String> testMap = new HashMap<>();
 		testMap.put("x-Foo", "Bar");
-		final APIRequest<Map<String, Object>> testCall = testInterface.getBothSingleParamStaticHeadersCall(testMap);
-		final APIResponse<Map<String, Object>> response = testCall.execute();
+
+		final APIResponse<Map<String, Object>> response = testInterface.getBothSingleParamStaticHeadersCall(testMap);
 		
 		assertEquals("Bar", ((Map<String, String>) response.getResponse().get("headers")).get("x-foo"));
 		assertEquals("Pong", ((Map<String, String>) response.getResponse().get("headers")).get("x-ping"));
@@ -139,13 +127,12 @@ public class HeaderTest {
 	@Test
 	public void testNoHeaders() throws Exception {
 
-        final TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
-				.builder("https://postman-echo.com")
+        final TestPostmanEchoAPIInterface testInterface = new JRest.APIBuilder("https://postman-echo.com")
 				.build(TestPostmanEchoAPIInterface.class);
 		final Map<String, String> testMap = new HashMap<>();
 		testMap.put("x-Foo", "Bar");
-		final APIRequest<Map<String, Object>> testCall = testInterface.noHeadersCall();
-		final APIResponse<Map<String, Object>> response = testCall.execute();
+
+		final APIResponse<Map<String, Object>> response = testInterface.noHeadersCall();
 		
 		assertFalse(((Map<String, String>) response.getResponse().get("headers")).containsKey("x-foo"));
 		
@@ -154,12 +141,11 @@ public class HeaderTest {
 	@Test
 	public void testFailureDynamicHeader() throws Exception {
 
-        final TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
-				.builder("https://postman-echo.com")
+        final TestPostmanEchoAPIInterface testInterface = new JRest.APIBuilder("https://postman-echo.com")
 				.build(TestPostmanEchoAPIInterface.class);
 
 		assertThrows(RuntimeException.class, () -> {
-			final APIRequest<Map<String, Object>> testCall = testInterface.incorrectHeadersCall("X-Foo:Bar");
+			final APIResponse<Map<String, Object>> testCall = testInterface.incorrectHeadersCall("X-Foo:Bar");
 		});
 		
 	}

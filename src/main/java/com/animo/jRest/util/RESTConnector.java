@@ -1,65 +1,65 @@
 package com.animo.jRest.util;
 
 import com.animo.jRest.model.RequestAuthentication;
-import com.animo.jRest.model.RequestBean;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.animo.jRest.model.APIRequest;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import lombok.SneakyThrows;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.lang.reflect.*;
-import java.net.*;
+import java.net.InetSocketAddress;
+import java.net.ProxySelector;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Map.Entry;
+import java.util.Optional;
 
-public class RESTConnector<Response>{
+public class RESTConnector {
 
 	private static final Logger logger = LogManager.getLogger(RESTConnector.class);
-	protected APICallBack<Response> myCallBack;
-	private final RequestBean<Object> bean;
-	private final Type type;
+	private final APIRequest apiRequest;
 
-	public RESTConnector(RequestBean<Object> bean, Type type) {
-		this.bean = bean;
-		this.type = type;
+	public RESTConnector(APIRequest apiRequest) {
+		this.apiRequest = apiRequest;
 	}
 
-	@SneakyThrows
-	public APIResponse<Response> fetch() {
-		if(bean == null)
+	public <Response> APIResponse<Response> fetch() throws Exception {
+		if(apiRequest == null)
 			return null;
-		APIResponse<Response> apiResponse = new APIResponse<Response>();
-		final URL url = new URL(this.bean.getUrl());
-		HttpRequest.Builder builder = HttpRequest.newBuilder()
-				.uri(url.toURI());
-		setRequestBody(builder);
-		setHeaders(builder);
-		setAuthentication(builder);
+		APIResponse<Response> apiResponse = new APIResponse<>();
 
 		try {
-			HttpResponse<String> response = HttpClient.newBuilder()
-					.followRedirects((bean.isFollowRedirects())? HttpClient.Redirect.ALWAYS : HttpClient.Redirect.NEVER)
-					.proxy(bean.getProxy() != null ? ProxySelector.of(new InetSocketAddress(bean.getProxy().getUrl(), bean.getProxy().getPort())) : ProxySelector.getDefault())
-					.build()
-					.send(builder.build(), HttpResponse.BodyHandlers.ofString());
+            final URL url = new URL(this.apiRequest.url());
+            HttpRequest.Builder builder = HttpRequest.newBuilder()
+                    .uri(url.toURI());
+            setRequestBody(builder);
+            setHeaders(builder);
+            setAuthentication(builder);
 
-			apiResponse.setResponseHeaders(response.headers().map());
-			apiResponse.setResponseCode(response.statusCode());
+			try(HttpClient client = HttpClient.newBuilder()
+					.followRedirects((apiRequest.followRedirects())? HttpClient.Redirect.ALWAYS : HttpClient.Redirect.NEVER)
+					.proxy(apiRequest.proxy().isPresent() ? ProxySelector.of(new InetSocketAddress(apiRequest.proxy().get().getUrl(), apiRequest.proxy().get().getPort())) : ProxySelector.getDefault())
+					.build()) {
+                HttpResponse<String> httpResponse = client
+                        .send(builder.build(), HttpResponse.BodyHandlers.ofString());
 
-			String responseJson = getResponseBody(response);
-            logger.debug("response json {}" ,responseJson);
-			GsonConverter converter = ConverterFactory.getGsonConverter();
-			Response response1 = converter.fromString(responseJson, type);
-            apiResponse.setResponse(response1);
-			//TODO: Create a converter with strategy pattern to convert response
-			//TODO: Converter should use factory pattern to create appropriate converter
+                apiResponse.setResponseHeaders(httpResponse.headers().map());
+                apiResponse.setResponseCode(httpResponse.statusCode());
+
+                String responseJson = getResponseBody(httpResponse);
+                logger.debug("response json {}" ,responseJson);
+                GsonConverter converter = ConverterFactory.getInstance().getGsonConverter();
+                Response response = converter.fromString(responseJson, apiRequest.responseType());
+                apiResponse.setResponse(response);
+            } catch (Exception e) {
+                logger.error("Unable to send request ", e);
+                throw e;
+            }
 			//convertResponse(responseJson, apiResponse);
 		} catch (Exception e) {
 			logger.error("Could not make connection ", e);
@@ -69,6 +69,7 @@ public class RESTConnector<Response>{
 	}
 
 	//TODO: Inject Converter (String , Json & GSON) as a dependency
+    /*
 	private void convertResponse(String repoJson, APIResponse<Response> apiResponse) throws Exception{
 		Gson gson = new Gson();
 		try {
@@ -92,7 +93,7 @@ public class RESTConnector<Response>{
 			logger.error("Error in json conversion ", e);
 			throw e;
 		}
-	}
+	}*/
 
     //TODO: Return optional
 	private String getResponseBody(HttpResponse<String> httpResponse) throws Exception {
@@ -105,10 +106,11 @@ public class RESTConnector<Response>{
 	}
 
 	private void setRequestBody(HttpRequest.Builder requestBuilder) throws IOException {
-		if(bean.getRequestType().toString().equals("POST") || bean.getRequestType().toString().equals("PATCH")
-				|| bean.getRequestType().toString().equals("PUT")) {
-			Object requestObject = bean.getRequestObject();
-			if(null != requestObject) {
+		if(apiRequest.httpMethod().toString().equals("POST") || apiRequest.httpMethod().toString().equals("PATCH")
+				|| apiRequest.httpMethod().toString().equals("PUT")) {
+			Optional<Object> requestObjectOptional = apiRequest.requestObject();
+			if(requestObjectOptional.isPresent()) {
+                var requestObject = requestObjectOptional.get();
 				StringBuilder builder = new StringBuilder();
 				if(requestObject instanceof ParameterizedType) {
 					builder.append(new Gson().toJson(requestObject, TypeToken.getParameterized(requestObject.getClass(),String.class).getType()));
@@ -117,17 +119,17 @@ public class RESTConnector<Response>{
 				}
 				final String json = builder.toString();
 				logger.debug("request json {}" ,json);
-				requestBuilder.method(bean.getRequestType().toString(),
+				requestBuilder.method(apiRequest.httpMethod().toString(),
 						HttpRequest.BodyPublishers.ofString(json));
 			}//TODO Add else block for null values
 		}else {
-			requestBuilder.method(bean.getRequestType().toString(), HttpRequest.BodyPublishers.noBody());
+			requestBuilder.method(apiRequest.httpMethod().toString(), HttpRequest.BodyPublishers.noBody());
 		}
 	}
 
 	private void setAuthentication(HttpRequest.Builder requestBuilder) {
-		if(bean.getAuthentication() != null) {
-			final RequestAuthentication auth = bean.getAuthentication();
+		if(apiRequest.authentication().isPresent()) {
+			final RequestAuthentication auth = apiRequest.authentication().get();
 			if(auth.getUsername() != null && auth.getPassword() != null) {
 				final String userPassword = auth.getUsername() + ":" + auth.getPassword();
 				final String encodedAuthorization = Base64.encodeBase64String(userPassword.getBytes());
@@ -135,15 +137,15 @@ public class RESTConnector<Response>{
 						encodedAuthorization.replaceAll("\n", ""));
 			}
 		}
-		if(bean.getAccessToken() != null)
-			requestBuilder.header("Authorization", " token " + bean.getAccessToken());
+		if(apiRequest.accessToken().isPresent())
+			requestBuilder.header("Authorization", " token " + apiRequest.accessToken().get());
 	}
 
 	private void setHeaders(HttpRequest.Builder requestBuilder) {
 		//Setting this to fix a bug in jdk which sets illegal "Accept" header
 		//httpsURLConnection.setRequestProperty("Accept", "application/json");
-		if(bean.getHeaders() != null && !bean.getHeaders().isEmpty()) {
-			for(Entry<String, String> entry:bean.getHeaders().entrySet()) {
+		if(apiRequest.headers().isPresent()) {
+			for(Entry<String, String> entry: apiRequest.headers().get().entrySet()) {
 				requestBuilder.header(entry.getKey(), entry.getValue());
 			}
 		}

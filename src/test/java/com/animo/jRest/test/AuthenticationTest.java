@@ -1,7 +1,6 @@
 package com.animo.jRest.test;
 
-import com.animo.jRest.util.APIRequest;
-import com.animo.jRest.util.APIService;
+import com.animo.jRest.util.JRest;
 import com.animo.jRest.util.APIResponse;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.Assertions;
@@ -13,12 +12,10 @@ public class AuthenticationTest {
 
     @Test
     public void testUsernamePasswordAuthentication() throws Exception {
-        final TestPostmanEchoAPIInterface testInterface = APIService.APIBuilder
-                .builder("https://postman-echo.com")
+        final TestPostmanEchoAPIInterface testInterface = new JRest.APIBuilder("https://postman-echo.com")
                 .addUsernameAndPassword("username", "password")
                 .build(TestPostmanEchoAPIInterface.class);
-        APIRequest<Map<String, Object>> testCall = testInterface.getCall();
-        APIResponse<Map<String, Object>> response = testCall.execute();
+        APIResponse<Map<String, Object>> response = testInterface.getCall();
 
         final String encodedCredentials = Base64.encodeBase64String("username:password".getBytes());
         Assertions.assertEquals("Basic "+encodedCredentials,((Map<String, String>)response.getResponse().get("headers")).get("authorization"));
