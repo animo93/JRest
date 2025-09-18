@@ -21,7 +21,7 @@ public class DynamicInvocationTest {
 
         APIResponse<Map<String,Object>> response = (APIResponse<Map<String, Object>>) testInterface.dynamicAPIInvocation();
 
-        assertFalse(((Map<String, String>) response.getResponse().get("headers")).containsKey("x-foo"));
+        assertFalse(((Map<String, String>) response.response().get("headers")).containsKey("x-foo"));
     }
 
 
@@ -36,8 +36,8 @@ public class DynamicInvocationTest {
 
         APIResponse<Map<String,Object>> response = (APIResponse<Map<String, Object>>) testInterface.dynamicAPIInvocation(queryMap,"pong");
 
-        assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("foo"));
-        assertEquals("pong", ((Map<String,String>) response.getResponse().get("args")).get("ping"));
+        assertEquals("bar", ((Map<String,String>) response.response().get("args")).get("foo"));
+        assertEquals("pong", ((Map<String,String>) response.response().get("args")).get("ping"));
     }
 
     @Test
@@ -64,8 +64,8 @@ public class DynamicInvocationTest {
         APIResponse<TestAPIResponse> response = (APIResponse<TestAPIResponse>) testInterface.dynamicAPIInvocation(queryMap,"pong");
 
         assertEquals("bar",
-                response.getResponse().getArgs().get("foo"));
+                response.response().getArgs().get("foo"));
         assertEquals("pong",
-                response.getResponse().getArgs().get("ping"));
+                response.response().getArgs().get("ping"));
     }
 }

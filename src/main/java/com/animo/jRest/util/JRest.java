@@ -3,9 +3,9 @@ package com.animo.jRest.util;
 import com.animo.jRest.annotation.FollowRedirects;
 import com.animo.jRest.annotation.HEADERS;
 import com.animo.jRest.annotation.REQUEST;
-import com.animo.jRest.model.APIRequestRecord;
+import com.animo.jRest.model.APIClientRecord;
 import com.animo.jRest.model.RequestAuthentication;
-import com.animo.jRest.model.APIRequest;
+import com.animo.jRest.model.APIRequestRecord;
 import com.animo.jRest.model.RequestProxy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -111,13 +111,13 @@ public final class JRest {
 		}
 
 		public <S> S build(final Class<S> interfaceClass) {
-            var apiRequestRecord = new APIRequestRecord(baseURL, queryParams,auth,proxy,disableSSLVerification);
-			return createApi(interfaceClass,apiRequestRecord);
+            var apiClientRecord = new APIClientRecord(baseURL, queryParams,auth,proxy,disableSSLVerification);
+			return createApi(interfaceClass,apiClientRecord);
 		}
 
         public <S> S buildDynamic(final Class<S> interfaceClass,final String methodName,final Class... parameterTypes) throws NoSuchMethodException {
-            var apiRequestRecord = new APIRequestRecord(baseURL, queryParams,auth,proxy,disableSSLVerification);
-            return createDynamicApi(interfaceClass,apiRequestRecord,methodName,parameterTypes);
+            var apiClientRecord = new APIClientRecord(baseURL, queryParams,auth,proxy,disableSSLVerification);
+            return createDynamicApi(interfaceClass,apiClientRecord,methodName,parameterTypes);
         }
 
 	}
@@ -146,16 +146,16 @@ public final class JRest {
      *
      * @param <S>              Service Class
      * @param interfaceClass            service.class
-     * @param apiRequestRecord
+     * @param apiClientRecord
      * @return {@code service}
      */
 	@SuppressWarnings("unchecked")
-	private static <S> S createApi(final Class<S> interfaceClass, APIRequestRecord apiRequestRecord) {
+	private static <S> S createApi(final Class<S> interfaceClass, APIClientRecord apiClientRecord) {
         //TODO: Add test scenario where a random interface is passed which doesn't have any REQUEST annotation
 		final ClassLoader loader = interfaceClass.getClassLoader();
 		final Class[] interfaces = new Class[]{interfaceClass};
 
-		final Object object = Proxy.newProxyInstance(loader, interfaces,setInvocationHandler(null,apiRequestRecord));
+		final Object object = Proxy.newProxyInstance(loader, interfaces,setInvocationHandler(null, apiClientRecord));
 
 		return (S) object;
 	}
@@ -191,23 +191,23 @@ public final class JRest {
 	 * @throws NoSuchMethodException When the method doesn't exists in service class
 	 * @return {@code service}
 	 */
-	private static <S> S createDynamicApi(final Class<S> interfaceClass,final APIRequestRecord apiRequestRecord,final String methodName,Class... parameterTypes) throws NoSuchMethodException {
+	private static <S> S createDynamicApi(final Class<S> interfaceClass, final APIClientRecord apiClientRecord, final String methodName, Class... parameterTypes) throws NoSuchMethodException {
 
 		final ClassLoader loader = interfaceClass.getClassLoader();
 		final Class[] interfaces = new Class[]{interfaceClass};
 
 		Method methodToCall = interfaceClass.getMethod(methodName,parameterTypes);
-		final Object object = Proxy.newProxyInstance(loader, interfaces,setInvocationHandler(methodToCall, apiRequestRecord));
+		final Object object = Proxy.newProxyInstance(loader, interfaces,setInvocationHandler(methodToCall, apiClientRecord));
 
 		return (S) object;
 
 	}
 
-	private static InvocationHandler setInvocationHandler(final Method methodToCall, APIRequestRecord apiRequestRecord) {
+	private static InvocationHandler setInvocationHandler(final Method methodToCall, APIClientRecord apiClientRecord) {
 		return new InvocationHandler() {
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-				if(methodToCall != null){
+				if(methodToCall != null) {
 					method = methodToCall;
 					args = (Object[]) args[0];
 				}
@@ -220,20 +220,20 @@ public final class JRest {
 					throw new Exception("No Request Annotation found");
 				}
 				final Parameter[] parameters = method.getParameters();
-                final APIRequest apiRequest = APIRequestBuilderService.builder(args,parameters,apiRequestRecord.baseUrl(),request,method.getGenericReturnType())
+                final APIRequestRecord apiRequestRecord = APIRequestBuilderService.builder(args,parameters, apiClientRecord.baseUrl(),request,method.getGenericReturnType())
                         .addPathParameters()
-                        .addQueryParameters(apiRequestRecord.queryParams())
+                        .addQueryParameters(apiClientRecord.queryParams())
                         .addHeaders(headersAnnotation)
                         .addRequestBody(request)
                         .addResponseType()
-                        .addAuthentication(apiRequestRecord.auth())
-                        .addProxy(apiRequestRecord.reqProxy())
+                        .addAuthentication(apiClientRecord.auth())
+                        .addProxy(apiClientRecord.reqProxy())
                         .addFollowRedirects(followRedirectsAnnotation)
-                        .addDisableSSLVerification(apiRequestRecord.disableSSLVerification())
+                        .addDisableSSLVerification(apiClientRecord.disableSSLVerification())
                         .build();
 
-                final var apiExecutor = new APIExecutorService(apiRequest);
-                final var apiResponseOptional = apiExecutor.executeAPI();
+                final var apiExecutor = new APIExecutorService();
+                final var apiResponseOptional = apiExecutor.executeAPI(apiRequestRecord);
                 return apiResponseOptional.orElse(null);
 			}
 		};

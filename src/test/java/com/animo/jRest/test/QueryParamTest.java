@@ -24,7 +24,7 @@ public class QueryParamTest {
 
 		APIResponse<Map<String,Object>> response = testInterface.singleQueryParamsCall("bar");
 		
-		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("foo"));
+		Assertions.assertEquals("bar", ((Map<String,String>) response.response().get("args")).get("foo"));
 		
 	}
 	
@@ -37,8 +37,8 @@ public class QueryParamTest {
 
 		APIResponse<Map<String,Object>> response = testInterface.multipleQueryParamsCall("bar","pong");
 
-		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("foo"));
-		Assertions.assertEquals("pong", ((Map<String,String>) response.getResponse().get("args")).get("ping"));
+		Assertions.assertEquals("bar", ((Map<String,String>) response.response().get("args")).get("foo"));
+		Assertions.assertEquals("pong", ((Map<String,String>) response.response().get("args")).get("ping"));
 		
 	}
 
@@ -51,8 +51,8 @@ public class QueryParamTest {
 
 		APIResponse<Map<String,Object>> response = testInterface.singleQueryParamsCall("bar");
 
-		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("foo"));
-		Assertions.assertEquals("pong", ((Map<String,String>) response.getResponse().get("args")).get("ping"));
+		Assertions.assertEquals("bar", ((Map<String,String>) response.response().get("args")).get("foo"));
+		Assertions.assertEquals("pong", ((Map<String,String>) response.response().get("args")).get("ping"));
 		
 	}
 
@@ -65,7 +65,7 @@ public class QueryParamTest {
 		APIResponse<Map<String,Object>> response = testInterface.singleQueryParamsCall(null);
 
 		//Assertions.assertEquals("https://postman-echo.com/get", call.requestBean().getUrl());
-		Assertions.assertTrue(((Map<String,String>) response.getResponse().get("args")).isEmpty());
+		Assertions.assertTrue(((Map<String,String>) response.response().get("args")).isEmpty());
 		
 	}
 
@@ -93,7 +93,7 @@ public class QueryParamTest {
 
 
 		//Assertions.assertEquals("https://postman-echo.com/get", call.requestBean().getUrl());
-		Assertions.assertTrue(((Map<String,String>) response.getResponse().get("args")).isEmpty());
+		Assertions.assertTrue(((Map<String,String>) response.response().get("args")).isEmpty());
 		
 	}
 	
@@ -108,7 +108,7 @@ public class QueryParamTest {
 		
 		
 		//Assert.assertEquals("https://postman-echo.com/get", call.getRequestBean().getUrl());		
-		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("query key"));
+		Assertions.assertEquals("bar", ((Map<String,String>) response.response().get("args")).get("query key"));
 		
 	}
 
@@ -122,7 +122,7 @@ public class QueryParamTest {
             try {
                 testInterface.unEncodedqueryKeyWithEncodedSetTrueCall("bar");
             } catch (java.lang.reflect.UndeclaredThrowableException e) {
-                Throwable cause = e.getCause();
+                Throwable cause = e.getCause().getCause();
                 if (cause instanceof URISyntaxException) {
                     throw (URISyntaxException) cause;
                 }
@@ -142,7 +142,7 @@ public class QueryParamTest {
 
 
 		//Assertions.assertEquals("https://postman-echo.com/get?query+key=bar", call.requestBean().getUrl());
-		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("query key"));
+		Assertions.assertEquals("bar", ((Map<String,String>) response.response().get("args")).get("query key"));
 		
 	}
 
@@ -158,8 +158,8 @@ public class QueryParamTest {
 
 		APIResponse<Map<String,Object>> response = testInterface.singleQueryMapCall(queryMap);
 
-		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("foo"));
-		Assertions.assertEquals("pong", ((Map<String,String>) response.getResponse().get("args")).get("ping"));
+		Assertions.assertEquals("bar", ((Map<String,String>) response.response().get("args")).get("foo"));
+		Assertions.assertEquals("pong", ((Map<String,String>) response.response().get("args")).get("ping"));
 		
 	}
 
@@ -179,10 +179,10 @@ public class QueryParamTest {
 
 		APIResponse<Map<String,Object>> response = testInterface.multipleQueryMapCall(queryMap,queryMap2);
 
-		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("foo"));
-		Assertions.assertEquals("pong",((Map<String,String>) response.getResponse().get("args")).get("ping"));
-		Assertions.assertEquals("tok", ((Map<String,String>) response.getResponse().get("args")).get("tik"));
-		Assertions.assertEquals("doe", ((Map<String,String>) response.getResponse().get("args")).get("john"));
+		Assertions.assertEquals("bar", ((Map<String,String>) response.response().get("args")).get("foo"));
+		Assertions.assertEquals("pong",((Map<String,String>) response.response().get("args")).get("ping"));
+		Assertions.assertEquals("tok", ((Map<String,String>) response.response().get("args")).get("tik"));
+		Assertions.assertEquals("doe", ((Map<String,String>) response.response().get("args")).get("john"));
 		
 	}
 
@@ -197,8 +197,8 @@ public class QueryParamTest {
 
 		APIResponse<Map<String,Object>> response = testInterface.bothQueryAndQueryMapCall(queryMap, "pong");
 
-		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("foo"));
-		Assertions.assertEquals("pong", ((Map<String,String>) response.getResponse().get("args")).get("ping"));
+		Assertions.assertEquals("bar", ((Map<String,String>) response.response().get("args")).get("foo"));
+		Assertions.assertEquals("pong", ((Map<String,String>) response.response().get("args")).get("ping"));
 		
 	}
 
@@ -214,9 +214,9 @@ public class QueryParamTest {
 
 		APIResponse<Map<String,Object>> response = testInterface.bothQueryAndQueryMapCall(queryMap, "pong");
 
-		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("foo"));
-		Assertions.assertEquals("pong", ((Map<String,String>) response.getResponse().get("args")).get("ping"));
-		Assertions.assertEquals("tok", ((Map<String,String>) response.getResponse().get("args")).get("tik"));
+		Assertions.assertEquals("bar", ((Map<String,String>) response.response().get("args")).get("foo"));
+		Assertions.assertEquals("pong", ((Map<String,String>) response.response().get("args")).get("ping"));
+		Assertions.assertEquals("tok", ((Map<String,String>) response.response().get("args")).get("tik"));
 		
 	}
 
@@ -244,7 +244,7 @@ public class QueryParamTest {
 		APIResponse<Map<String,Object>> response = testInterface.singleQueryMapCall(null);
 
 		//Assertions.assertEquals("https://postman-echo.com/get", call.requestBean().getUrl());
-		Assertions.assertTrue(((Map<String,String>) response.getResponse().get("args")).isEmpty());
+		Assertions.assertTrue(((Map<String,String>) response.response().get("args")).isEmpty());
 		
 	}
 
@@ -259,7 +259,7 @@ public class QueryParamTest {
 
 		APIResponse<Map<String,Object>> response = testInterface.getCall();
 
-		Assertions.assertEquals("bar", ((Map<String,String>) response.getResponse().get("args")).get("foo"));
+		Assertions.assertEquals("bar", ((Map<String,String>) response.response().get("args")).get("foo"));
 
 	}
 	

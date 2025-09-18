@@ -12,14 +12,14 @@ public interface APICallBack<Response> {
 	/**
 	 * Invoked for a received HTTP response
 	 * <p>Note: An HTTP response may still indicate an application-level failure such as a 404 or 500.
-	 * param myCall APICall parameter used for callback
+     * @param response APIResponse object which holds the response data
 	 */
     void callBackOnSuccess(APIResponse<Response> response);
 
 	/**
 	 * Invoked when a network exception occurred talking to the server or when an unexpected exception
 	 * occurred creating the request or processing the response.
-	 *  e Exception to be returned back
+	 * @param e Exception to be returned back
 	 */
 	void callBackOnFailure(Throwable e);
 }

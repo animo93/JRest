@@ -16,6 +16,6 @@ public class TestResponseBody {
                 .build(TestPostmanEchoAPIInterface.class);
 
         final APIResponse<String> response = testInterface.responseAsString();
-        assertNotNull(response.getResponse());
+        assertNotNull(response.response());
     }
 }

@@ -2,7 +2,7 @@ package com.animo.jRest.util;
 
 import com.animo.jRest.annotation.*;
 import com.animo.jRest.model.RequestAuthentication;
-import com.animo.jRest.model.APIRequest;
+import com.animo.jRest.model.APIRequestRecord;
 import com.animo.jRest.model.RequestProxy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,6 +23,10 @@ import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * This class is responsible for building the APIRequestRecord object.<br>
+ * It takes the method parameters and annotations and builds the final request object
+ */
 public final class APIRequestBuilderService {
 
     private final static Logger logger = LogManager.getLogger(APIRequestBuilderService.class);
@@ -46,9 +50,7 @@ public final class APIRequestBuilderService {
         this.requestArgs = requestArgs;
         this.parameters = parameters;
         this.finalUrl = new StringBuilder(baseUrl).append(request.endpoint());
-        //this.apiRequest = new APIRequest();
         this.httpMethod = request.type();
-        //TODO: Code Smell : Fix this
         this.returnType = returnType;
     }
 
@@ -255,24 +257,7 @@ public final class APIRequestBuilderService {
         return responseClass;
     }
 
-    public APIRequest build() {
-        return new APIRequest(
-                Optional.empty(),
-                this.httpMethod,
-                finalUrl.toString(),
-                requestBody != null ? Optional.of(requestBody) : Optional.empty(),
-                auth != null ? Optional.of(auth) : Optional.empty(),
-                requestProxy != null ? Optional.of(requestProxy) : Optional.empty(),
-                requestHeadersMap != null && !requestHeadersMap.isEmpty() ? Optional.of(requestHeadersMap) : Optional.empty(),
-                disableSSLVerification,
-                followRedirects,
-                callBack !=null ? Optional.of(callBack) : Optional.empty(),
-                this.returnType,
-                this.responseType
-        );
-    }
-
-    private APIRequestBuilderService addCallback() {
+    private void addCallback() {
         if(returnType.getTypeName().equals("void")) {
             for (int i = 0; i < parameters.length; i++) {
                 if (parameters[i].getType().equals(APICallBack.class)) {
@@ -289,6 +274,22 @@ public final class APIRequestBuilderService {
                 throw new RuntimeException("Callback parameter not found");
             }
         }
-        return this;
+    }
+
+    public APIRequestRecord build() {
+        return new APIRequestRecord(
+                Optional.empty(),
+                this.httpMethod,
+                finalUrl.toString(),
+                requestBody != null ? Optional.of(requestBody) : Optional.empty(),
+                auth != null ? Optional.of(auth) : Optional.empty(),
+                requestProxy != null ? Optional.of(requestProxy) : Optional.empty(),
+                requestHeadersMap != null && !requestHeadersMap.isEmpty() ? Optional.of(requestHeadersMap) : Optional.empty(),
+                disableSSLVerification,
+                followRedirects,
+                callBack !=null ? Optional.of(callBack) : Optional.empty(),
+                this.returnType,
+                this.responseType
+        );
     }
 }

@@ -18,6 +18,6 @@ public class AuthenticationTest {
         APIResponse<Map<String, Object>> response = testInterface.getCall();
 
         final String encodedCredentials = Base64.encodeBase64String("username:password".getBytes());
-        Assertions.assertEquals("Basic "+encodedCredentials,((Map<String, String>)response.getResponse().get("headers")).get("authorization"));
+        Assertions.assertEquals("Basic "+encodedCredentials,((Map<String, String>)response.response().get("headers")).get("authorization"));
     }
 }
