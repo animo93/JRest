@@ -1,13 +1,15 @@
-package com.jrest.java.util;
+package com.jrest.java.api;
 
-import com.jrest.java.annotation.Body;
-import com.jrest.java.annotation.FollowRedirects;
-import com.jrest.java.annotation.HEADERS;
-import com.jrest.java.annotation.REQUEST;
-import com.jrest.java.model.APIClientRecord;
-import com.jrest.java.model.RequestAuthenticationRecord;
-import com.jrest.java.model.APIRequestRecord;
-import com.jrest.java.model.RequestProxyRecord;
+import com.jrest.java.api.annotation.Body;
+import com.jrest.java.api.annotation.FollowRedirects;
+import com.jrest.java.api.annotation.HEADERS;
+import com.jrest.java.api.annotation.REQUEST;
+import com.jrest.java.core.APIExecutorService;
+import com.jrest.java.core.APIRequestBuilderService;
+import com.jrest.java.core.APIClientRecord;
+import com.jrest.java.core.RequestAuthenticationRecord;
+import com.jrest.java.core.APIRequestRecord;
+import com.jrest.java.core.RequestProxyRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

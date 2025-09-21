@@ -1,6 +1,7 @@
-package com.jrest.java.util;
+package com.jrest.java.core;
 
 import com.google.gson.Gson;
+
 import java.lang.reflect.Type;
 /**
  * Implementation of Converter interface using Gson library for JSON serialization and deserialization.

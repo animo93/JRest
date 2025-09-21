@@ -1,6 +1,7 @@
-package com.jrest.java.util;
+package com.jrest.java.core;
 
-import com.jrest.java.model.APIRequestRecord;
+import com.jrest.java.api.APICallBack;
+import com.jrest.java.api.APIResponse;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

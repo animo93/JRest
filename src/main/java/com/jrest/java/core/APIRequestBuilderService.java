@@ -1,9 +1,9 @@
-package com.jrest.java.util;
+package com.jrest.java.core;
 
-import com.jrest.java.annotation.*;
-import com.jrest.java.model.RequestAuthenticationRecord;
-import com.jrest.java.model.APIRequestRecord;
-import com.jrest.java.model.RequestProxyRecord;
+import com.jrest.java.api.APICallBack;
+import com.jrest.java.api.APIResponse;
+import com.jrest.java.api.HTTP_METHOD;
+import com.jrest.java.api.annotation.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

@@ -1,4 +1,4 @@
-package com.jrest.java.util;
+package com.jrest.java.api;
 
 /**
  * Accepted values of all HTTP types supported by JREST. Values are GET,POST,PATCH,PUT and DELETE

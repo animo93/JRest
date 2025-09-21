@@ -1,11 +1,10 @@
 package com.jrest.java;
 
-import com.jrest.java.util.JRest;
-import com.jrest.java.util.APIResponse;
+import com.jrest.java.api.APIResponse;
+import com.jrest.java.api.JRest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestResponseBody {
 

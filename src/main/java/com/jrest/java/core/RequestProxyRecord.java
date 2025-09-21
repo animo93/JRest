@@ -1,4 +1,4 @@
-package com.jrest.java.model;
+package com.jrest.java.core;
 
 public record RequestProxyRecord(
         String url,

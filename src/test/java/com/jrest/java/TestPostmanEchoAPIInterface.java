@@ -2,10 +2,10 @@ package com.jrest.java;
 
 import java.util.Map;
 
-import com.jrest.java.annotation.*;
-import com.jrest.java.util.APICallBack;
-import com.jrest.java.util.APIResponse;
-import com.jrest.java.util.HTTP_METHOD;
+import com.jrest.java.api.APICallBack;
+import com.jrest.java.api.APIResponse;
+import com.jrest.java.api.HTTP_METHOD;
+import com.jrest.java.api.annotation.*;
 
 public interface TestPostmanEchoAPIInterface {
 	

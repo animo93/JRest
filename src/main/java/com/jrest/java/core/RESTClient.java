@@ -1,9 +1,8 @@
-package com.jrest.java.util;
+package com.jrest.java.core;
 
-import com.jrest.java.model.APIRequestRecord;
-import com.jrest.java.model.RequestAuthenticationRecord;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.jrest.java.api.APIResponse;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

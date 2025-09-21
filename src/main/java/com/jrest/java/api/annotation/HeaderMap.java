@@ -1,4 +1,4 @@
-package com.jrest.java.annotation;
+package com.jrest.java.api.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

@@ -1,4 +1,4 @@
-package com.jrest.java.util;
+package com.jrest.java.api;
 
 import java.util.List;
 import java.util.Map;

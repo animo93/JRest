@@ -1,4 +1,4 @@
-package com.jrest.java.util;
+package com.jrest.java.core;
 
 /**
  * Factory class to provide instances of various converters

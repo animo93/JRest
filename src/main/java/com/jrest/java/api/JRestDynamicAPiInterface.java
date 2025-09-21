@@ -1,4 +1,6 @@
-package com.jrest.java.util;
+package com.jrest.java.api;
+
+import com.jrest.java.core.APIExecutorService;
 
 public interface JRestDynamicAPiInterface {
 

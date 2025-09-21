@@ -1,4 +1,4 @@
-package com.jrest.java.util;
+package com.jrest.java.api;
 
 /**
  * Communicates responses from a server or offline requests. One and only one method will be invoked

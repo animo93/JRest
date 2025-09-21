@@ -1,4 +1,4 @@
-package com.jrest.java.util;
+package com.jrest.java.core;
 
 import java.lang.reflect.Type;
 

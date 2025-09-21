@@ -1,11 +1,11 @@
 package com.jrest.java;
 
-import com.jrest.java.annotation.Query;
-import com.jrest.java.annotation.QueryMap;
-import com.jrest.java.annotation.REQUEST;
-import com.jrest.java.util.APIResponse;
-import com.jrest.java.util.HTTP_METHOD;
-import com.jrest.java.util.JRestDynamicAPiInterface;
+import com.jrest.java.api.annotation.Query;
+import com.jrest.java.api.annotation.QueryMap;
+import com.jrest.java.api.annotation.REQUEST;
+import com.jrest.java.api.APIResponse;
+import com.jrest.java.api.HTTP_METHOD;
+import com.jrest.java.api.JRestDynamicAPiInterface;
 
 import java.util.Map;
 

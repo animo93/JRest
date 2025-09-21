@@ -1,7 +1,7 @@
 package com.jrest.java;
 
-import com.jrest.java.util.JRest;
-import com.jrest.java.util.APIResponse;
+import com.jrest.java.api.JRest;
+import com.jrest.java.api.APIResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

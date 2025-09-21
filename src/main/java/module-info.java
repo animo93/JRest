@@ -6,8 +6,7 @@ module jRest {
     requires org.apache.logging.log4j;
     requires java.net.http;
 
-    opens com.jrest.java.util to com.google.gson;
-    exports com.jrest.java.util;
-    exports com.jrest.java.annotation;
-    exports com.jrest.java.model;
+    exports com.jrest.java.api;
+    exports com.jrest.java.api.annotation;
+    opens com.jrest.java.core to com.google.gson;
 }

@@ -1,7 +1,7 @@
-package com.jrest.java.model;
+package com.jrest.java.core;
 
-import com.jrest.java.util.APICallBack;
-import com.jrest.java.util.HTTP_METHOD;
+import com.jrest.java.api.APICallBack;
+import com.jrest.java.api.HTTP_METHOD;
 
 import java.lang.reflect.Type;
 import java.util.Map;
