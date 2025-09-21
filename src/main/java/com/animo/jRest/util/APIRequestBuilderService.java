@@ -3,7 +3,7 @@ package com.animo.jRest.util;
 import com.animo.jRest.annotation.*;
 import com.animo.jRest.model.RequestAuthenticationRecord;
 import com.animo.jRest.model.APIRequestRecord;
-import com.animo.jRest.model.RequestProxy;
+import com.animo.jRest.model.RequestProxyRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -39,7 +39,7 @@ public final class APIRequestBuilderService {
     private Map<String, String> requestHeadersMap;
     private Object requestBody;
     private RequestAuthenticationRecord auth;
-    private RequestProxy requestProxy;
+    private RequestProxyRecord requestProxyRecord;
     private boolean followRedirects;
     private boolean disableSSLVerification;
     private Type responseType;
@@ -213,8 +213,8 @@ public final class APIRequestBuilderService {
         return this;
     }
 
-    public APIRequestBuilderService addProxy(final RequestProxy requestProxy) {
-        this.requestProxy = requestProxy;
+    public APIRequestBuilderService addProxy(final RequestProxyRecord requestProxyRecord) {
+        this.requestProxyRecord = requestProxyRecord;
         return this;
     }
 
@@ -283,7 +283,7 @@ public final class APIRequestBuilderService {
                 finalUrl.toString(),
                 requestBody != null ? Optional.of(requestBody) : Optional.empty(),
                 auth != null ? Optional.of(auth) : Optional.empty(),
-                requestProxy != null ? Optional.of(requestProxy) : Optional.empty(),
+                requestProxyRecord != null ? Optional.of(requestProxyRecord) : Optional.empty(),
                 requestHeadersMap != null && !requestHeadersMap.isEmpty() ? Optional.of(requestHeadersMap) : Optional.empty(),
                 disableSSLVerification,
                 followRedirects,

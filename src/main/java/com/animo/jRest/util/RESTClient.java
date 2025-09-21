@@ -42,7 +42,7 @@ public final class RESTClient implements APIClient {
 
             try(HttpClient client = HttpClient.newBuilder()
                     .followRedirects((apiRequestRecord.followRedirects())? HttpClient.Redirect.ALWAYS : HttpClient.Redirect.NEVER)
-                    .proxy(apiRequestRecord.proxy().isPresent() ? ProxySelector.of(new InetSocketAddress(apiRequestRecord.proxy().get().getUrl(), apiRequestRecord.proxy().get().getPort())) : ProxySelector.getDefault())
+                    .proxy(apiRequestRecord.proxy().isPresent() ? ProxySelector.of(new InetSocketAddress(apiRequestRecord.proxy().get().url(), apiRequestRecord.proxy().get().port())) : ProxySelector.getDefault())
                     .build()) {
                 HttpResponse<String> httpResponse = client
                         .send(builder.build(), HttpResponse.BodyHandlers.ofString());

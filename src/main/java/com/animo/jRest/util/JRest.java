@@ -6,7 +6,7 @@ import com.animo.jRest.annotation.REQUEST;
 import com.animo.jRest.model.APIClientRecord;
 import com.animo.jRest.model.RequestAuthenticationRecord;
 import com.animo.jRest.model.APIRequestRecord;
-import com.animo.jRest.model.RequestProxy;
+import com.animo.jRest.model.RequestProxyRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -41,7 +41,7 @@ public final class JRest {
 		private final String baseURL;
 		private Map<String,String> queryParams;
 		private RequestAuthenticationRecord auth;
-		private RequestProxy proxy;
+		private RequestProxyRecord proxy;
 		private boolean disableSSLVerification;
 
 		public APIBuilder(final String baseURL){
@@ -90,12 +90,8 @@ public final class JRest {
 		 */
 		public APIBuilder addProxy(final String proxyURL, final String username, final String password, final int port) {
 			if(this.proxy ==null){
-				this.proxy = new RequestProxy();
+				this.proxy = new RequestProxyRecord(proxyURL,username,password,port);
 			}
-			this.proxy.setUrl(proxyURL);
-			this.proxy.setUsername(username);
-			this.proxy.setPassword(password);
-			this.proxy.setPort(port);
 			return this;
 		}
 

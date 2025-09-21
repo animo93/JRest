@@ -15,6 +15,6 @@ public record APIClientRecord(
         String baseUrl,
         Map<String, String> queryParams,
         RequestAuthenticationRecord auth,
-        RequestProxy reqProxy,
+        RequestProxyRecord reqProxy,
         boolean disableSSLVerification
 ) {}

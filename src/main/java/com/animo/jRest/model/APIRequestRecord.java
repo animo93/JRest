@@ -28,7 +28,7 @@ public record APIRequestRecord(
         String url,
         Optional<Object> requestObject,
         Optional<RequestAuthenticationRecord> authentication,
-        Optional<RequestProxy> proxy,
+        Optional<RequestProxyRecord> proxy,
         Optional<Map<String, String>> headers,
         boolean disableSSLVerification,
         boolean followRedirects,
