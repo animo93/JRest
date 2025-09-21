@@ -230,7 +230,7 @@ public final class JRest {
                         .addDisableSSLVerification(apiClientRecord.disableSSLVerification())
                         .build();
 
-                final var apiExecutor = new APIExecutorService();
+                final var apiExecutor = APIExecutorService.getInstance();
                 final var apiResponseOptional = apiExecutor.executeAPI(apiRequestRecord);
                 return apiResponseOptional.orElse(null);
 			}

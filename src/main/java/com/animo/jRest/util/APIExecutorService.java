@@ -8,16 +8,26 @@ import java.util.Optional;
 import java.util.concurrent.*;
 
 /**
- * An invocation of a APIService method that sends a request to a webserver and returns a response.
- * Each call yields its own response object
- *
- * <p>Calls may be executed synchronously with {@link #execute}, or asynchronously with {@link
- * #executeWithCallBack(APICallBack,APIRequestRecord)} and {@link #executeWithFuture(APIRequestRecord)}.
- *
+ * A singleton service class to execute API calls.
+ * <p>Calls may be executed synchronously , asynchronously or with callback.
  */
 public final class APIExecutorService {
 
+    private static volatile APIExecutorService instance;
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+
+    private APIExecutorService() {}
+
+    public static APIExecutorService getInstance() {
+        if(instance == null) {
+            synchronized (APIExecutorService.class) {
+                if(instance == null) {
+                    instance = new APIExecutorService();
+                }
+            }
+        }
+        return instance;
+    }
 
     /**
      * If the return type is of type APIResponse , execute synchronously
