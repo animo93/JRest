@@ -1,7 +1,7 @@
 package com.animo.jRest.util;
 
 import com.animo.jRest.model.APIRequestRecord;
-import com.animo.jRest.model.RequestAuthentication;
+import com.animo.jRest.model.RequestAuthenticationRecord;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.codec.binary.Base64;
@@ -129,9 +129,9 @@ public final class RESTClient implements APIClient {
 
     private void setAuthentication(final HttpRequest.Builder requestBuilder,final APIRequestRecord apiRequestRecord) {
         if(apiRequestRecord.authentication().isPresent()) {
-            final RequestAuthentication auth = apiRequestRecord.authentication().get();
-            if(auth.getUsername() != null && auth.getPassword() != null) {
-                final String userPassword = auth.getUsername() + ":" + auth.getPassword();
+            final RequestAuthenticationRecord auth = apiRequestRecord.authentication().get();
+            if(auth.username().isPresent() && auth.password().isPresent()) {
+                final String userPassword = auth.username().get() + ":" + auth.password().get();
                 final String encodedAuthorization = Base64.encodeBase64String(userPassword.getBytes());
                 requestBuilder.header("Authorization", "Basic " +
                         encodedAuthorization.replaceAll("\n", ""));

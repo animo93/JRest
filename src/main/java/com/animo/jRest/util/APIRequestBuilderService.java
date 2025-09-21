@@ -1,7 +1,7 @@
 package com.animo.jRest.util;
 
 import com.animo.jRest.annotation.*;
-import com.animo.jRest.model.RequestAuthentication;
+import com.animo.jRest.model.RequestAuthenticationRecord;
 import com.animo.jRest.model.APIRequestRecord;
 import com.animo.jRest.model.RequestProxy;
 import org.apache.logging.log4j.LogManager;
@@ -38,7 +38,7 @@ public final class APIRequestBuilderService {
     private final Type returnType;
     private Map<String, String> requestHeadersMap;
     private Object requestBody;
-    private RequestAuthentication auth;
+    private RequestAuthenticationRecord auth;
     private RequestProxy requestProxy;
     private boolean followRedirects;
     private boolean disableSSLVerification;
@@ -208,7 +208,7 @@ public final class APIRequestBuilderService {
         return this;
     }
 
-    public APIRequestBuilderService addAuthentication(final RequestAuthentication auth) {
+    public APIRequestBuilderService addAuthentication(final RequestAuthenticationRecord auth) {
         this.auth = auth;
         return this;
     }

@@ -72,7 +72,7 @@ public final class APIExecutorService {
             try {
                 return client.fetch(apiRequestRecord);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new CompletionException(e);
             }
         },executor);
     }
@@ -97,8 +97,7 @@ public final class APIExecutorService {
                 .thenAccept(callBack::callBackOnSuccess)
                 .exceptionally(e -> {
                     callBack.callBackOnFailure(e);
-                    //TODO: Check if there is alternative to returning null
-                    return null;
+                    throw new CompletionException(e);
                 });
     }
 }

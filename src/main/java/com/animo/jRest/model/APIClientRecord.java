@@ -2,10 +2,19 @@ package com.animo.jRest.model;
 
 import java.util.Map;
 
+/**
+ * Immutable record to hold APIClient configuration.<br>
+ * This is shared across multiple APIRequestRecord instances
+ * @param baseUrl
+ * @param queryParams
+ * @param auth
+ * @param reqProxy
+ * @param disableSSLVerification
+ */
 public record APIClientRecord(
         String baseUrl,
         Map<String, String> queryParams,
-        RequestAuthentication auth,
+        RequestAuthenticationRecord auth,
         RequestProxy reqProxy,
         boolean disableSSLVerification
 ) {}

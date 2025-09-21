@@ -4,7 +4,7 @@ import com.animo.jRest.annotation.FollowRedirects;
 import com.animo.jRest.annotation.HEADERS;
 import com.animo.jRest.annotation.REQUEST;
 import com.animo.jRest.model.APIClientRecord;
-import com.animo.jRest.model.RequestAuthentication;
+import com.animo.jRest.model.RequestAuthenticationRecord;
 import com.animo.jRest.model.APIRequestRecord;
 import com.animo.jRest.model.RequestProxy;
 import org.apache.logging.log4j.LogManager;
@@ -14,6 +14,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * API Service method which is used for initializing and building the initial API request.
@@ -39,7 +40,7 @@ public final class JRest {
 	public static class APIBuilder {
 		private final String baseURL;
 		private Map<String,String> queryParams;
-		private RequestAuthentication auth;
+		private RequestAuthenticationRecord auth;
 		private RequestProxy proxy;
 		private boolean disableSSLVerification;
 
@@ -71,10 +72,11 @@ public final class JRest {
 		 */
 		public APIBuilder addUsernameAndPassword(final String username,final String password) {
 			if(this.auth == null){
-				this.auth = new RequestAuthentication();
+				this.auth = new RequestAuthenticationRecord(Optional.of(username),
+                        Optional.of(password),
+                        Optional.empty(),
+                        Optional.empty());
 			}
-			this.auth.setUsername(username);
-			this.auth.setPassword(password);
 			return this;
 		}
 
