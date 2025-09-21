@@ -9,6 +9,6 @@ module jRest.test {
     requires org.junit.jupiter.api;
     requires org.mockito;
 
-    opens com.animo.jRest.test to com.google.gson;
-    exports com.animo.jRest.test to org.junit.platform.commons;
+    opens com.jrest.java to com.google.gson;
+    exports com.jrest.java to org.junit.platform.commons;
 }

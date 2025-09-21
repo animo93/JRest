@@ -6,8 +6,8 @@ module jRest {
     requires org.apache.logging.log4j;
     requires java.net.http;
 
-    opens com.animo.jRest.util to com.google.gson;
-    exports com.animo.jRest.util;
-    exports com.animo.jRest.annotation;
-    exports com.animo.jRest.model;
+    opens com.jrest.java.util to com.google.gson;
+    exports com.jrest.java.util;
+    exports com.jrest.java.annotation;
+    exports com.jrest.java.model;
 }
