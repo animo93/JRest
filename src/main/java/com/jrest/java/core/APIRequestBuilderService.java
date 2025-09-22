@@ -60,8 +60,8 @@ public final class APIRequestBuilderService {
 
     public APIRequestBuilderService addPathParameters() throws Exception {
         for(int i = 0 ; i < parameters.length ; i++) {
-            if(parameters[i].getAnnotation(PATH.class) != null) {
-                PATH path = (PATH) parameters[i].getAnnotation(PATH.class);
+            if(parameters[i].getAnnotation(Path.class) != null) {
+                Path path = (Path) parameters[i].getAnnotation(Path.class);
                 final String value = path.value();
                 final Pattern pattern = Pattern.compile("\\{" + value + "\\}");
                 final Matcher matcher = pattern.matcher(finalUrl);
@@ -139,7 +139,7 @@ public final class APIRequestBuilderService {
 
     //TODO: Needs refactoring
     public APIRequestBuilderService addHeaders(final Annotation headersAnnotation) {
-        final HEADERS headers = (HEADERS) headersAnnotation;
+        final Headers headers = (Headers) headersAnnotation;
         final String[] requestHeadersFromMethod;
         Map<String, String> requestHeadersMap = new HashMap<>();
         if(headers != null) {

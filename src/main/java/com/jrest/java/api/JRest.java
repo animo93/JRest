@@ -2,7 +2,7 @@ package com.jrest.java.api;
 
 import com.jrest.java.api.annotation.Body;
 import com.jrest.java.api.annotation.FollowRedirects;
-import com.jrest.java.api.annotation.HEADERS;
+import com.jrest.java.api.annotation.Headers;
 import com.jrest.java.api.annotation.REQUEST;
 import com.jrest.java.core.APIExecutorService;
 import com.jrest.java.core.APIRequestBuilderService;
@@ -25,10 +25,9 @@ import java.util.Optional;
  * by passing the builder method to generate an implementation.<p>
  * For example :-
  * <pre><code>
- * APIService apiService = APIService.APIBuilder
+ * TestInterface testInterface = new JRest().APIBuilder
  *			.builder("https://api.github.com/")
- *			.build();
- * MyApiInterface myApiInterface = apiService.createApi(MyApiInterface.class);
+ *			.build(TestInterface.class);
  * </code></pre>
  * 
  * @author animo
@@ -111,11 +110,67 @@ public final class JRest {
 			return this;
 		}
 
+        /**
+         * Create an implementation of the API endpoints defined by the {@code service} interface.
+         * <p>The relative path for a given method is obtained from an annotation on the method describing
+         * the request type.The built-in methods are {GET},{PUT} ,{POST},{PATCH} , {DELETE}
+         * <p>Method parameters can be used to replace parts of the URL by annotating them with {Path}. Replacement sections are denoted by an identifier surrounded by
+         * curly braces (e.g., "{foo}").
+         *
+         * <p>The body of a request is denoted by the {@link Body @Body} annotation.
+         * The body would be converted to JSON via Google GSON
+         *
+         * <p>By default, methods return a {@link APIResponse APIResponse} which represents the HTTP response. The generic
+         * parameter of the call is the response body type and will be converted by Gson
+         *
+         * <p>For example :
+         * <pre><code>
+         * public interface MyApiInterface {
+         *
+         * 	{@code @REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
+         *      APIResponse<Response> listRepos(@Path(value = "user") String user);}
+         *
+         * }</code></pre>
+         *
+         * @param interfaceClass service.class
+         * @return {@code service}
+         */
 		public <S> S build(final Class<S> interfaceClass) {
             var apiClientRecord = new APIClientRecord(baseURL, queryParams,auth,proxy,disableSSLVerification);
 			return createApi(interfaceClass,apiClientRecord);
 		}
 
+        /**
+         * Create a dynamic runtime implementation of the API endpoints defined by the {@code service} interface.
+         * <p>The {@code service} interface should extend {@code JRestDynamicAPiInterface} , if dynamic implementation is required</p>
+         * <p>This should be used to dynamically invoke any of the APIs already defined in the {@code service} interface.</p>
+         * <p>The Service interface APIs should be created as usual ,and can be invoked by providing the name and arguments </p>
+         *
+         *
+         * <p>For example : (Service Definition)
+         * <pre><code>
+         * {@code
+         * public interface TestInterface extends JRestDynamicAPiInterface{
+         *
+         *	@REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET) }
+         *	APIResponse<Response> listRepos(@PATH(value = "user") String user);}
+         *
+         *</code></pre>
+         *
+         * <p> For example : (Service Execution) </p>
+         * <pre><code>
+         * TestInterface testInterface = new JRest().APIBuilder
+         *			.builder("https://api.github.com/")
+         *			.buildDynamic(TestInterface.class,"listRepos");
+         *	APIResponse<Response> response = (APIResponse<Response>) testInterface.dynamicAPIInvocation();
+         * </code></pre>
+         *
+         * @param interfaceClass service.class
+         * @param methodName The method name which is going to be dynamically invoked
+         * @param parameterTypes The parameter types for the method going to be dynamically invoked
+         * @throws NoSuchMethodException When the method doesn't exists in service class
+         * @return {@code service}
+         */
         public <S> S buildDynamic(final Class<S> interfaceClass,final String methodName,final Class... parameterTypes) throws NoSuchMethodException {
             var apiClientRecord = new APIClientRecord(baseURL, queryParams,auth,proxy,disableSSLVerification);
             return createDynamicApi(interfaceClass,apiClientRecord,methodName,parameterTypes);
@@ -123,33 +178,6 @@ public final class JRest {
 
 	}
 
-	/**
-     * Create an implementation of the API endpoints defined by the {@code service} interface.
-     * <p>The relative path for a given method is obtained from an annotation on the method describing
-     * the request type.The built-in methods are {GET},{PUT} ,{POST},{PATCH} , {DELETE}
-     * <p>Method parameters can be used to replace parts of the URL by annotating them with {Path}. Replacement sections are denoted by an identifier surrounded by
-     * curly braces (e.g., "{foo}").
-     *
-     * <p>The body of a request is denoted by the {@link Body @Body} annotation.
-     * The body would be converted to JSON via Google GSON
-     *
-     * <p>By default, methods return a {@link APIExecutorService APIRequest} which represents the HTTP request. The generic
-     * parameter of the call is the response body type and will be converted by Jackson Object Mapper
-     *
-     * <p>For example :
-     * <pre><code>
-     * public interface MyApiInterface {
-     *
-     * 	&#64;REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
-     *    {@code APIRequest<ApiResponse> listRepos(@PATH(value = "user") String user);}
-     *
-     * }</code></pre>
-     *
-     * @param <S>              Service Class
-     * @param interfaceClass            service.class
-     * @param apiClientRecord
-     * @return {@code service}
-     */
 	@SuppressWarnings("unchecked")
 	private static <S> S createApi(final Class<S> interfaceClass, APIClientRecord apiClientRecord) {
         //TODO: Add test scenario where a random interface is passed which doesn't have any REQUEST annotation
@@ -161,43 +189,12 @@ public final class JRest {
 		return (S) object;
 	}
 
-	/**
-	 * Create a dynamic runtime implementation of the API endpoints defined by the {@code service} interface.
-	 * <p>The {@code service} interface should extend JRestDynamicAPiInterface&#60;T&#62; , if dynamic implementation is required</p>
-	 * <p>This should be used to dynamically invoke any of the APIs already defined in the {@code service} interface.</p>
-	 * <p>The Service interface APIs should be created as usual ,and can be invoked by providing the name and arguments </p>
-	 *
-	 *
-	 * <p>For example : (Service Definition)
-	 * <pre><code>
-	 * public interface MyApiInterface extends JRestDynamicAPiInterface&#60;ApiResponse&#62;{
-	 *
-	 *	&#64;REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
-	 *	{@code APIRequest<ApiResponse> listRepos(@PATH(value = "user") String user);}
-	 *  {@code APIRequest<ApiResponse> dynamicApiInvocation(Object... args);}
-	 *
-	 *}</code></pre>
-	 *
-	 * <p> For example : (Service Execution) </p>
-	 * <pre><code>
-	 *     MyApiInterface testInterface = apiService.createDynamicApi(MyApiInterface.class,"listRepos");
-	 *     {@code APIRequest<Map<String,Object> call = testInterface.dynamicAPIInvocation("testUser");}
-	 *     {@code APIResponse<Map<String,Object>> response = call.callMeNow();}
-	 * </code></pre>
-	 *
-	 * @param interfaceClass service.class
-	 * @param <S> Service Class
-	 * @param methodName The method name which is going to be dynamically invoked
-	 * @param parameterTypes The parameter types for the method going to be dynamically invoked
-	 * @throws NoSuchMethodException When the method doesn't exists in service class
-	 * @return {@code service}
-	 */
 	private static <S> S createDynamicApi(final Class<S> interfaceClass, final APIClientRecord apiClientRecord, final String methodName, Class... parameterTypes) throws NoSuchMethodException {
 
 		final ClassLoader loader = interfaceClass.getClassLoader();
 		final Class[] interfaces = new Class[]{interfaceClass};
 
-		Method methodToCall = interfaceClass.getMethod(methodName,parameterTypes);
+		final Method methodToCall = interfaceClass.getMethod(methodName,parameterTypes);
 		final Object object = Proxy.newProxyInstance(loader, interfaces,setInvocationHandler(methodToCall, apiClientRecord));
 
 		return (S) object;
@@ -213,7 +210,7 @@ public final class JRest {
 					args = (Object[]) args[0];
 				}
 				final Annotation requestAnnotation = method.getAnnotation(REQUEST.class);
-				final Annotation headersAnnotation = method.getAnnotation(HEADERS.class);
+				final Annotation headersAnnotation = method.getAnnotation(Headers.class);
 				FollowRedirects followRedirectsAnnotation = method.getAnnotation(FollowRedirects.class);
 				REQUEST request = (REQUEST) requestAnnotation;
 

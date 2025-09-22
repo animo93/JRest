@@ -1,12 +1,9 @@
 package com.jrest.java.api;
 
 /**
- * Communicates responses from a server or offline requests. One and only one method will be invoked
- * in response to a given request.
- * Callbacks are only used when opting for performing an asynchronous non blocking call
- * @author animo
+ * Callback interface for delivering parsed responses.
  *
- * @param <Response> Result type
+ * @param <Response> The type of the successful response object.
  */
 public interface APICallBack<Response> {
 	/**

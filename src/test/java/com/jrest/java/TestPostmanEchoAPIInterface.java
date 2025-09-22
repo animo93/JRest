@@ -10,25 +10,25 @@ import com.jrest.java.api.annotation.*;
 public interface TestPostmanEchoAPIInterface {
 	
 	@REQUEST(endpoint = "/get", type = HTTP_METHOD.GET)
-	@HEADERS("X-Foo:Bar")
+	@Headers("X-Foo:Bar")
     APIResponse<Map<String, Object>> getCall();
 	
 	@REQUEST(endpoint = "/get", type = HTTP_METHOD.GET)
-	@HEADERS({
+	@Headers({
 		"X-Foo:Bar",
 		"X-Ping:Pong"
 	})
     APIResponse<Map<String, Object>> getMultipleHeadersCall();
 	
 	@REQUEST(endpoint = "/get", type = HTTP_METHOD.GET)
-	@HEADERS("X-FooBar")
+	@Headers("X-FooBar")
     APIResponse<Map<String, Object>> getIncorrectHeader();
 	
 	@REQUEST(endpoint = "/get", type = HTTP_METHOD.GET)
     APIResponse<Map<String, Object>> getSingleParamHeadersCall(@HeaderMap Map<String, String> header);
 	
 	@REQUEST(endpoint = "/get", type = HTTP_METHOD.GET)
-	@HEADERS({
+	@Headers({
 		"X-Ping:Pong",
 		"X-Static:True"
 	})
@@ -77,19 +77,19 @@ public interface TestPostmanEchoAPIInterface {
     APIResponse<Map<String,Object>> singleQueryMapFailureCall(@QueryMap() int bar);
 
 	@REQUEST(endpoint = "/post",type = HTTP_METHOD.POST)
-	@HEADERS("Content-Type: application/json")
+	@Headers("Content-Type: application/json")
     APIResponse<Map<String,Object>> requestBodyObjectCall(@Body TestRequestBody requestBody);
 
 	@REQUEST(endpoint = "/post",type = HTTP_METHOD.POST)
-	@HEADERS("Content-Type: application/json")
+	@Headers("Content-Type: application/json")
     APIResponse<Map<String,Object>> requestBodyMapCall(@Body Map<String,Object> requestBody);
 
     @REQUEST(endpoint = "/get",type = HTTP_METHOD.GET)
-    @HEADERS("Content-Type: application/json")
+    @Headers("Content-Type: application/json")
     APIResponse<String> responseAsString();
 
     @REQUEST(endpoint = "/get", type = HTTP_METHOD.GET)
-    @HEADERS("X-Foo:Bar")
+    @Headers("X-Foo:Bar")
     void asyncCall(APICallBack<Map<String, Object>> callBack);
 
 }

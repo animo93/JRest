@@ -13,8 +13,10 @@ import com.jrest.java.api.HTTP_METHOD;
  * and the endpoint URL for making the connection 
  * <p>For Example :
  * <pre><code>
- * &#64;REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
- * APICall&#60;Void,ApiResponse&#62; listRepos(@PATH(value = "user") String user);
+ * {@code
+ * @REQUEST(endpoint = "/get",type=HTTP_METHOD.GET)
+ * APIResponse<Void,Map<String,Object>> getSingleParamHeadersCall(@QueryMap Map<String,String> page);
+ * }
  * </code></pre>
  * @author animo
  *

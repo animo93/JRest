@@ -10,15 +10,15 @@ import java.lang.annotation.Target;
  * Named replacement in a URL path segment. Values are converted to strings using the Parameters passed to the request Method
  * <p>For Example :
  * <pre><code>
- * &#64;REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
- * APICall&#60;Void,ApiResponse&#62; listRepos(@PATH(value = "user") String user);
+ * {@code @REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
+ *  APIResponse<Void,Map<String,Object>> listRepos(@Path(value = "user") String user);}
  * </code></pre>
- * @author animo
  *
+ * @author animo
  */
 @Documented
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PATH {
+public @interface Path {
     String value();
 }

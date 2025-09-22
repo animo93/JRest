@@ -18,6 +18,10 @@ import java.net.http.HttpResponse;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * RESTClient is an implementation of the APIClient interface that uses Java's built-in HttpClient to send HTTP requests.
+ * It supports various HTTP methods, authentication, headers, and request bodies.
+ */
 public final class RESTClient implements APIClient {
 
     private static final Logger logger = LogManager.getLogger(RESTClient.class);

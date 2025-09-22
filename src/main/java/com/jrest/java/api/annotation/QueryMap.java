@@ -16,23 +16,16 @@ import java.lang.annotation.Target;
  * <p>Simple Example:
  *
  * <pre><code>
- * &#64;GET("/friends")
- * Call&lt;ResponseBody&gt; friends(@QueryMap Map&lt;String, String&gt; filters);
+ * {@code
+ * @REQUEST(endpoint = "/get",type=HTTP_METHOD.GET)
+ * APIResponse<Void,Map<String,Object>> getSingleParamHeadersCall(@QueryMap Map<String,String> page);
+ * }
  * </code></pre>
  *
- * Calling with {@code foo.friends(ImmutableMap.of("group", "coworker", "age", "42"))} yields {@code
- * /friends?group=coworker&age=42}.
+ * Calling with {@code getSingleParamHeadersCall(ImmutableMap.of("group", "coworker", "age", "42"))} yields {@code
+ * /get?group=coworker&age=42}.
  *
  * <p>Map keys and values representing parameter values are URL encoded by default. Specify {encoded=true} to change this behavior.
- *
- * <pre><code>
- * &#64;GET("/friends")
- * Call&lt;ResponseBody&gt; friends(@QueryMap(encoded=true) Map&lt;String, String&gt; filters);
- * </code></pre>
- *
- * Calling with {@code foo.list(ImmutableMap.of("group", "coworker+bowling"))} yields {@code
- * /friends?group=coworker+bowling}.
- *
  * <p>A {@code null} value for the map, as a key, or as a value is not allowed.
  * 
  * @author animo
