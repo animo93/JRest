@@ -1,4 +1,4 @@
-package com.jrest.java;
+package com.jrest.java.e2e;
 
 import com.jrest.java.api.JRest;
 import com.jrest.java.api.APIResponse;

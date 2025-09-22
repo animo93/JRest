@@ -9,6 +9,6 @@ module jRest.test {
     requires org.junit.jupiter.api;
     requires org.mockito;
 
-    opens com.jrest.java to com.google.gson;
-    exports com.jrest.java to org.junit.platform.commons;
+    exports com.jrest.java.e2e to org.junit.platform.commons;
+    opens com.jrest.java.e2e to com.google.gson;
 }

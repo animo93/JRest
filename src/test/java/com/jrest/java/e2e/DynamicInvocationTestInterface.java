@@ -1,4 +1,4 @@
-package com.jrest.java;
+package com.jrest.java.e2e;
 
 import com.jrest.java.api.annotation.Query;
 import com.jrest.java.api.annotation.QueryMap;

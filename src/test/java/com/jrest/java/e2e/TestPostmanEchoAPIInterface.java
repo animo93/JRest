@@ -1,4 +1,4 @@
-package com.jrest.java;
+package com.jrest.java.e2e;
 
 import java.util.Map;
 import java.util.concurrent.Future;
