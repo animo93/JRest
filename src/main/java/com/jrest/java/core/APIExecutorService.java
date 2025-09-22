@@ -72,7 +72,6 @@ public final class APIExecutorService {
         },executor).get();
     }
 
-    //TODO: Add test cases
     /**
      * Asynchronous implementation of {@link APIExecutorService APIRequest} via Future.
      * @return a Future of {@link APIResponse}

@@ -8,13 +8,14 @@ import org.mockito.Mockito;
 
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
 
 import static org.mockito.ArgumentMatchers.any;
 
 public class AsyncTest {
 
     @Test
-    public void callMeLater_shouldInvokeCallBackOnSuccess() throws InterruptedException {
+    public void testCallback_shouldInvokeCallBackOnSuccess() throws InterruptedException {
         final TestPostmanEchoAPIInterface testInterface = new JRest.APIBuilder("https://postman-echo.com")
                 .build(TestPostmanEchoAPIInterface.class);
 
@@ -28,7 +29,7 @@ public class AsyncTest {
             public void callBackOnFailure(Throwable e) {
             }
         });
-        testInterface.asyncCall(callback);
+        testInterface.testCallback(callback);
 
         // To wait for the main thread to complete
         countDownLatch.await(3000, java.util.concurrent.TimeUnit.MILLISECONDS);
@@ -38,7 +39,7 @@ public class AsyncTest {
     }
 
     @Test
-    public void callMeLater_shouldInvokeCallBackOnFailure_whenExecutionFails() throws InterruptedException {
+    public void testCallback_shouldInvokeCallBackOnFailure_whenExecutionFails() throws InterruptedException {
         //Wrong url provided to simulate exception
         final TestPostmanEchoAPIInterface testInterface = new JRest.APIBuilder("https://postman-echo.com1")
                 .build(TestPostmanEchoAPIInterface.class);
@@ -54,12 +55,23 @@ public class AsyncTest {
                 countDownLatch.countDown();
             }
         });
-        testInterface.asyncCall(callback);
+        testInterface.testCallback(callback);
 
         // To wait for the main thread to complete
         countDownLatch.await(3000, java.util.concurrent.TimeUnit.MILLISECONDS);
 
         Mockito.verify(callback,Mockito.never()).callBackOnSuccess(any());
         Mockito.verify(callback).callBackOnFailure(any());
+    }
+
+    @Test
+    public void testFuture_shouldReturnFuture() throws Exception {
+        final TestPostmanEchoAPIInterface testInterface = new JRest.APIBuilder("https://postman-echo.com")
+                .build(TestPostmanEchoAPIInterface.class);
+        Future<APIResponse<Map<String, Object>>> future = testInterface.testFuture();
+        APIResponse<Map<String, Object>> response = future.get();
+
+        assert(response != null);
+        assert(response.responseCode() == 200);
     }
 }

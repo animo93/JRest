@@ -1,6 +1,7 @@
 package com.jrest.java;
 
 import java.util.Map;
+import java.util.concurrent.Future;
 
 import com.jrest.java.api.APICallBack;
 import com.jrest.java.api.APIResponse;
@@ -90,6 +91,10 @@ public interface TestPostmanEchoAPIInterface {
 
     @REQUEST(endpoint = "/get", type = HTTP_METHOD.GET)
     @Headers("X-Foo:Bar")
-    void asyncCall(APICallBack<Map<String, Object>> callBack);
+    void testCallback(APICallBack<Map<String, Object>> callBack);
+
+    @REQUEST(endpoint = "/get", type = HTTP_METHOD.GET)
+    @Headers("X-Foo:Bar")
+    Future<APIResponse<Map<String,Object>>> testFuture();
 
 }
