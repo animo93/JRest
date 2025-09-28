@@ -9,10 +9,10 @@ import java.lang.annotation.Target;
 /**
  * Named replacement in a URL path segment. Values are converted to strings using the Parameters passed to the request Method
  * <p>For Example :
- * <pre><code>
+ * <pre>
  * {@code @REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
- *  APIResponse<Void,Map<String,Object>> listRepos(@Path(value = "user") String user);}
- * </code></pre>
+ * APIResponse<Void,Map<String,Object>> listRepos(@Path(value = "user") String user);}
+ * </pre>
  *
  * @author animo
  */

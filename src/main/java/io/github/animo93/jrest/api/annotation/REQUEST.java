@@ -12,12 +12,12 @@ import io.github.animo93.jrest.api.HTTP_METHOD;
  * Use this mandatory annotation to specify the HTTP Method type 
  * and the endpoint URL for making the connection 
  * <p>For Example :
- * <pre><code>
+ * <pre>
  * {@code
  * @REQUEST(endpoint = "/get",type=HTTP_METHOD.GET)
  * APIResponse<Void,Map<String,Object>> getSingleParamHeadersCall(@QueryMap Map<String,String> page);
  * }
- * </code></pre>
+ * </pre>
  * @author animo
  *
  */

@@ -15,12 +15,12 @@ import java.lang.annotation.Target;
  *
  * <p>Simple Example:
  *
- * <pre><code>
+ * <pre>
  * {@code
  * @REQUEST(endpoint = "/get",type=HTTP_METHOD.GET)
  * APIResponse<Void,Map<String,Object>> getSingleParamHeadersCall(@Query("page") int page);
  * }
- * </code></pre>
+ * </pre>
  *
  * Calling with {@code getSingleParamHeadersCall(1)} yields {@code /get?page=1}.
  * <br>
@@ -29,12 +29,12 @@ import java.lang.annotation.Target;
  * <p>Parameter names and values are URL encoded by default. Specify {@link #encoded() encoded=true}
  * to change this behavior.
  *
- * <pre><code>
+ * <pre>
  * {@code
  * @REQUEST(endpoint = "/get",type=HTTP_METHOD.GET)
  * APIResponse<Void,Map<String,Object>> getSingleParamHeadersCall(@Query(value="group", encoded=true) String group);
  * }
- * </code></pre>
+ * </pre>
  *
  * Calling with {@code getSingleParamHeadersCall("foo+bar"))} yields {@code /get?group=foo+bar}.
  * @author animo

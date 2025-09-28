@@ -2,6 +2,12 @@ package io.github.animo93.jrest.api;
 
 import io.github.animo93.jrest.core.APIExecutorService;
 
+/**
+ * This is the interface which should be implemented in any JREST API interface
+ * to enable dynamic API invocation
+ * @author animo
+ *
+ */
 public interface JRestDynamicAPiInterface {
 
     /**

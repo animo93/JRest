@@ -1,3 +1,9 @@
+/**
+ * jRest - A simple and lightweight Java REST client library.
+ * <p>
+ * Provides an easy-to-use API for making HTTP requests and handling responses.
+ * </p>
+ */
 module jRest {
     requires com.google.gson;
     requires com.fasterxml.jackson.databind;

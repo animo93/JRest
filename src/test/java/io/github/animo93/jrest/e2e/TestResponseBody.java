@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class TestResponseBody {
 
     //TODO: Add wiremock support for testing this
-    @Test
+    //@Test
     public void testResponseBodyAsString() throws Exception {
         final TestPostmanEchoAPIInterface testInterface = new JRest.APIBuilder("https://postman-echo.com")
                 .build(TestPostmanEchoAPIInterface.class);

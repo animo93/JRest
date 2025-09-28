@@ -39,6 +39,10 @@ public final class JRest {
     //TODO: Rename to APIClientBuilder
     //TODO: Check what would happen if two threads are trying to execute
     //TODO: Test what would happen if two separate JRest instances are created for the same interface
+
+    /**
+     * Create a new instance of the APIBuilder with the provided baseURL
+     */
 	public static class APIBuilder {
 		private final String baseURL;
 		private Map<String,String> queryParams;
@@ -46,10 +50,20 @@ public final class JRest {
 		private RequestProxyRecord proxy;
 		private boolean disableSSLVerification;
 
+        /**
+         * Constructor for the APIBuilder class
+         * @param baseURL String used for the base URL of the API
+         */
 		public APIBuilder(final String baseURL){
 			this.baseURL = baseURL;
 		}
 
+        /**
+         * Add a single query parameter to the API request
+         * @param key String used for the key of the query parameter
+         * @param value String used for the value of the query parameter
+         * @return APIBuilder object with adjusted fields
+         */
 		public APIBuilder addQueryParameter(final String key, final String value){
 			if(queryParams ==null){
 				queryParams = new HashMap<>();
@@ -58,6 +72,11 @@ public final class JRest {
 			return this;
 		}
 
+        /**
+         * Add multiple query parameters to the API request
+         * @param params Map of String key and String value used for the query parameters
+         * @return APIBuilder object with adjusted fields
+         */
 		public APIBuilder addQueryMap(final Map<String,String> params) {
 			if(this.queryParams == null){
 				this.queryParams = new HashMap<>();
@@ -124,15 +143,17 @@ public final class JRest {
          * parameter of the call is the response body type and will be converted by Gson
          *
          * <p>For example :
-         * <pre><code>
+         * <pre>{@code
          * public interface MyApiInterface {
          *
-         * 	{@code @REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
-         *      APIResponse<Response> listRepos(@Path(value = "user") String user);}
+         * 	 @REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET)
+         *      APIResponse<Response> listRepos(@Path(value = "user") String user);
+         * }
          *
-         * }</code></pre>
+         * }</pre>
          *
          * @param interfaceClass service.class
+         * @param <S> The type of the service interface
          * @return {@code service}
          */
 		public <S> S build(final Class<S> interfaceClass) {
@@ -148,26 +169,27 @@ public final class JRest {
          *
          *
          * <p>For example : (Service Definition)
-         * <pre><code>
+         * <pre>
          * {@code
          * public interface TestInterface extends JRestDynamicAPiInterface{
          *
          *	@REQUEST(endpoint = "/users/{user}/repos",type = HTTP_METHOD.GET) }
          *	APIResponse<Response> listRepos(@PATH(value = "user") String user);}
          *
-         *</code></pre>
+         *</pre>
          *
          * <p> For example : (Service Execution) </p>
-         * <pre><code>
+         * <pre>{@code
          * TestInterface testInterface = new JRest().APIBuilder
          *			.builder("https://api.github.com/")
          *			.buildDynamic(TestInterface.class,"listRepos");
          *	APIResponse<Response> response = (APIResponse<Response>) testInterface.dynamicAPIInvocation();
-         * </code></pre>
+         * }</pre>
          *
          * @param interfaceClass service.class
          * @param methodName The method name which is going to be dynamically invoked
          * @param parameterTypes The parameter types for the method going to be dynamically invoked
+         * @param <S> The type of the service interface
          * @throws NoSuchMethodException When the method doesn't exists in service class
          * @return {@code service}
          */

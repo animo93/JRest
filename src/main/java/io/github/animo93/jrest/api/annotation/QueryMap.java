@@ -14,14 +14,12 @@ import java.lang.annotation.Target;
  * {@link Object#toString()}, if no matching string converter is installed).
  *
  * <p>Simple Example:
- *
- * <pre><code>
+ * <pre>
  * {@code
  * @REQUEST(endpoint = "/get",type=HTTP_METHOD.GET)
  * APIResponse<Void,Map<String,Object>> getSingleParamHeadersCall(@QueryMap Map<String,String> page);
  * }
- * </code></pre>
- *
+ * </pre>
  * Calling with {@code getSingleParamHeadersCall(ImmutableMap.of("group", "coworker", "age", "42"))} yields {@code
  * /get?group=coworker&age=42}.
  *
