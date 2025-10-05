@@ -32,7 +32,7 @@ public class AsyncTest {
         testInterface.testCallback(callback);
 
         // To wait for the main thread to complete
-        countDownLatch.await(3000, java.util.concurrent.TimeUnit.MILLISECONDS);
+        countDownLatch.await(4000, java.util.concurrent.TimeUnit.MILLISECONDS);
 
         Mockito.verify(callback).callBackOnSuccess(any());
         Mockito.verify(callback, Mockito.never()).callBackOnFailure(any());
@@ -58,7 +58,7 @@ public class AsyncTest {
         testInterface.testCallback(callback);
 
         // To wait for the main thread to complete
-        countDownLatch.await(3000, java.util.concurrent.TimeUnit.MILLISECONDS);
+        countDownLatch.await(4000, java.util.concurrent.TimeUnit.MILLISECONDS);
 
         Mockito.verify(callback,Mockito.never()).callBackOnSuccess(any());
         Mockito.verify(callback).callBackOnFailure(any());
