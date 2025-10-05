@@ -3,6 +3,17 @@ A Declarative Java Rest Client developed on the lines of Spring Feign Client
 
 For more information please visit [the website][1].
 
+## How to use
+This library is available on Maven Central Repository. You can add the following dependency to your `pom.xml` file.
+### Maven Dependency
+```xml
+<dependency>
+    <groupId>io.github.animo93</groupId>
+    <artifactId>jrest</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
 License
 =======
 
