@@ -47,7 +47,7 @@
         <org.google.code.gson.version>2.13.1</org.google.code.gson.version>
         <org.junit.jupiter.version>6.0.0-RC1</org.junit.jupiter.version>
         <org.mockito.version>5.19.0</org.mockito.version>
-        <org.apache.logging.log4j.version>2.25.3</org.apache.logging.log4j.version>
+        <org.apache.logging.log4j.version>2.25.4</org.apache.logging.log4j.version>
         <org.jacoco.version>0.8.13</org.jacoco.version>
         <commons-codec.version>1.19.0</commons-codec.version>
         <com.fasterxml.jackson.version>2.20.0-rc1</com.fasterxml.jackson.version>
