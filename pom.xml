@@ -50,7 +50,7 @@
         <org.apache.logging.log4j.version>2.25.4</org.apache.logging.log4j.version>
         <org.jacoco.version>0.8.13</org.jacoco.version>
         <commons-codec.version>1.19.0</commons-codec.version>
-        <com.fasterxml.jackson.version>2.20.0-rc1</com.fasterxml.jackson.version>
+        <com.fasterxml.jackson.version>2.22.0</com.fasterxml.jackson.version>
 	</properties>
 
 
